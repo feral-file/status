@@ -245,6 +245,15 @@ def render(bucket3, census, updates, generated_at):
     depends on Feral File&rsquo;s own servers. The fewer links that need us,
     the more permanent the work &mdash; and that is what this page watches:
     how many works still need us, and for which links.</p>
+    <p>One honest limit is worth stating, because it is widely
+    misunderstood: putting a file on IPFS does not copy it anywhere. A work
+    stays available only while someone, somewhere, keeps a copy. What
+    content addressing adds is that every copy is equal and verifiable
+    &mdash; a copy on a collector&rsquo;s computer counts exactly as much as
+    one on ours, and none can be altered without detection. So when this
+    page publishes a work&rsquo;s content address, keeping that work alive
+    becomes something any collector, museum, or archive can do with one
+    command, without asking our permission. That is the invitation.</p>
   </section>
 
   <section class="tiles" aria-label="Summary">
@@ -355,6 +364,15 @@ anything stored on chain. Content-addressed files can be kept by anyone who
 cares to pin them. Whatever remains depends on Feral File's own servers. The
 fewer links that need us, the more permanent the work. This page watches how
 many works still need us, and for which links.
+
+One honest limit, because it is widely misunderstood: putting a file on IPFS
+does not copy it anywhere. A work stays available only while someone,
+somewhere, keeps a copy. What content addressing adds is that every copy is
+equal and verifiable — a collector's copy counts exactly as much as ours,
+and none can be altered without detection. When this page publishes a work's
+content address, keeping that work alive becomes something any collector,
+museum, or archive can do with one command, without asking our permission.
+That is the invitation.
 
 ## Works, by what their survival depends on
 
