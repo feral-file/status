@@ -1,6 +1,11 @@
 [
   {
     "date": "2026-08-03",
+    "title": "First full census of Ethereum and Tezos works",
+    "body": "Every file of every edition — 35,008 works, 106,392 files — was fetched through the public gateways wallets and browsers use. 17,563 works have all media content-addressed and resolving on ipfs.io. 184 works have content-addressed media that currently fails on a public gateway. 17,261 works' media lives only on our CDN; they join the Bitmark-era works on the remediation path. These checks measure the artwork files; the metadata link and rendering are not yet measured."
+  },
+  {
+    "date": "2026-08-03",
     "title": "Works that depend entirely on us, enumerated",
     "body": "Published the complete list of works whose only copy sits behind Feral File's own servers: 4,959 works across 215 series in 17 exhibitions, all minted on the Bitmark blockchain before Feral File moved to Ethereum and Tezos. Every series' media was checked and currently resolves. Remediation — a content-addressed copy for every work, so each resolves independently of us — is targeted within 2 to 3 months. The full census of Ethereum and Tezos works is running and publishes here when it completes."
   }

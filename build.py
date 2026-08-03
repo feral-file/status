@@ -2,12 +2,13 @@
 """Build status.feralfile.com from the data/ directory.
 
 Inputs (data/):
-  bitmark_exhibitions_<date>.json   per-exhibition migration totals (bucket 3)
+  bitmark_exhibitions_<date>.json   per-exhibition migration totals (Bitmark era)
   bitmark_chain_enumeration_<date>.csv   per-work list, works still on Bitmark
   bitmark_series_media_<date>.csv   per-series CDN probe results
+  exhibitions_<date>.json           all published exhibitions (title, slug,
+                                    start date) from the public API
   census/token_census_*.csv         token-health-monitor census output
-                                    (buckets 1 and 2; optional until the first
-                                    census completes)
+                                    (ETH+Tezos, every edition, every file)
   updates.json                      dated changelog entries -> page + RSS
 
 Outputs (public/): index.html, status.md, llms.txt, feed.xml, robots.txt,
@@ -19,10 +20,10 @@ the template by hand.
 Framing (decided 2026-08-03): the page is "Feral File Status" — every
 published work, and whether it still works. A published work is a chain of
 references (token -> contract -> metadata -> files -> runtime); the tiles
-measure what each work's survival depends on. "Resolves" (fetchable from
-public infrastructure) is measured now; "plays" (renders correctly) is out of
-scope until the #3485 probe exists — the page says so plainly and promises
-nothing.
+measure what each work's survival depends on, AT THE MEDIA LAYER. The census
+fetches metadata through Feral File's own API, so it verifies the artwork
+files, not the on-chain tokenURI link — the method section says so plainly.
+"Plays" (renders correctly) stays out of scope until the #3485 probe exists.
 """
 
 import csv
@@ -30,7 +31,7 @@ import glob
 import html
 import json
 import shutil
-from collections import Counter
+from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from email.utils import format_datetime
 from pathlib import Path
@@ -44,6 +45,13 @@ SITE_URL = "https://status.feralfile.com"
 def latest(pattern):
     matches = sorted(DATA.glob(pattern))
     return matches[-1] if matches else None
+
+
+def load_exhibitions():
+    path = latest("exhibitions_*.json")
+    exs = json.loads(path.read_text())
+    exs.sort(key=lambda e: e.get("exhibitionStartAt") or "")
+    return {"file": path.name, "list": exs}
 
 
 def load_bucket3():
@@ -79,48 +87,57 @@ def load_bucket3():
             "total": len(series),
         },
         "media_mix": dict(Counter(s["medium"] for s in series)),
+        "by_slug": {
+            e["slug"]: e["still_bitmark"] + e["swap_initiated"]
+            for e in doc["exhibitions"]
+        },
         "files": [ex_path.name, work_path.name, series_path.name],
     }
 
 
 def load_census():
-    """Buckets 1 and 2 from the token-health-monitor census CSV, if present.
+    """Media-layer rollup of the token-health-monitor census, if present.
 
-    Roll up per-resource rows to per-work state:
-      independent   every CID resource resolves on ipfs.io
-      gateway_gap   has CID resources, but at least one fails on ipfs.io
-      dependent     no CID resources at all (cdn / other hosting only)
+    The census fetches metadata via Feral File's API, so metadata rows say
+    nothing about on-chain tokenURI hosting — they are EXCLUDED here. A work
+    is classified by its media resources only:
+      independent   has content-addressed media, all of it resolving on ipfs.io
+      gateway_gap   has content-addressed media, at least one file failing
+      dependent     no content-addressed media at all (CDN/other hosting only)
     """
-    path = None
     candidates = sorted(glob.glob(str(DATA / "census" / "token_census_*.csv")))
-    if candidates:
-        path = Path(candidates[-1])
-    if path is None:
+    if not candidates:
         return None
+    path = Path(candidates[-1])
 
     per_work = {}
     for r in csv.DictReader(open(path)):
+        if r["resource"] == "metadata":
+            continue
         key = (r["chain"], r["contract"], r["token_id"])
-        st = per_work.setdefault(key, {"cid": 0, "cid_fail": 0, "resources": 0})
-        st["resources"] += 1
+        st = per_work.setdefault(key, {"cid": 0, "fail": 0, "ex": r["exhibition"]})
         if r["cid"]:
             st["cid"] += 1
             if r.get("ipfs_io_ok", "") != "ok":
-                st["cid_fail"] += 1
+                st["fail"] += 1
 
     buckets = Counter()
+    per_ex = defaultdict(Counter)
     for st in per_work.values():
-        if st["cid"] == 0:
-            buckets["dependent"] += 1
-        elif st["cid_fail"]:
-            buckets["gateway_gap"] += 1
-        else:
-            buckets["independent"] += 1
+        state = (
+            "dependent"
+            if st["cid"] == 0
+            else ("gateway_gap" if st["fail"] else "independent")
+        )
+        buckets[state] += 1
+        per_ex[st["ex"]][state] += 1
+        per_ex[st["ex"]]["works"] += 1
     return {
         "file": path.name,
         "date": path.name.replace("token_census_", "").split("T")[0],
         "works": len(per_work),
         "buckets": dict(buckets),
+        "per_exhibition": {k: dict(v) for k, v in per_ex.items()},
     }
 
 
@@ -141,19 +158,47 @@ def tile(number, label, note):
       </div>"""
 
 
-def render(bucket3, census, updates, generated_at):
+def catalog_rows(exhibitions, census, bucket3):
+    rows = []
+    for e in exhibitions["list"]:
+        c = census["per_exhibition"].get(e["id"], {}) if census else {}
+        bm = bucket3["by_slug"].get(e["slug"], 0)
+        works = c.get("works", 0) + bm
+        rows.append(
+            {
+                "slug": e["slug"],
+                "title": e["title"],
+                "start": (e.get("exhibitionStartAt") or "")[:10],
+                "works": works,
+                "independent": c.get("independent", 0),
+                "gateway_gap": c.get("gateway_gap", 0),
+                "dependent": c.get("dependent", 0) + bm,
+            }
+        )
+    return rows
+
+
+def render(bucket3, census, exhibitions, updates, generated_at):
+    dep_total = bucket3["works_on_bitmark"] + (
+        census["buckets"].get("dependent", 0) if census else 0
+    )
     if census:
         b = census["buckets"]
         tile1 = tile(
             n(b.get("independent", 0)),
             "works that resolve without Feral File",
-            f"Every content-addressed file verified on ipfs.io, {esc(census['date'])}.",
+            f"Every content-addressed media file verified on ipfs.io, {esc(census['date'])}.",
         )
         tile2 = tile(
             n(b.get("gateway_gap", 0)),
             "works that should resolve without us, but currently fail",
-            "Content-addressed, but at least one file did not resolve on "
-            "ipfs.io. Being re-pinned.",
+            "Media is content-addressed, but at least one file did not "
+            "resolve on ipfs.io when checked.",
+        )
+        tile3_note = (
+            f"{n(bucket3['works_on_bitmark'])} Bitmark-era works plus "
+            f"{n(b.get('dependent', 0))} works on Ethereum and Tezos whose "
+            "media lives only on our CDN. Details and remediation below."
         )
         census_note = ""
     else:
@@ -168,6 +213,10 @@ def render(bucket3, census, updates, generated_at):
             "A June 5 audit found 17 of 49 Ethereum exhibitions whose metadata "
             "did not resolve on ipfs.io. The census re-checks every work.",
         )
+        tile3_note = (
+            f"Bitmark-era works, enumerated {esc(bucket3['as_of'])}. "
+            "Details and remediation below."
+        )
         census_note = (
             '<p class="dated">The Ethereum and Tezos census started '
             "August 3, 2026 and probes every file of every edition through the "
@@ -177,11 +226,39 @@ def render(bucket3, census, updates, generated_at):
         )
 
     tile3 = tile(
-        n(bucket3["works_on_bitmark"]),
+        n(dep_total) if census else n(bucket3["works_on_bitmark"]),
         "works that depend entirely on Feral File",
-        f"Bitmark-era works, enumerated {esc(bucket3['as_of'])}. "
-        "Details and remediation below.",
+        tile3_note,
     )
+
+    catalog_html = ""
+    if census:
+        cat_rows = "\n".join(
+            f"""        <tr>
+          <td><span class="dated">{esc(r["start"])}</span> <a href="https://feralfile.com/exhibitions/{esc(r["slug"])}">{esc(r["title"])}</a></td>
+          <td class="num">{n(r["works"])}</td>
+          <td class="num">{n(r["independent"])}</td>
+          <td class="num">{n(r["gateway_gap"])}</td>
+          <td class="num">{n(r["dependent"])}</td>
+        </tr>"""
+            for r in catalog_rows(exhibitions, census, bucket3)
+        )
+        catalog_html = f"""
+  <section id="catalog">
+    <h2>Every exhibition</h2>
+    <p>The whole catalog, oldest first: every published exhibition, how many
+    works it holds, and what each work&rsquo;s media depends on today. The
+    same three states as the tiles above.</p>
+    <table>
+      <thead>
+        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Resolve without us</th><th class="num">Failing gateways</th><th class="num">Depend on us</th></tr>
+      </thead>
+      <tbody>
+{cat_rows}
+      </tbody>
+    </table>
+  </section>
+"""
 
     ex_rows = "\n".join(
         f"""        <tr>
@@ -205,8 +282,20 @@ def render(bucket3, census, updates, generated_at):
     probe = bucket3["series_probe"]
     data_files = "".join(
         f'<li><a href="data/{esc(f)}">{esc(f)}</a></li>'
-        for f in bucket3["files"] + (["census/" + census["file"]] if census else [])
+        for f in bucket3["files"]
+        + ([exhibitions["file"]])
+        + (["census/" + census["file"]] if census else [])
     )
+
+    eth_dep_para = ""
+    if census:
+        eth_dep_para = f"""
+    <p>The census also surfaced a larger set: {n(census["buckets"].get("dependent", 0))}
+    works on Ethereum and Tezos &mdash; discovered {esc(census["date"])} &mdash;
+    whose media likewise lives only on our CDN. Works migrated from Bitmark
+    share their series&rsquo; files with the copies being pinned now; the
+    rest follow the same path: content-addressed copy, byte-verified,
+    published here.</p>"""
 
     return f"""<!doctype html>
 <html lang="en">
@@ -236,9 +325,9 @@ def render(bucket3, census, updates, generated_at):
     <p>A work published on Feral File is not a file in one place. It is a
     chain of references: a token on a blockchain points to a smart contract,
     the contract points to metadata, the metadata points to the files of the
-    artwork, and those files run in a browser or on an Art Computer. Some works also
-    read data from their contract while they run. A work is alive when every
-    link in that chain answers.</p>
+    artwork, and those files run in a browser or on an Art Computer. Some
+    works also read data from their contract while they run. A work is alive
+    when every link in that chain answers.</p>
     <p>Each link has a keeper. The blockchain keeps the token, the contract,
     and anything stored on chain. Content-addressed files can be kept by
     anyone who cares to pin them, including collectors. Whatever remains
@@ -260,9 +349,9 @@ def render(bucket3, census, updates, generated_at):
 {tile1}{tile2}{tile3}
   </section>
   {census_note}
-
+{catalog_html}
   <section id="bitmark">
-    <h2>Works that depend entirely on us ({n(bucket3["works_on_bitmark"])})</h2>
+    <h2>Works that depend entirely on us</h2>
     <p>Feral File&rsquo;s first {len(bucket3["exhibitions"])} exhibitions were
     minted on the Bitmark blockchain, which we built in 2014 and retired in
     2025. The chain itself was preserved as a verifiable archive &mdash; its
@@ -279,7 +368,7 @@ def render(bucket3, census, updates, generated_at):
     media copy on our content delivery network (cdn.feralfileassets.com).
     Those files were last verified reachable on {esc(probe["date"])}:
     {n(probe["resolving"])} of {n(probe["total"])} series resolved (one probe
-    per series; editions of a series share files).</p>
+    per series; editions of a series share files).</p>{eth_dep_para}
     <p>A single copy behind our servers is not what we promise. Remediation
     is in progress and targeted within 2&ndash;3 months: every work gets a
     content-addressed copy that resolves independently of our infrastructure,
@@ -298,17 +387,20 @@ def render(bucket3, census, updates, generated_at):
     <h2>What we check, and what we don&rsquo;t yet</h2>
     <p>Two different promises hide inside &ldquo;it still works.&rdquo; A work
     <strong>resolves</strong> when every reference in its chain can be fetched
-    from public infrastructure. That is what this page measures: checks follow
-    the token&rsquo;s metadata to its files and request each one over the
-    public gateways wallets and browsers use, with ordinary headers and
-    redirects. A file counts as resolving only when a public gateway serves it
-    &mdash; our own infrastructure answering is not enough.</p>
-    <p>A work <strong>plays</strong> when what resolves also renders the way
-    the artist intended. This page does not yet measure playing. What is
-    stored on chain is not probed either: it survives with the chain itself.
-    Bitmark-era works are enumerated from the public Feral File API by each
-    work&rsquo;s on-chain location. This page is regenerated from the raw data
-    on every update; no number on it is typed by hand.</p>
+    from public infrastructure. These checks currently measure the
+    <strong>artwork files</strong>: every file of every edition is requested
+    over the public gateways wallets and browsers use (ipfs.io, dweb.link,
+    ipfs.feralfile.com), with ordinary headers and redirects. A file counts as
+    resolving only when a public gateway serves it &mdash; our own
+    infrastructure answering is not enough.</p>
+    <p>Not yet measured: the <strong>metadata link</strong> &mdash; whether
+    each token&rsquo;s on-chain reference is itself content-addressed &mdash;
+    and whether a work <strong>plays</strong>, meaning what resolves also
+    renders the way the artist intended. What is stored on chain is not
+    probed: it survives with the chain itself. Bitmark-era works are
+    enumerated from the public Feral File API by each work&rsquo;s on-chain
+    location. This page is regenerated from the raw data on every update; no
+    number on it is typed by hand.</p>
   </section>
 
   <section id="data">
@@ -337,15 +429,34 @@ def render(bucket3, census, updates, generated_at):
 """
 
 
-def build_markdown(bucket3, census, updates, generated_at):
+def build_markdown(bucket3, census, exhibitions, updates, generated_at):
     """The whole page as plain Markdown — the cheap read for a model."""
+    probe = bucket3["series_probe"]
     if census:
         b = census["buckets"]
-        b1 = f"{b.get('independent', 0):,} works (every content-addressed file verified on ipfs.io, {census['date']})"
-        b2 = f"{b.get('gateway_gap', 0):,} works (at least one file failing on ipfs.io)"
+        b1 = f"{b.get('independent', 0):,} works (every content-addressed media file verified on ipfs.io, {census['date']})"
+        b2 = f"{b.get('gateway_gap', 0):,} works (at least one media file failing on ipfs.io)"
+        b3_extra = (
+            f" Plus {b.get('dependent', 0):,} works on Ethereum and Tezos whose "
+            f"media likewise lives only on our CDN (discovered {census['date']}); "
+            "they follow the same remediation path."
+        )
+        catalog_md = "\n".join(
+            f"| {r['start']} | {r['title']} | {r['works']:,} | {r['independent']:,} "
+            f"| {r['gateway_gap']:,} | {r['dependent']:,} |"
+            for r in catalog_rows(exhibitions, census, bucket3)
+        )
+        catalog_section = f"""
+## Every exhibition (oldest first)
+
+| Started | Exhibition | Works | Resolve without us | Failing gateways | Depend on us |
+|---|---|---:|---:|---:|---:|
+{catalog_md}
+"""
     else:
         b1 = b2 = "census in progress (started 2026-08-03; publishes here on completion)"
-    probe = bucket3["series_probe"]
+        b3_extra = ""
+        catalog_section = ""
     rows = "\n".join(
         f"| {e['title']} | {e['works']:,} | {e['still_bitmark'] + e['swap_initiated']:,} "
         f"| {e['migrated_ethereum']:,} | {e['migrated_tezos']:,} |"
@@ -364,8 +475,8 @@ Machine-readable summary: {SITE_URL}/data/status.json
 A work published on Feral File is a chain of references: a token on a
 blockchain points to a smart contract, the contract points to metadata, the
 metadata points to the files of the artwork, and those files run in a browser
-or on an Art Computer. Some works also read data from their contract while they run. A
-work is alive when every link in that chain answers.
+or on an Art Computer. Some works also read data from their contract while
+they run. A work is alive when every link in that chain answers.
 
 Each link has a keeper. The blockchain keeps the token, the contract, and
 anything stored on chain. Content-addressed files can be kept by anyone who
@@ -382,22 +493,22 @@ content address, keeping that work alive becomes something any collector,
 museum, or archive can do with one command, without asking our permission.
 That is the invitation.
 
-## Works, by what their survival depends on
+## Works, by what their media depends on
 
 1. Resolve without Feral File: {b1}
 2. Should resolve without us, but currently fail on public gateways: {b2}
-3. Depend entirely on Feral File (media layer): {bucket3["works_on_bitmark"]:,} works
-   across {bucket3["series_count"]:,} series in {bucket3["exhibitions_affected"]}
-   exhibitions (as of {bucket3["as_of"]}), sole media copy on
-   cdn.feralfileassets.com. Their ownership records are already safe: the
-   Bitmark blockchain (retired 2025) was preserved as a verifiable archive —
-   data on IPFS, Merkle root on Ethereum, timestamp on Bitcoin
-   (https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive).
-   Last probe {probe["date"]}: {probe["resolving"]:,} of {probe["total"]:,}
-   series resolved (one probe per series; editions share files). Remediation
-   targeted within 2-3 months: a content-addressed copy per work, or a dated
-   exception with an owner.
-
+3. Depend entirely on Feral File: {bucket3["works_on_bitmark"]:,} Bitmark-era
+   works across {bucket3["series_count"]:,} series in
+   {bucket3["exhibitions_affected"]} exhibitions (as of {bucket3["as_of"]}),
+   sole media copy on cdn.feralfileassets.com. Their ownership records are
+   already safe: the Bitmark blockchain (retired 2025) was preserved as a
+   verifiable archive — data on IPFS, Merkle root on Ethereum, timestamp on
+   Bitcoin (https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive).{b3_extra}
+   Last CDN probe {probe["date"]}: {probe["resolving"]:,} of
+   {probe["total"]:,} series resolved (one probe per series; editions share
+   files). Remediation targeted within 2-3 months: a content-addressed copy
+   per work, or a dated exception with an owner.
+{catalog_section}
 ## Bitmark-era exhibitions
 
 | Exhibition | Works | Not yet migrated | On Ethereum | On Tezos |
@@ -407,16 +518,16 @@ That is the invitation.
 ## What we check, and what we don't yet
 
 A work RESOLVES when every reference in its chain can be fetched from public
-infrastructure. That is what this page measures: checks follow the token's
-metadata to its files and request each one over the public gateways wallets
-and browsers use. A file counts as resolving only when a public gateway
-serves it — our own infrastructure answering is not enough.
+infrastructure. These checks currently measure the ARTWORK FILES: every file
+of every edition is requested over the public gateways wallets and browsers
+use. A file counts as resolving only when a public gateway serves it — our
+own infrastructure answering is not enough.
 
-A work PLAYS when what resolves also renders the way the artist intended.
-This page does not yet measure playing. On-chain data is not probed: it
-survives with the chain itself. Bitmark-era works are enumerated from the
-public Feral File API by each work's on-chain location. The page is
-regenerated from the raw data on every update.
+Not yet measured: the METADATA LINK (whether each token's on-chain reference
+is itself content-addressed), and whether a work PLAYS (what resolves also
+renders as the artist intended). On-chain data is not probed: it survives
+with the chain itself. The page is regenerated from the raw data on every
+update.
 
 ## Data
 
@@ -504,6 +615,7 @@ def build_feed(updates, generated_at_dt):
 def main():
     bucket3 = load_bucket3()
     census = load_census()
+    exhibitions = load_exhibitions()
     updates = sorted(
         json.loads((DATA / "updates.json").read_text()),
         key=lambda u: u["date"],
@@ -520,16 +632,19 @@ def main():
     (PUBLIC / "data").mkdir(parents=True)
     shutil.copytree(ROOT / "static", PUBLIC / "static")
 
-    for f in bucket3["files"]:
+    for f in bucket3["files"] + [exhibitions["file"]]:
         shutil.copy(DATA / f, PUBLIC / "data" / f)
     if census:
         (PUBLIC / "data" / "census").mkdir()
         shutil.copy(DATA / "census" / census["file"], PUBLIC / "data" / "census")
 
+    dep_total = bucket3["works_on_bitmark"] + (
+        census["buckets"].get("dependent", 0) if census else 0
+    )
     status = {
         "generated_at": now.isoformat(timespec="seconds"),
         "site": SITE_URL,
-        "works_by_dependency": {
+        "works_by_media_dependency": {
             "resolve_without_feralfile": (
                 {"works": census["buckets"].get("independent", 0), "as_of": census["date"]}
                 if census
@@ -541,28 +656,48 @@ def main():
                 else {"status": "census_in_progress", "started": "2026-08-03"}
             ),
             "depend_entirely_on_feralfile": {
-                "works": bucket3["works_on_bitmark"],
-                "series": bucket3["series_count"],
-                "exhibitions": bucket3["exhibitions_affected"],
-                "as_of": bucket3["as_of"],
+                "works": dep_total,
+                "bitmark_era": {
+                    "works": bucket3["works_on_bitmark"],
+                    "series": bucket3["series_count"],
+                    "exhibitions": bucket3["exhibitions_affected"],
+                    "as_of": bucket3["as_of"],
+                    "last_probe": bucket3["series_probe"],
+                    "media_mix_by_series": bucket3["media_mix"],
+                },
+                "eth_tezos_cdn_only": (
+                    {"works": census["buckets"].get("dependent", 0), "as_of": census["date"]}
+                    if census
+                    else None
+                ),
                 "host": "cdn.feralfileassets.com",
-                "last_probe": bucket3["series_probe"],
-                "media_mix_by_series": bucket3["media_mix"],
                 "remediation": "content-addressed copy per work, targeted 2-3 months from 2026-08-03",
             },
         },
         "scope": {
-            "measures": "resolves: every reference in a work's chain fetchable from public infrastructure",
-            "not_yet_measured": "plays: what resolves also renders as the artist intended",
+            "measures": "resolves, media layer: every artwork file fetchable from the public gateways wallets and browsers use",
+            "not_yet_measured": [
+                "metadata link: whether each token's on-chain reference is content-addressed",
+                "plays: what resolves also renders as the artist intended",
+            ],
         },
+        "exhibitions": (
+            catalog_rows(exhibitions, census, bucket3) if census else None
+        ),
         "bitmark_exhibitions": bucket3["exhibitions"],
         "updates": updates,
     }
 
-    (PUBLIC / "index.html").write_text(render(bucket3, census, updates, generated_at))
-    (PUBLIC / "data" / "status.json").write_text(json.dumps(status, indent=2, ensure_ascii=False))
+    (PUBLIC / "index.html").write_text(
+        render(bucket3, census, exhibitions, updates, generated_at)
+    )
+    (PUBLIC / "data" / "status.json").write_text(
+        json.dumps(status, indent=2, ensure_ascii=False)
+    )
     (PUBLIC / "feed.xml").write_text(build_feed(updates, now))
-    (PUBLIC / "status.md").write_text(build_markdown(bucket3, census, updates, generated_at))
+    (PUBLIC / "status.md").write_text(
+        build_markdown(bucket3, census, exhibitions, updates, generated_at)
+    )
     (PUBLIC / "llms.txt").write_text(build_llms_txt(bucket3))
     (PUBLIC / "robots.txt").write_text(ROBOTS_TXT)
     (PUBLIC / "_headers").write_text(HEADERS_FILE)
