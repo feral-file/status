@@ -236,7 +236,7 @@ def render(bucket3, census, updates, generated_at):
     <p>A work published on Feral File is not a file in one place. It is a
     chain of references: a token on a blockchain points to a smart contract,
     the contract points to metadata, the metadata points to the files of the
-    artwork, and those files run in a browser or on an FF1. Some works also
+    artwork, and those files run in a browser or on an Art Computer. Some works also
     read data from their contract while they run. A work is alive when every
     link in that chain answers.</p>
     <p>Each link has a keeper. The blockchain keeps the token, the contract,
@@ -347,7 +347,7 @@ Machine-readable summary: {SITE_URL}/data/status.json
 A work published on Feral File is a chain of references: a token on a
 blockchain points to a smart contract, the contract points to metadata, the
 metadata points to the files of the artwork, and those files run in a browser
-or on an FF1. Some works also read data from their contract while they run. A
+or on an Art Computer. Some works also read data from their contract while they run. A
 work is alive when every link in that chain answers.
 
 Each link has a keeper. The blockchain keeps the token, the contract, and
