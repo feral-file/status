@@ -207,6 +207,8 @@ def render(bucket3, census, updates, generated_at):
 <title>Feral File Storage Status</title>
 <link rel="stylesheet" href="static/style.css">
 <link rel="alternate" type="application/rss+xml" title="Feral File storage updates" href="feed.xml">
+<link rel="alternate" type="application/json" href="data/status.json">
+<link rel="alternate" type="text/markdown" href="status.md">
 <meta name="description" content="Where every published Feral File work is stored, and whether each copy resolves right now.">
 </head>
 <body>
@@ -264,9 +266,11 @@ def render(bucket3, census, updates, generated_at):
 
   <section id="data">
     <h2>Data</h2>
-    <p>Everything above, machine-readable. Agents welcome.</p>
+    <p>Everything above, machine-readable. Agents welcome: start at
+    <a href="llms.txt">llms.txt</a>. Data files are served with open CORS.</p>
     <ul>
       <li><a href="data/status.json">status.json</a> &mdash; summary of every number on this page</li>
+      <li><a href="status.md">status.md</a> &mdash; this page as plain Markdown</li>
       {data_files}
       <li><a href="feed.xml">feed.xml</a> &mdash; RSS, one entry per update</li>
     </ul>
@@ -283,6 +287,109 @@ def render(bucket3, census, updates, generated_at):
 </footer>
 </body>
 </html>
+"""
+
+
+def build_markdown(bucket3, census, updates, generated_at):
+    """The whole page as plain Markdown — the cheap read for a model."""
+    if census:
+        b = census["buckets"]
+        b1 = f"{b.get('public', 0):,} works (verified on ipfs.io, {census['date']})"
+        b2 = f"{b.get('gateway_gap', 0):,} works (at least one file failing on ipfs.io)"
+    else:
+        b1 = b2 = "census in progress (started 2026-08-03; publishes here on completion)"
+    probe = bucket3["series_probe"]
+    rows = "\n".join(
+        f"| {e['title']} | {e['works']:,} | {e['still_bitmark'] + e['swap_initiated']:,} "
+        f"| {e['migrated_ethereum']:,} | {e['migrated_tezos']:,} |"
+        for e in bucket3["exhibitions"]
+    )
+    upd = "\n".join(f"- **{u['date']} — {u['title']}.** {u['body']}" for u in updates)
+    return f"""# Feral File Storage Status
+
+Where every published Feral File work is stored, and whether each copy
+resolves right now. Generated {generated_at}. Canonical URL: {SITE_URL}
+Machine-readable summary: {SITE_URL}/data/status.json
+
+## Buckets
+
+1. Content-addressed and publicly resolvable: {b1}
+2. Content-addressed but failing on public gateways: {b2}
+3. Single copy on our CDN (Bitmark-era): {bucket3["works_on_bitmark"]:,} works
+   across {bucket3["series_count"]:,} series in {bucket3["exhibitions_affected"]}
+   exhibitions (as of {bucket3["as_of"]}), hosted on cdn.feralfileassets.com.
+   Last probe {probe["date"]}: {probe["resolving"]:,} of {probe["total"]:,}
+   series resolved (one probe per series; editions share files). Remediation
+   targeted within 2-3 months: a content-addressed copy per work, or a dated
+   exception with an owner.
+
+## Bitmark-era exhibitions
+
+| Exhibition | Works | Still on Bitmark | On Ethereum | On Tezos |
+|---|---:|---:|---:|---:|
+{rows}
+
+## Method
+
+Checks fetch the way a real consumer does: follow the token's metadata to its
+files and request each one over the public gateways wallets and browsers use.
+A file counts as resolving only when a public gateway serves it. Bitmark-era
+works are enumerated from the public Feral File API by each work's on-chain
+location. This page is regenerated from the raw data on every update.
+
+## Data
+
+- {SITE_URL}/data/status.json
+- {SITE_URL}/feed.xml (RSS, one entry per update)
+- CSVs listed at {SITE_URL}/#data
+
+## Updates
+
+{upd}
+"""
+
+
+def build_llms_txt(bucket3):
+    return f"""# Feral File Storage Status
+
+> Where every published Feral File work ({SITE_URL.replace("status.", "")}) is
+> stored, and whether each copy resolves on the public gateways wallets and
+> browsers use. Static page, no client-side rendering; every number is
+> generated from the raw data files below. Data is served with open CORS.
+
+## Read this first
+
+- [status.md]({SITE_URL}/status.md): the whole page as plain Markdown
+- [status.json]({SITE_URL}/data/status.json): every number, structured
+
+## Raw data
+
+- [Bitmark-era per-work enumeration]({SITE_URL}/data/{bucket3["files"][1]}):
+  one row per work whose only copy is on the CDN
+- [Per-series media probes]({SITE_URL}/data/{bucket3["files"][2]}): one CDN
+  probe per series
+- [Per-exhibition totals]({SITE_URL}/data/{bucket3["files"][0]})
+
+## Updates
+
+- [RSS feed]({SITE_URL}/feed.xml): one entry per change to this page
+"""
+
+
+ROBOTS_TXT = """User-agent: *
+Allow: /
+"""
+
+# Cloudflare Pages header rules: open CORS so agents in browser contexts can
+# fetch the data; correct content type for the markdown mirror.
+HEADERS_FILE = """/*
+  Access-Control-Allow-Origin: *
+
+/status.md
+  Content-Type: text/markdown; charset=utf-8
+
+/llms.txt
+  Content-Type: text/plain; charset=utf-8
 """
 
 
@@ -321,8 +428,11 @@ def main():
     now = datetime.now(timezone.utc)
     generated_at = now.strftime("%Y-%m-%d %H:%M UTC")
 
+    # Clean contents but keep the directory inode, so a running `make serve`
+    # keeps working across rebuilds.
     if PUBLIC.exists():
-        shutil.rmtree(PUBLIC)
+        for item in PUBLIC.iterdir():
+            shutil.rmtree(item) if item.is_dir() else item.unlink()
     (PUBLIC / "data").mkdir(parents=True)
     shutil.copytree(ROOT / "static", PUBLIC / "static")
 
@@ -364,6 +474,10 @@ def main():
     (PUBLIC / "index.html").write_text(render(bucket3, census, updates, generated_at))
     (PUBLIC / "data" / "status.json").write_text(json.dumps(status, indent=2, ensure_ascii=False))
     (PUBLIC / "feed.xml").write_text(build_feed(updates, now))
+    (PUBLIC / "status.md").write_text(build_markdown(bucket3, census, updates, generated_at))
+    (PUBLIC / "llms.txt").write_text(build_llms_txt(bucket3))
+    (PUBLIC / "robots.txt").write_text(ROBOTS_TXT)
+    (PUBLIC / "_headers").write_text(HEADERS_FILE)
 
     kind = f"census {census['file']}" if census else "census pending"
     print(f"built public/ ({kind}, bucket3 as of {bucket3['as_of']})")
