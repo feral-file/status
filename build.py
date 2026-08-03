@@ -288,8 +288,9 @@ def render(bucket3, census, exhibitions, updates, generated_at):
         tile2 = tile(
             n(b.get("gateway_gap", 0)),
             "works that should resolve without us, but currently fail",
-            "Media is content-addressed, but at least one file did not "
-            "resolve on ipfs.io when checked.",
+            "HLS video works: the master playlist is content-addressed "
+            "and resolves, but its stream files are unreachable from any "
+            "gateway. The video currently plays only from our CDN.",
         )
         tile3_note = (
             f"{n(bucket3['works_on_bitmark'])} Bitmark-era works plus "
@@ -503,6 +504,7 @@ def render(bucket3, census, exhibitions, updates, generated_at):
     ipfs.feralfile.com), with ordinary headers and redirects. A file counts as
     resolving only when a public gateway serves it &mdash; our own
     infrastructure answering is not enough.</p>
+    <p>Known gap, found 2026-08-03: HLS video is followed only to its master playlist; the stream files it references are not yet traversed, and for the works flagged above they are not on IPFS at all.</p>
     <p>Not yet measured: the <strong>metadata link</strong> &mdash; whether
     each token&rsquo;s on-chain reference is itself content-addressed &mdash;
     and whether a work <strong>plays</strong>, meaning what resolves also
@@ -546,7 +548,7 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at):
     if census:
         b = census["buckets"]
         b1 = f"{b.get('independent', 0):,} works (every content-addressed media file verified on ipfs.io, {census['date']})"
-        b2 = f"{b.get('gateway_gap', 0):,} works (at least one media file failing on ipfs.io)"
+        b2 = f"{b.get('gateway_gap', 0):,} works (HLS video: master playlist resolves, stream files unreachable from any gateway — video plays only from our CDN)"
         b3_extra = (
             f" Plus {b.get('dependent', 0):,} works on Ethereum and Tezos whose "
             f"media likewise lives only on our CDN (discovered {census['date']}); "
