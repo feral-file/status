@@ -264,21 +264,29 @@ def render(bucket3, census, updates, generated_at):
   <section id="bitmark">
     <h2>Works that depend entirely on us ({n(bucket3["works_on_bitmark"])})</h2>
     <p>Feral File&rsquo;s first {len(bucket3["exhibitions"])} exhibitions were
-    minted on the Bitmark blockchain. Works later collected on Ethereum or
-    Tezos were migrated and carry content-addressed copies. The
-    {n(bucket3["works_on_bitmark"])} works still on Bitmark &mdash; across
-    {n(bucket3["series_count"])} series in {bucket3["exhibitions_affected"]}
-    exhibitions &mdash; have their only copy on our content delivery network
-    (cdn.feralfileassets.com). Those files were last verified reachable on
-    {esc(probe["date"])}: {n(probe["resolving"])} of {n(probe["total"])} series
-    resolved (one probe per series; editions of a series share files).</p>
+    minted on the Bitmark blockchain, which we built in 2014 and retired in
+    2025. The chain itself was preserved as a verifiable archive &mdash; its
+    data on IPFS, its Merkle root on Ethereum, a timestamp on Bitcoin (<a
+    href="https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive">the
+    Bitmark Archive</a>; <a
+    href="https://feralfile.substack.com/p/before-ethereum-before-nfts-there">the
+    story</a>) &mdash; so the ownership records of these works are already
+    safe. What remained exposed was the artwork files themselves. Works later
+    collected on Ethereum or Tezos were migrated and carry content-addressed
+    copies; the {n(bucket3["works_on_bitmark"])} works never migrated &mdash;
+    across {n(bucket3["series_count"])} series in
+    {bucket3["exhibitions_affected"]} exhibitions &mdash; have their only
+    media copy on our content delivery network (cdn.feralfileassets.com).
+    Those files were last verified reachable on {esc(probe["date"])}:
+    {n(probe["resolving"])} of {n(probe["total"])} series resolved (one probe
+    per series; editions of a series share files).</p>
     <p>A single copy behind our servers is not what we promise. Remediation
     is in progress and targeted within 2&ndash;3 months: every work gets a
     content-addressed copy that resolves independently of our infrastructure,
     or a dated exception with an owner and a migration path.</p>
     <table>
       <thead>
-        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Still on Bitmark</th><th class="num">On Ethereum</th><th class="num">On Tezos</th></tr>
+        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Not yet migrated</th><th class="num">On Ethereum</th><th class="num">On Tezos</th></tr>
       </thead>
       <tbody>
 {ex_rows}
@@ -378,9 +386,13 @@ That is the invitation.
 
 1. Resolve without Feral File: {b1}
 2. Should resolve without us, but currently fail on public gateways: {b2}
-3. Depend entirely on Feral File: {bucket3["works_on_bitmark"]:,} works
+3. Depend entirely on Feral File (media layer): {bucket3["works_on_bitmark"]:,} works
    across {bucket3["series_count"]:,} series in {bucket3["exhibitions_affected"]}
-   exhibitions (as of {bucket3["as_of"]}), sole copy on cdn.feralfileassets.com.
+   exhibitions (as of {bucket3["as_of"]}), sole media copy on
+   cdn.feralfileassets.com. Their ownership records are already safe: the
+   Bitmark blockchain (retired 2025) was preserved as a verifiable archive —
+   data on IPFS, Merkle root on Ethereum, timestamp on Bitcoin
+   (https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive).
    Last probe {probe["date"]}: {probe["resolving"]:,} of {probe["total"]:,}
    series resolved (one probe per series; editions share files). Remediation
    targeted within 2-3 months: a content-addressed copy per work, or a dated
@@ -388,7 +400,7 @@ That is the invitation.
 
 ## Bitmark-era exhibitions
 
-| Exhibition | Works | Still on Bitmark | On Ethereum | On Tezos |
+| Exhibition | Works | Not yet migrated | On Ethereum | On Tezos |
 |---|---:|---:|---:|---:|
 {rows}
 
