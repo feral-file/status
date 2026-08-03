@@ -141,6 +141,102 @@ def load_census():
     }
 
 
+def emit_work_shards(census, bucket3, exhibitions):
+    """Per-work lookup data: one JSON shard per exhibition + a token index.
+
+    Shard: data/works/<exhibition_id>.json ->
+      {"exhibition": {...}, "works": {token_id: [{chain, contract, state,
+       files: [...]}, ...]}}
+    Index: data/work_index.json -> {token_id: [exhibition_id, ...]}
+    """
+    ex_meta = {e["id"]: e for e in exhibitions["list"]}
+    slug_to_id = {e["slug"]: e["id"] for e in exhibitions["list"]}
+    shards = defaultdict(lambda: defaultdict(list))
+    index = defaultdict(set)
+
+    if census:
+        per_work = {}
+        for r in csv.DictReader(open(DATA / "census" / census["file"])):
+            if r["resource"] == "metadata":
+                continue
+            key = (r["chain"], r["contract"], r["token_id"], r["exhibition"])
+            w = per_work.setdefault(
+                key, {"chain": r["chain"], "contract": r["contract"], "files": []}
+            )
+            if r["cid"]:
+                f = {"res": r["resource"], "host": "ipfs", "cid": r["cid"]}
+                for gw_col, gw in (
+                    ("ipfs_io_ok", "ipfs.io"),
+                    ("ipfs_feralfile_com_ok", "ipfs.feralfile.com"),
+                    ("dweb_link_ok", "dweb.link"),
+                ):
+                    f[gw] = "ok" if r.get(gw_col, "") == "ok" else "fail"
+                w["files"].append(f)
+            else:
+                w["files"].append(
+                    {
+                        "res": r["resource"],
+                        "host": r["hosting"],
+                        "domain": r["host_or_gateway"],
+                        "status": r["http_status"],
+                    }
+                )
+        for (chain, contract, token_id, ex_id), w in per_work.items():
+            cids = [f for f in w["files"] if f.get("host") == "ipfs"]
+            if not cids:
+                state = "dependent"
+            elif any(f["ipfs.io"] != "ok" for f in cids):
+                state = "gateway_gap"
+            else:
+                state = "independent"
+            shards[ex_id][token_id].append(
+                {"chain": chain, "contract": contract, "state": state, "files": w["files"]}
+            )
+            index[token_id].add(ex_id)
+
+    for r in csv.DictReader(open(DATA / latest("bitmark_chain_enumeration_*.csv").name)):
+        ex_id = slug_to_id.get(r["exhibition_slug"])
+        if not ex_id:
+            continue
+        token_id = r["bitmark_token_id"]
+        files = []
+        if r["thumbnail_host"]:
+            files.append({"res": "thumbnail", "host": "cdn", "domain": r["thumbnail_host"]})
+        files.append({"res": "media", "host": "cdn", "domain": "cdn.feralfileassets.com"})
+        shards[ex_id][token_id].append(
+            {
+                "chain": "bitmark",
+                "contract": "",
+                "state": "dependent",
+                "name": r["artwork_name"],
+                "files": files,
+            }
+        )
+        index[token_id].add(ex_id)
+
+    out_dir = PUBLIC / "data" / "works"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for ex_id, works in shards.items():
+        meta = ex_meta.get(ex_id, {})
+        (out_dir / f"{ex_id}.json").write_text(
+            json.dumps(
+                {
+                    "exhibition": {
+                        "id": ex_id,
+                        "slug": meta.get("slug"),
+                        "title": meta.get("title"),
+                    },
+                    "works": works,
+                },
+                separators=(",", ":"),
+            )
+        )
+    (PUBLIC / "data" / "work_index.json").write_text(
+        json.dumps({k: sorted(v) for k, v in index.items()}, separators=(",", ":"))
+    )
+    return sum(len(w) for w in shards.values())
+
+
 def esc(s):
     return html.escape(str(s), quote=True)
 
@@ -383,6 +479,20 @@ def render(bucket3, census, exhibitions, updates, generated_at):
     </table>
   </section>
 
+  <section id="lookup">
+    <h2>Look up a work</h2>
+    <p>Paste a token ID &mdash; the number in your wallet or on the
+    work&rsquo;s page &mdash; and see exactly what that work&rsquo;s media
+    depends on, file by file, from the same data as everything above.
+    (Search by wallet address is not built yet; token ID only.)</p>
+    <form id="lookup-form">
+      <input id="lookup-input" type="text" inputmode="text" autocomplete="off"
+             placeholder="Token ID" aria-label="Token ID">
+      <button type="submit">Check</button>
+    </form>
+    <div id="lookup-result" aria-live="polite"></div>
+  </section>
+
   <section id="method">
     <h2>What we check, and what we don&rsquo;t yet</h2>
     <p>Two different promises hide inside &ldquo;it still works.&rdquo; A work
@@ -424,6 +534,7 @@ def render(bucket3, census, exhibitions, updates, generated_at):
 <footer>
   <p>Generated {esc(generated_at)} &middot; <a href="https://feralfile.com">feralfile.com</a></p>
 </footer>
+<script src="static/lookup.js"></script>
 </body>
 </html>
 """
@@ -688,6 +799,8 @@ def main():
         "updates": updates,
     }
 
+    shard_works = emit_work_shards(census, bucket3, exhibitions)
+    print(f"lookup shards: {shard_works} works indexed")
     (PUBLIC / "index.html").write_text(
         render(bucket3, census, exhibitions, updates, generated_at)
     )

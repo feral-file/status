@@ -123,3 +123,20 @@ footer {
   .tile-number { font-size: 36px; }
   table { display: block; overflow-x: auto; }
 }
+
+/* Lookup */
+#lookup-form { display: flex; gap: 0.5rem; max-width: 42rem; }
+#lookup-input {
+  flex: 1; font-family: "Space Mono", monospace; font-size: 14px;
+  padding: 0.6rem 0.75rem; border: 1px solid var(--ink);
+  background: var(--surface); color: var(--ink);
+}
+#lookup-form button {
+  font-family: "Space Mono", monospace; font-size: 14px;
+  padding: 0.6rem 1.25rem; border: 1px solid var(--ink);
+  background: var(--ink); color: var(--surface); cursor: pointer;
+}
+#lookup-form button:hover { background: var(--highlight); color: #000; border-color: var(--highlight); }
+#lookup-result { margin-top: 1.5rem; font-size: 16px; }
+.lookup-match { margin-bottom: 2rem; }
+.lookup-state { font-family: "Space Mono", monospace; font-size: 14px; color: var(--ink-secondary); }
