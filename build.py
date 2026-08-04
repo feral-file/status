@@ -28,6 +28,7 @@ files, not the on-chain tokenURI link — the method section says so plainly.
 
 import csv
 import glob
+import gzip
 import html
 import json
 import shutil
@@ -425,7 +426,7 @@ def render(bucket3, census, exhibitions, updates, generated_at):
         for f in bucket3["files"]
         + ([bucket3["pin_summary"]["file"]] if bucket3.get("pin_summary") else [])
         + ([exhibitions["file"]])
-        + (["census/" + census["file"]] if census else [])
+        + (["census/" + census["file"] + ".gz"] if census else [])
     )
 
     ps = bucket3.get("pin_summary")
@@ -814,8 +815,12 @@ def main():
     for f in bucket3["files"] + extra + [exhibitions["file"]]:
         shutil.copy(DATA / f, PUBLIC / "data" / f)
     if census:
+        # Cloudflare Pages caps files at 25 MiB; the census CSV exceeds it.
         (PUBLIC / "data" / "census").mkdir()
-        shutil.copy(DATA / "census" / census["file"], PUBLIC / "data" / "census")
+        with open(DATA / "census" / census["file"], "rb") as f_in, gzip.open(
+            PUBLIC / "data" / "census" / (census["file"] + ".gz"), "wb", compresslevel=9
+        ) as f_out:
+            shutil.copyfileobj(f_in, f_out)
 
     dep_total = bucket3["works_on_bitmark"] + (
         census["buckets"].get("dependent", 0) if census else 0
