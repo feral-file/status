@@ -7,13 +7,18 @@ Sources (data/):
   bitmark_series_media_<date>.csv  series titles/artists for readability
   archive_pins_<date>.json       a2p, the Bitmark chain archive, HLS masters
 
-Output: archive-manifest.json (stdout path printed). Add it to IPFS, pin it,
-then call setManifest(<cid>) on the registry.
+Optional: data/registry.json ({"chain": "eip155:1", "address": "0x..."}) —
+written after deployment, then the manifest is rebuilt so it names its own
+registry (authenticates the contract against clones).
+
+Output: archive-manifest.json, byte-deterministic for identical inputs.
+Add to IPFS with exactly: ipfs add -Q --cid-version 1  (raw-leaves is
+implied by CIDv1; a different flag set yields a different CID for the same
+bytes). Then call setManifest(<cid>) on the registry, from the Safe.
 """
 
 import csv
 import json
-from datetime import datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
@@ -55,6 +60,20 @@ def main():
             }
         )
 
+    # Deterministic: derived from the data, not the wall clock, so identical
+    # inputs always produce identical bytes and therefore the same CID.
+    data_as_of = max(
+        [p["synced_at"] for p in pins] + [extra["as_of"] + "T00:00:00Z"]
+    )
+
+    registry_path = DATA / "registry.json"
+    registry = (
+        json.loads(registry_path.read_text())
+        if registry_path.exists()
+        else {"chain": "eip155:1", "address": None,
+              "note": "unset until deployment; rebuild after data/registry.json exists"}
+    )
+
     manifest = {
         "name": "Feral File Archive",
         "description": (
@@ -65,7 +84,8 @@ def main():
             "FeralFileArchiveRegistry contract on Ethereum."
         ),
         "site": "https://status.feralfile.com",
-        "generated_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "data_as_of": data_as_of,
+        "registry": registry,
         "collections": [
             {
                 "id": "bitmark-era-series",

@@ -61,24 +61,41 @@ Helvetica until the deploy wires the hosted fonts.
 ## The Feral File Archive Registry
 
 `contracts/FeralFileArchiveRegistry.sol` — the on-chain pointer to
-`archive-manifest.json` (built by `tools/build_archive_manifest.py`, pinned
-on the archival node). Root on Ethereum, data on IPFS — the same pattern as
-the Bitmark blockchain archive.
+`archive-manifest.json` (built by `tools/build_archive_manifest.py`). Root on
+Ethereum, data on IPFS — the same pattern as the Bitmark blockchain archive.
+Red-teamed 2026-08-04 (fresh-context adversarial audit + external passes);
+history is held in contract storage, CIDs are validated on write, and the
+manifest names the registry's own address so clones can't impersonate it.
 
-Current manifest CID:
-`bafkreihjjtrhsk5gufrnbneg2w2jwdypthbdnij5ooadzupqhq6ll3szum`
+Deploy runbook (rehearse the WHOLE thing on Sepolia against a test Safe
+first — it retires every Transaction Builder unknown for ~nothing):
 
-Deploy (ten minutes, Remix path):
+1. Compile with **exactly 0.8.24** (pragma is pinned). Note the long
+   compiler version, optimizer setting + runs, and EVM version — Etherscan
+   verification needs them character-exact. Remix defaults optimizer OFF.
+2. Deploy from a **hardware wallet**, mainnet. Do steps 2-5 in one sitting:
+   until the Safe owns the contract, the deployer key is a single point of
+   failure.
+3. Verify the source on Etherscan (single file, MIT, the settings from
+   step 1).
+4. `transferOwnership(<Feral File Safe — must already exist on mainnet>)`,
+   then from the Safe (Transaction Builder) call `acceptOwnership()`
+   (selector `0x79ba5097` if the ABI doesn't auto-load).
+5. Confirm `owner()` = the Safe and `pendingOwner()` = zero address.
+6. Write `data/registry.json`: `{"chain": "eip155:1", "address": "0x…"}`.
+   Rebuild the manifest (now names its own registry), then on the archival
+   node: `ipfs add -Q --cid-version 1 archive-manifest.json` — exactly those
+   flags; different flags give a different CID for identical bytes.
+7. From the Safe: `setManifest(<cid>)`. The Safe's first act is the
+   authoritative publish.
+8. Publish the address: on this page, in `status.json`, in `llms.txt` — only
+   after step 5. The loop must close in both directions (page → address,
+   manifest → address) or a $5 byte-identical clone is indistinguishable.
 
-1. remix.ethereum.org → new file → paste the contract → compile with
-   0.8.24+.
-2. Deploy tab → Injected Provider (the deploying wallet, Ethereum mainnet)
-   → Deploy.
-3. Call `setManifest("bafkreihjjtrhsk5gufrnbneg2w2jwdypthbdnij5ooadzupqhq6ll3szum")`.
-4. Verify the source on Etherscan (single file, MIT, 0.8.24).
-5. `transferOwnership(<Feral File Safe address>)`, then from the Safe
-   (Transaction Builder) call `acceptOwnership()`.
+Updating later: refresh the data, rebuild, `ipfs add` with the same flags,
+`setManifest` from the Safe. Every prior CID stays readable on-chain via
+`historyAt(i)` — not only in event logs.
 
-Updating later: rebuild the manifest, `ipfs add` it on the archival node,
-call `setManifest(<new cid>)` from the Safe. Every prior CID stays readable
-in the `ManifestUpdated` event history.
+If the Safe is ever lost the contract freezes read-only at the last CID:
+the intended failure mode. Assets force-sent to the contract are stuck by
+design; it holds nothing.
