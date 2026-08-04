@@ -103,8 +103,11 @@ Post-audit additions (2026-08-04, two external adversarial passes folded):
   publication, not the twenty-year archive.
 - Record the runtime code hash in `data/registry.json` — the registry's
   identity is the tuple (chain, address, code hash), not the address alone.
-- Review the Safe's configuration before transfer (owners, threshold,
-  modules, guards): the Safe's modules ARE part of the owner. Snapshot it.
+- Owner is the Feral File custody Safe (decided 2026-08-04: one Safe, one
+  institutional identity — easier internally and for the outside world).
+  Consequence: any module/guard ever added to that Safe also touches the
+  Archive's authority. Review and snapshot the config before transfer
+  (owners, threshold, modules, guards), and re-review on any config change.
 - Copy the Safe address from the Safe UI, never retype it; confirm
   `pendingOwner()` reads exactly the Safe in the same sitting — a mistyped
   but live address could accept the transfer.
