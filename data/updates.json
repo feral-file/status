@@ -1,5 +1,10 @@
 [
   {
+    "date": "2026-08-04",
+    "title": "Every Bitmark-era series now has a verified content-addressed copy",
+    "body": "All 215 series — 398 GB, every file of every work whose only copy lived on our CDN — have been added to IPFS and verified byte-for-byte against the originals. The addresses are published in the pin manifest beside this page, so any collector, museum, or archive can hold a copy of any work with one command. The works' own references still point at our CDN; linking them to these copies is the next step."
+  },
+  {
     "date": "2026-08-03",
     "title": "First full census of Ethereum and Tezos works",
     "body": "Every file of every edition — 35,008 works, 106,392 files — was fetched through the public gateways wallets and browsers use. 17,563 works have all media content-addressed and resolving on ipfs.io. 184 works have content-addressed media that currently fails on a public gateway. 17,261 works' media lives only on our CDN; they join the Bitmark-era works on the remediation path. These checks measure the artwork files; the metadata link and rendering are not yet measured."

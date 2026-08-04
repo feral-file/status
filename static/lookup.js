@@ -54,6 +54,9 @@ function fileRow(f) {
     result = ["ipfs.io", "ipfs.feralfile.com", "dweb.link"]
       .map((gw) => `${gw}: ${f[gw]}`)
       .join(" · ");
+  } else if (f.host === "ipfs-archival") {
+    where = "IPFS " + f.cid.slice(0, 14) + "… (whole series)";
+    result = "byte-verified archival copy — co-pin welcome";
   } else {
     where = (f.host || "") + (f.domain ? " (" + f.domain + ")" : "");
     result = f.status ? "HTTP " + f.status : "not probed individually";

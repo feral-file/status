@@ -73,7 +73,22 @@ def load_bucket3():
             )
 
     probe_ok = sum(1 for s in series if s["probe_status"] == "200")
+    manifest_path = latest("pin_manifest_*.csv")
+    pins = {}
+    if manifest_path:
+        pins = {r["series_id"]: r for r in csv.DictReader(open(manifest_path))}
+    pin_summary = None
+    if pins:
+        pin_summary = {
+            "series": len(pins),
+            "bytes": sum(int(r["bytes"]) for r in pins.values()),
+            "all_verified": all(r["verified"] == "true" for r in pins.values()),
+            "as_of": max(r["synced_at"] for r in pins.values())[:10],
+            "file": manifest_path.name,
+        }
     return {
+        "pins": pins,
+        "pin_summary": pin_summary,
         "as_of": doc["as_of"],
         "exhibitions": doc["exhibitions"],
         "works_on_bitmark": len(works),
@@ -203,6 +218,9 @@ def emit_work_shards(census, bucket3, exhibitions):
         if r["thumbnail_host"]:
             files.append({"res": "thumbnail", "host": "cdn", "domain": r["thumbnail_host"]})
         files.append({"res": "media", "host": "cdn", "domain": "cdn.feralfileassets.com"})
+        pin = bucket3["pins"].get(r["series_id"])
+        if pin and pin["verified"] == "true":
+            files.append({"res": "archival copy (series)", "host": "ipfs-archival", "cid": pin["cid"]})
         shards[ex_id][token_id].append(
             {
                 "chain": "bitmark",
@@ -405,9 +423,23 @@ def render(bucket3, census, exhibitions, updates, generated_at):
     data_files = "".join(
         f'<li><a href="data/{esc(f)}">{esc(f)}</a></li>'
         for f in bucket3["files"]
+        + ([bucket3["pin_summary"]["file"]] if bucket3.get("pin_summary") else [])
         + ([exhibitions["file"]])
         + (["census/" + census["file"]] if census else [])
     )
+
+    ps = bucket3.get("pin_summary")
+    pin_para = ""
+    if ps and ps["all_verified"]:
+        pin_para = f"""
+    <p>The first step is done. As of {esc(ps["as_of"])}, every one of the
+    {n(ps["series"])} Bitmark-era series has a content-addressed copy &mdash;
+    {ps["bytes"] / 1e9:.0f}&nbsp;GB added to IPFS and verified byte-for-byte
+    against the original files. The addresses are published in
+    <a href="data/{esc(ps["file"])}">the manifest</a>, so anyone can hold a
+    copy of any work. The works&rsquo; own references still point at our
+    CDN, so they remain counted as depending on us until those references
+    change &mdash; the copies exist; the links come next.</p>"""
 
     eth_dep_para = ""
     if census:
@@ -494,7 +526,7 @@ def render(bucket3, census, exhibitions, updates, generated_at):
     <p>A single copy behind our servers is not what we promise. Remediation
     is in progress and targeted within 2&ndash;3 months: every work gets a
     content-addressed copy that resolves independently of our infrastructure,
-    or a dated exception with an owner and a migration path.</p>
+    or a dated exception with an owner and a migration path.</p>{pin_para}
     <table>
       <thead>
         <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Not yet migrated</th><th class="num">On Ethereum</th><th class="num">On Tezos</th></tr>
@@ -600,6 +632,14 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at):
         f"| {e['migrated_ethereum']:,} | {e['migrated_tezos']:,} |"
         for e in bucket3["exhibitions"]
     )
+    ps = bucket3.get("pin_summary")
+    pin_md = ""
+    if ps and ps["all_verified"]:
+        pin_md = (
+            f" DONE for every series as of {ps['as_of']}: all {ps['series']} series"
+            f" have byte-verified content-addressed copies ({ps['bytes']/1e9:.0f} GB;"
+            f" addresses in {SITE_URL}/data/{ps['file']})."
+        )
     upd = "\n".join(f"- **{u['date']} — {u['title']}.** {u['body']}" for u in updates)
     return f"""# Feral File Status
 
@@ -645,7 +685,7 @@ That is the invitation.
    Last CDN probe {probe["date"]}: {probe["resolving"]:,} of
    {probe["total"]:,} series resolved (one probe per series; editions share
    files). Remediation targeted within 2-3 months: a content-addressed copy
-   per work, or a dated exception with an owner.
+   per work, or a dated exception with an owner.{pin_md}
 {catalog_section}
 ## Bitmark-era exhibitions
 
@@ -770,7 +810,8 @@ def main():
     (PUBLIC / "data").mkdir(parents=True)
     shutil.copytree(ROOT / "static", PUBLIC / "static")
 
-    for f in bucket3["files"] + [exhibitions["file"]]:
+    extra = [bucket3["pin_summary"]["file"]] if bucket3.get("pin_summary") else []
+    for f in bucket3["files"] + extra + [exhibitions["file"]]:
         shutil.copy(DATA / f, PUBLIC / "data" / f)
     if census:
         (PUBLIC / "data" / "census").mkdir()
@@ -803,6 +844,17 @@ def main():
                     "last_probe": bucket3["series_probe"],
                     "media_mix_by_series": bucket3["media_mix"],
                 },
+                "archival_copies": (
+                    {
+                        "series": bucket3["pin_summary"]["series"],
+                        "bytes": bucket3["pin_summary"]["bytes"],
+                        "byte_verified": bucket3["pin_summary"]["all_verified"],
+                        "as_of": bucket3["pin_summary"]["as_of"],
+                        "manifest": "data/" + bucket3["pin_summary"]["file"],
+                    }
+                    if bucket3.get("pin_summary")
+                    else None
+                ),
                 "eth_tezos_cdn_only": (
                     {"works": census["buckets"].get("dependent", 0), "as_of": census["date"]}
                     if census
