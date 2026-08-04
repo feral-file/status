@@ -39,6 +39,13 @@ make serve    # preview at http://localhost:8321
 2. Add an entry to `data/updates.json` saying what changed.
 3. `make build`, review, commit, push. Deployment publishes `public/`.
 
+## Publish-day checklist
+
+1. Re-run the Bitmark enumeration (works in `payment`/`processing` swap
+   states can flip to `complete` at any time — confirmed by Hieu,
+   feral-file#3463, 2026-08-04) and drop the fresh CSVs into `data/`.
+2. `make build`, review, push.
+
 ## Deployment
 
 Cloudflare Pages (same pattern as docs.feralfile.com): build command
