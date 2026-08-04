@@ -1,0 +1,13 @@
+[
+  {
+    "title": "Unsupervised",
+    "primary_slug": "unsupervised-sla",
+    "members": [
+      "unsupervised-sla",
+      "unsupervised-burned-data-universe-moma-2d-tlf",
+      "unsupervised-burned-data-universe-moma-3d-6pj",
+      "unsupervised-burned-machine-hallucinations-moma-dreams-b9c"
+    ],
+    "note": "One exhibition. The three 2023 entries are the MoMA burn-mint events; the API records mint events as separate exhibitions."
+  }
+]

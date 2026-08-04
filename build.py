@@ -255,22 +255,47 @@ def tile(number, label, note):
 
 
 def catalog_rows(exhibitions, census, bucket3):
+    """One row per curatorial exhibition. data/exhibition_groups.json merges
+    API entities that are mint events of the same exhibition (display only —
+    raw data keeps the per-entity records)."""
+    groups_path = DATA / "exhibition_groups.json"
+    groups = json.loads(groups_path.read_text()) if groups_path.exists() else []
+    member_of = {}
+    for g in groups:
+        for slug in g["members"]:
+            member_of[slug] = g
+
     rows = []
+    by_group = {}
     for e in exhibitions["list"]:
         c = census["per_exhibition"].get(e["id"], {}) if census else {}
         bm = bucket3["by_slug"].get(e["slug"], 0)
-        works = c.get("works", 0) + bm
-        rows.append(
-            {
-                "slug": e["slug"],
-                "title": e["title"],
-                "start": (e.get("exhibitionStartAt") or "")[:10],
-                "works": works,
-                "independent": c.get("independent", 0),
-                "gateway_gap": c.get("gateway_gap", 0),
-                "dependent": c.get("dependent", 0) + bm,
-            }
-        )
+        row = {
+            "slug": e["slug"],
+            "title": e["title"],
+            "start": (e.get("exhibitionStartAt") or "")[:10],
+            "works": c.get("works", 0) + bm,
+            "independent": c.get("independent", 0),
+            "gateway_gap": c.get("gateway_gap", 0),
+            "dependent": c.get("dependent", 0) + bm,
+        }
+        g = member_of.get(e["slug"])
+        if g is None:
+            rows.append(row)
+            continue
+        key = g["title"]
+        if key not in by_group:
+            merged = dict(row)
+            merged["slug"] = g["primary_slug"]
+            merged["title"] = g["title"]
+            merged["members"] = list(g["members"])
+            by_group[key] = merged
+            rows.append(merged)
+        else:
+            m = by_group[key]
+            for k in ("works", "independent", "gateway_gap", "dependent"):
+                m[k] += row[k]
+            m["start"] = min(m["start"], row["start"])
     return rows
 
 
