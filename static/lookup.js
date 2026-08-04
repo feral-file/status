@@ -5,6 +5,7 @@ const STATE_LABEL = {
   independent: "resolves without Feral File",
   gateway_gap: "content-addressed, but failing on a public gateway",
   dependent: "depends entirely on Feral File",
+  third_party: "depends on a third-party platform",
 };
 
 let indexPromise = null;

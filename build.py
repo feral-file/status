@@ -131,20 +131,27 @@ def load_census():
         if r["resource"] == "metadata":
             continue
         key = (r["chain"], r["contract"], r["token_id"])
-        st = per_work.setdefault(key, {"cid": 0, "fail": 0, "ex": r["exhibition"]})
+        st = per_work.setdefault(
+            key, {"cid": 0, "fail": 0, "other": 0, "rest": 0, "ex": r["exhibition"]}
+        )
         if r["cid"]:
             st["cid"] += 1
             if r.get("ipfs_io_ok", "") != "ok":
                 st["fail"] += 1
+        elif r["hosting"] == "other":
+            st["other"] += 1
+        else:
+            st["rest"] += 1
 
     buckets = Counter()
     per_ex = defaultdict(Counter)
     for st in per_work.values():
-        state = (
-            "dependent"
-            if st["cid"] == 0
-            else ("gateway_gap" if st["fail"] else "independent")
-        )
+        if st["cid"]:
+            state = "gateway_gap" if st["fail"] else "independent"
+        elif st["other"] and not st["rest"]:
+            state = "third_party"
+        else:
+            state = "dependent"
         buckets[state] += 1
         per_ex[st["ex"]][state] += 1
         per_ex[st["ex"]]["works"] += 1
@@ -200,7 +207,8 @@ def emit_work_shards(census, bucket3, exhibitions):
         for (chain, contract, token_id, ex_id), w in per_work.items():
             cids = [f for f in w["files"] if f.get("host") == "ipfs"]
             if not cids:
-                state = "dependent"
+                others = [f for f in w["files"] if f.get("host") == "other"]
+                state = "third_party" if others and len(others) == len(w["files"]) else "dependent"
             elif any(f["ipfs.io"] != "ok" for f in cids):
                 state = "gateway_gap"
             else:
@@ -339,7 +347,9 @@ def render(bucket3, census, exhibitions, updates, generated_at):
         tile3_note = (
             f"{n(bucket3['works_on_bitmark'])} Bitmark-era works plus "
             f"{n(b.get('dependent', 0))} works on Ethereum and Tezos whose "
-            "media lives only on our CDN. Details and remediation below."
+            "media lives only on our CDN. A further "
+            f"{n(b.get('third_party', 0))} depend on a third-party platform "
+            "instead of us. Details and remediation below."
         )
         census_note = ""
     else:
@@ -447,7 +457,10 @@ def render(bucket3, census, exhibitions, updates, generated_at):
         eth_dep_para = f"""
     <p>The census also surfaced a larger set: {n(census["buckets"].get("dependent", 0))}
     works on Ethereum and Tezos &mdash; discovered {esc(census["date"])} &mdash;
-    whose media likewise lives only on our CDN. Works migrated from Bitmark
+    whose media likewise lives only on our CDN, and
+    {n(census["buckets"].get("third_party", 0))} whose media lives on a
+    third-party platform &mdash; a different dependency with a different
+    owner, listed separately in the data. Works migrated from Bitmark
     share their series&rsquo; files with the copies being pinned now; the
     rest follow the same path: content-addressed copy, byte-verified,
     published here.</p>"""
@@ -610,7 +623,9 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at):
         b3_extra = (
             f" Plus {b.get('dependent', 0):,} works on Ethereum and Tezos whose "
             f"media likewise lives only on our CDN (discovered {census['date']}); "
-            "they follow the same remediation path."
+            "they follow the same remediation path. A further "
+            f"{b.get('third_party', 0):,} works depend on a third-party "
+            "platform instead of us — different dependency, different owner."
         )
         catalog_md = "\n".join(
             f"| {r['start']} | {r['title']} | {r['works']:,} | {r['independent']:,} "
@@ -833,6 +848,11 @@ def main():
                 {"works": census["buckets"].get("independent", 0), "as_of": census["date"]}
                 if census
                 else {"status": "census_in_progress", "started": "2026-08-03"}
+            ),
+            "depend_on_third_party": (
+                {"works": census["buckets"].get("third_party", 0), "as_of": census["date"]}
+                if census
+                else None
             ),
             "failing_public_gateways": (
                 {"works": census["buckets"].get("gateway_gap", 0), "as_of": census["date"]}
