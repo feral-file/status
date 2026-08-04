@@ -1,0 +1,2220 @@
+{
+  "name": "Feral File Archive",
+  "description": "Content-addressed, byte-verified copies of works Feral File preserves. Every CID below can be pinned by anyone; each copy held anywhere makes the works more permanent. Published by Feral File; the current CID of this document is recorded in the FeralFileArchiveRegistry contract on Ethereum.",
+  "site": "https://status.feralfile.com",
+  "generated_at": "2026-08-04T14:23:07+00:00",
+  "collections": [
+    {
+      "id": "bitmark-era-series",
+      "description": "Complete media of the 215 series from Feral File's Bitmark-era exhibitions (4,959 never-migrated works plus the migrated editions that share these files), synced from the origin store and verified byte-for-byte. One CID per series, wrapping artworks/ and previews/.",
+      "items": [
+        {
+          "series_id": "00f8e853-e20e-49bb-9f2f-8190507b8066",
+          "title": "Scrampled",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeieevi7otn2qlkiojtbx2hdpeeaqv24n4nmoi7hispvvspbb2ppyfy",
+          "bytes": 364907998,
+          "files": 18,
+          "verified_at": "2026-08-03T21:47:37Z"
+        },
+        {
+          "series_id": "03c9301f-e338-4419-8830-3e790fdc936b",
+          "title": "Kubo Final",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeieri6cmzieyadfmuc7a6rf5fqe6skn6dwa2khro4euucj7ikk3r7u",
+          "bytes": 428382094,
+          "files": 27,
+          "verified_at": "2026-08-03T21:48:25Z"
+        },
+        {
+          "series_id": "05c97416-7379-4d26-a61d-61277b939d3f",
+          "title": "36 Points #18",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeiduauytlixl3xerjqnbaq73d2npiim2bkeflpavrnmdx66guov5ua",
+          "bytes": 367859100,
+          "files": 36,
+          "verified_at": "2026-08-03T21:49:10Z"
+        },
+        {
+          "series_id": "063ccfde-866d-4dbd-95ed-5213336cfbca",
+          "title": "Strange Fruit",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeigm72alzwctmru2xzbuv4is2wgpvsxmqjrhcrenlug3j6ggnmyr5i",
+          "bytes": 437312354,
+          "files": 10,
+          "verified_at": "2026-08-03T21:49:43Z"
+        },
+        {
+          "series_id": "0698273e-13fc-43e9-910e-0f6d81827a01",
+          "title": "Entity",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeibzbskdaqkph42dwcc4nxj65yoxqw2s66kvptmjq6thvto7tndsiu",
+          "bytes": 2857834752,
+          "files": 7,
+          "verified_at": "2026-08-03T21:55:07Z"
+        },
+        {
+          "series_id": "06dccbad-8fee-4c3c-934a-7eb45bd0b9d1",
+          "title": "Free Fall Study III",
+          "artist": null,
+          "exhibition": "the-long-cut-bqv",
+          "cid": "bafybeifxsa334seer4g6tjrdi5nrasbxpvaf4liamhf257v5jlrpvp6lci",
+          "bytes": 590236980,
+          "files": 6,
+          "verified_at": "2026-08-03T21:55:55Z"
+        },
+        {
+          "series_id": "07c766f0-edc4-45fd-be50-83f89228b08c",
+          "title": "dada data",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeicdzq262k5kbjp4nta2de6ranlt44hv2glv5ldfphykqqg2bb67yy",
+          "bytes": 365474953,
+          "files": 13,
+          "verified_at": "2026-08-03T21:57:22Z"
+        },
+        {
+          "series_id": "094b8bd3-a89b-4127-937f-faef6c6eee96",
+          "title": "One Million Manga Pages",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeidgyes76zhactav3bkm6epsorq3gq6ccjwrki2rktrgowpicdf22u",
+          "bytes": 539733897,
+          "files": 6,
+          "verified_at": "2026-08-03T21:58:19Z"
+        },
+        {
+          "series_id": "0c3fa80b-712a-4688-b01a-fb904c658b76",
+          "title": "The Interfered Microscopy Plot",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeibm3vo3hq5h35hpuga2zrbfi7ety4hmz5w6zo7qfhxaixwma55hgi",
+          "bytes": 21387810976,
+          "files": 10,
+          "verified_at": "2026-08-03T22:46:29Z"
+        },
+        {
+          "series_id": "0f7a9421-44df-4d9c-a0d0-f850e4fdd43f",
+          "title": "36 Points #17",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeidyzd54zbfcgzjolduf23yo5mjg353e744bd3nc3a7piy3ifrlbde",
+          "bytes": 367913882,
+          "files": 43,
+          "verified_at": "2026-08-03T22:47:07Z"
+        },
+        {
+          "series_id": "102f320e-2315-49a5-b0d9-bb96da1bf820",
+          "title": "36 Points #19",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeiawofx6hkobzdefwrabj7ymgzuchxkmxnzvifsoc65yo55kr36gca",
+          "bytes": 367864849,
+          "files": 36,
+          "verified_at": "2026-08-03T22:47:35Z"
+        },
+        {
+          "series_id": "11b4449b-e435-4737-bd14-81cd3366ac89",
+          "title": "Infinite Entropy 10",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeifh2fltt4ll5fqdnzbwiy5dnvtfvdpilha2e5mly33wjmqfsgylba",
+          "bytes": 6973835,
+          "files": 16,
+          "verified_at": "2026-08-03T22:47:45Z"
+        },
+        {
+          "series_id": "1703b594-d76d-49a5-a6c8-ce04f85550ed",
+          "title": "Steering Pixels",
+          "artist": null,
+          "exhibition": "the-long-cut-bqv",
+          "cid": "bafybeihsjavr4ytw5cjffjvazvj5ntqfsxkvwnszw4ieu3fl2fdnlttaii",
+          "bytes": 713000670,
+          "files": 6,
+          "verified_at": "2026-08-03T22:48:39Z"
+        },
+        {
+          "series_id": "17b11372-d1b1-405a-8b54-13b3e1a0738e",
+          "title": "Infinite Entropy 25",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeihdckfhdu46ssu4mkfk4f26vdobpsojynf6qwyaytj3iquc6rrj5y",
+          "bytes": 6626631,
+          "files": 10,
+          "verified_at": "2026-08-03T22:48:49Z"
+        },
+        {
+          "series_id": "18125d2a-d424-496f-9949-9c3e625f114e",
+          "title": "POST 2",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeih56gd4zfi3geayd76x6bpkn7fjxjauh7ss2gd3teyhmlzdxa2aci",
+          "bytes": 5089119234,
+          "files": 125,
+          "verified_at": "2026-08-03T22:56:21Z"
+        },
+        {
+          "series_id": "193dc737-9fe3-4f98-8714-c484cb4ce3e8",
+          "title": "36 Points #16",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeihsiccbnoudddflvqbp2vqxpzd6liq45c4mwwupavengta4hvoynm",
+          "bytes": 367861019,
+          "files": 36,
+          "verified_at": "2026-08-03T22:56:51Z"
+        },
+        {
+          "series_id": "19c097b4-c440-44e9-b6a8-eb97f3b4513a",
+          "title": "sextape",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeie4tpjzlddwq4pdyjvdxuh2nqttozvp2gpo64qyaqzyk3z23jn4xu",
+          "bytes": 1369058722,
+          "files": 6,
+          "verified_at": "2026-08-03T22:59:04Z"
+        },
+        {
+          "series_id": "1b1ffd48-5fc2-4d19-a563-364e00ddfb01",
+          "title": "F(l)ight",
+          "artist": null,
+          "exhibition": "graph-eg6",
+          "cid": "bafybeifw37f4euezltudfp3ln6smn6wnhehzjq7hj2u77kiac55scykkve",
+          "bytes": 590133253,
+          "files": 785,
+          "verified_at": "2026-08-03T23:00:22Z"
+        },
+        {
+          "series_id": "1b205395-6654-4174-b170-45c82866270b",
+          "title": "COUNT ZERO FOUR",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeictb2bj26igmdxjfuvdrpwqwvkm6febsquz3kmxbknjxl5rsoshzq",
+          "bytes": 440583889,
+          "files": 12,
+          "verified_at": "2026-08-03T23:01:00Z"
+        },
+        {
+          "series_id": "1b6bd73c-b612-4c24-a837-e5afe08616f7",
+          "title": "Infinite Entropy 8",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeic6zoze4c5wowu2q5xexfsl6bfqmsoig6f4263awx3ej336sv2orq",
+          "bytes": 6974271,
+          "files": 16,
+          "verified_at": "2026-08-03T23:01:10Z"
+        },
+        {
+          "series_id": "1e0b019f-60fa-4ae2-96ab-78796310ce0d",
+          "title": "Time To Grow",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeigtrqy3sz2h7wthyghuwgey5s5zk366jlehrpoce4zvu3e5xfqwfq",
+          "bytes": 815638106,
+          "files": 395,
+          "verified_at": "2026-08-03T23:02:39Z"
+        },
+        {
+          "series_id": "1f060e42-3437-444c-b823-a8b8532c449c",
+          "title": "1DE94",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeiaowfr53qzugzulh2wcjzlma6v3zobllas3pd22kcbofbaj4o76ua",
+          "bytes": 366863214,
+          "files": 15,
+          "verified_at": "2026-08-03T23:03:09Z"
+        },
+        {
+          "series_id": "1fdd923d-91f0-4b28-a51a-8d01da7cc562",
+          "title": "Infinite Entropy 14",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeig2bjwgn2a6ghnhvu7qf5cbmpm4ktzcucuxogokkd4vkbzlktehyi",
+          "bytes": 6625293,
+          "files": 10,
+          "verified_at": "2026-08-03T23:03:19Z"
+        },
+        {
+          "series_id": "21a5bd39-64d0-490b-b578-6c6ecd317b7a",
+          "title": "Simultan Dub",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeict42lavd3zaox4nb6bk7nvsgo3un3kqmwcl4rbsqtw5nmtw7rgg4",
+          "bytes": 1026317459,
+          "files": 29,
+          "verified_at": "2026-08-03T23:04:35Z"
+        },
+        {
+          "series_id": "231fa61b-eb94-40d7-9a5c-0d5c7e94f1ed",
+          "title": "E-dream: We’ll stay, forever, in this way (2020 selected)",
+          "artist": null,
+          "exhibition": "the-long-cut-bqv",
+          "cid": "bafybeiggeumyvwigcon7o72hhyad6h64gmi55a3hjqpfy2eclb75jlie2y",
+          "bytes": 202560386,
+          "files": 6,
+          "verified_at": "2026-08-03T23:04:56Z"
+        },
+        {
+          "series_id": "23d93636-48be-42be-8b9c-59083b481079",
+          "title": "Infinite Entropy 4",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeigunmeztdzqmsgnvdsilv3vydx4us22pujmz2ytfd7jfyzke5mfey",
+          "bytes": 6973278,
+          "files": 16,
+          "verified_at": "2026-08-03T23:05:06Z"
+        },
+        {
+          "series_id": "252527ee-2232-45e0-9ead-27379ff26219",
+          "title": "Abstract Oracle Miner 0009328437",
+          "artist": null,
+          "exhibition": "the-long-cut-bqv",
+          "cid": "bafybeiawv4yxg5yc6hr7yywqf2n2w5qiowyidfrfurosrr7ymztgajpc6u",
+          "bytes": 511373220,
+          "files": 1006,
+          "verified_at": "2026-08-03T23:06:18Z"
+        },
+        {
+          "series_id": "25a0daeb-ec6d-4bfd-8a24-11c44beb5629",
+          "title": "Seizures Palace",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeibnx6bcloccezfiemyqdkkhrn6d3mqqa24t4of5w27ihb5t2qyj5y",
+          "bytes": 914669207,
+          "files": 28,
+          "verified_at": "2026-08-03T23:07:37Z"
+        },
+        {
+          "series_id": "25a3d5d3-43a6-495e-bf18-e0583fa11f72",
+          "title": "Smart Cut",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeibkn5bxuicnhuoe3cagzck2sd67uhbp7caai7duhv5ymkfvu7ar6e",
+          "bytes": 1670247063,
+          "files": 6,
+          "verified_at": "2026-08-03T23:10:08Z"
+        },
+        {
+          "series_id": "26433d62-bb36-46f8-bc8e-ed7214967cc2",
+          "title": "k.f0",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeify2zeabtidvqlg4msnjjm2yndnga6vmh54zmpho4irz442fh5ll4",
+          "bytes": 374643673,
+          "files": 18,
+          "verified_at": "2026-08-03T23:11:18Z"
+        },
+        {
+          "series_id": "28cad12d-50f2-4d82-a77d-1284cf934b8c",
+          "title": "Shimmer",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeiacgr4nlmieo6smcapcguxzjy3bjbtkjfu3ozsiwiqwymvmwvgovm",
+          "bytes": 364581548,
+          "files": 10,
+          "verified_at": "2026-08-03T23:11:52Z"
+        },
+        {
+          "series_id": "2998a10b-8ddc-4344-9f3d-710ab5ec9287",
+          "title": "Butterfly Cosplayer",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeicobys42tsdhkig5qbdrc27ehrqko7vy6ejnssor72ngapxpaviei",
+          "bytes": 870210638,
+          "files": 397,
+          "verified_at": "2026-08-03T23:13:23Z"
+        },
+        {
+          "series_id": "29b720ff-fcbf-4467-a53d-e79a90ad0d60",
+          "title": "Unsupervised — Machine Hallucinations — MoMA",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeiewbci54mcuxaf3tkeqv6rj7valvj4sw5pinavamvunaxixbophme",
+          "bytes": 9462196881,
+          "files": 6,
+          "verified_at": "2026-08-03T23:35:38Z"
+        },
+        {
+          "series_id": "29cd44b3-2ed9-4d8b-beb5-073d248a1a00",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — I",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeieqpbnvqdkcxivywoum6dsxtb5ciehowhhpwotmydm6j3m2rwmjb4",
+          "bytes": 316081647,
+          "files": 6,
+          "verified_at": "2026-08-03T23:36:40Z"
+        },
+        {
+          "series_id": "2a57c29f-fa5b-440d-8dee-2d58cdb9238c",
+          "title": "The Mystery [v5-dv1] ",
+          "artist": null,
+          "exhibition": "the-bardo-unpacking-the-real-a2j",
+          "cid": "bafybeia6roqxnxhix3243fgcokjpotiwr6vdqwpowdultwvg7rwgcbfklq",
+          "bytes": 1193520104,
+          "files": 23,
+          "verified_at": "2026-08-03T23:41:37Z"
+        },
+        {
+          "series_id": "2a727b17-7890-4464-913d-3fe5ad2af4ae",
+          "title": "Transparent Grit",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeicsco5e2lkbyvgaqmymxyc5xguseo5trcedb4skcrwihg3bx6rrw4",
+          "bytes": 365984161,
+          "files": 10,
+          "verified_at": "2026-08-03T23:42:16Z"
+        },
+        {
+          "series_id": "2d1f1330-d66a-4e9e-afd6-c17e5e55f2c4",
+          "title": "In endless flow of absolute truth, there are innumerable relative conjecture.",
+          "artist": null,
+          "exhibition": "the-long-cut-bqv",
+          "cid": "bafybeiciq4woo2bmlcrdg4h2frlv4izmpvuwfnq5koqdj2hbrt36m7z32i",
+          "bytes": 402608466,
+          "files": 95,
+          "verified_at": "2026-08-03T23:43:01Z"
+        },
+        {
+          "series_id": "2da1ec21-e476-40df-bc45-fb07573bdfe5",
+          "title": "36 Points #10",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeigplv3szo3unblyj2gpcohxc743fbod2jhlppvinsxn6dyi7z35uq",
+          "bytes": 367857102,
+          "files": 36,
+          "verified_at": "2026-08-03T23:43:56Z"
+        },
+        {
+          "series_id": "2dbd7ac7-afe2-43fd-a83c-2156406c158e",
+          "title": "36 Points #08",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeidhblkpai7wkafvxc7ekr7eltya5w7jvj7m42vqpeurjpnk6mfvbi",
+          "bytes": 367859821,
+          "files": 36,
+          "verified_at": "2026-08-03T23:44:43Z"
+        },
+        {
+          "series_id": "2e68b1a3-6370-4ad5-af12-153de80637eb",
+          "title": "Infinite Entropy 13",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeigdm767ngpdhm3oz4tlizqyvnyrhrqwjxd6lrdgduprz3syq5hzqi",
+          "bytes": 6626115,
+          "files": 10,
+          "verified_at": "2026-08-03T23:44:54Z"
+        },
+        {
+          "series_id": "2ee448fc-b02a-4f74-a8c0-0e4da84f7ab1",
+          "title": "MAJLIS AL-JINN: Huma + The Archive",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeibhvwrgqdd3agtmi5alejzklrdwewf4v6ag325gxaixvla7vjp5k4",
+          "bytes": 687555691,
+          "files": 6,
+          "verified_at": "2026-08-03T23:47:34Z"
+        },
+        {
+          "series_id": "2fb649d0-3ed2-4539-8ea2-e073b85e9a21",
+          "title": "Umwelt",
+          "artist": null,
+          "exhibition": "graph-eg6",
+          "cid": "bafybeignug5bwyrd6gjat3qvny37v4c4padxupmzbya4ardqv6mwq24pja",
+          "bytes": 997319118,
+          "files": 1583,
+          "verified_at": "2026-08-03T23:50:40Z"
+        },
+        {
+          "series_id": "30780351-fa82-47f1-9a2d-7d331f460995",
+          "title": "Infinite Entropy 20",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeigzh5ry3tosiqsmhqmfs4jmhlq4l6aoxy2kjtlqk5tihg45elbmsq",
+          "bytes": 6626445,
+          "files": 10,
+          "verified_at": "2026-08-03T23:50:51Z"
+        },
+        {
+          "series_id": "3110459a-bcad-4dd9-a43d-a0f1eaddc0f8",
+          "title": "Slinky Dog",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeiax7cme5qagnacgabj5le3frhg4goplxzgyoncmxx2iin7lysa2a4",
+          "bytes": 639663596,
+          "files": 393,
+          "verified_at": "2026-08-03T23:52:37Z"
+        },
+        {
+          "series_id": "31a680b4-c00a-4eac-8729-cba633c91c54",
+          "title": "Ganxillo",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeib5mbnyh3s3pbpoophkn5if3nfcaljhxgomtizzij6e4i6skywuve",
+          "bytes": 753669637,
+          "files": 23,
+          "verified_at": "2026-08-03T23:53:56Z"
+        },
+        {
+          "series_id": "31bc21a0-c834-49a3-866f-d4839cbe14df",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — G",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeigg55usboqwovt2hdtg3dhjcjsxj2ty2fka7ogde474qmarynpmqi",
+          "bytes": 271013897,
+          "files": 6,
+          "verified_at": "2026-08-03T23:54:30Z"
+        },
+        {
+          "series_id": "31eb3d1f-9bf5-4f87-b1ea-b9a4a98a348b",
+          "title": "smoking-vase-1",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeidh5i7bp3xoqyldjjbob5mc4jyxxcupoaacirdbceh3sepxepkbiq",
+          "bytes": 323023109,
+          "files": 6,
+          "verified_at": "2026-08-03T23:55:03Z"
+        },
+        {
+          "series_id": "3224d677-f521-415d-86c0-1f2f9c47abef",
+          "title": "CUSP - Marsh Birds",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeicllvhrbufjx3mmckamacmbmj5zulwc7pikyoizc7z5v65orexdga",
+          "bytes": 4869828359,
+          "files": 8,
+          "verified_at": "2026-08-04T00:06:57Z"
+        },
+        {
+          "series_id": "33e55482-5dac-40b8-972e-750c374d69bb",
+          "title": "Lamia",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeicyr67aors2ppetayopqpcn42em5v4dpeo56ki65fsnjaej7c3tpm",
+          "bytes": 366231326,
+          "files": 15,
+          "verified_at": "2026-08-04T00:08:05Z"
+        },
+        {
+          "series_id": "34f52c05-cde0-4dee-880b-df96eebf37be",
+          "title": "Infinite Entropy 23",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeiamizldgiapenyoyulhpvxcx6hhgprpx7nj3wshp4xynxxqbtb3f4",
+          "bytes": 6626953,
+          "files": 10,
+          "verified_at": "2026-08-04T00:08:18Z"
+        },
+        {
+          "series_id": "35b11663-0ced-4c14-9113-b5d763da0040",
+          "title": "36 Points #34",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeiaj7oththdzkzs6zjwseh4a625f2rzmqg3tts36ugjad6h56pl6eq",
+          "bytes": 367864216,
+          "files": 36,
+          "verified_at": "2026-08-04T00:10:00Z"
+        },
+        {
+          "series_id": "361076b7-b4f5-4b47-b800-8c1f31100271",
+          "title": "36 Points #23",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeieqvvxxamxzzf7jkg3s2q75ywqwaciv66s24iiychxys63mnfld4y",
+          "bytes": 367864733,
+          "files": 36,
+          "verified_at": "2026-08-04T00:10:48Z"
+        },
+        {
+          "series_id": "3620d7ce-0677-4c59-be8e-0638632dc43b",
+          "title": "k.a9",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeigtcztnz3tv3v4jnavliz4prfkzseyuokf2vglbkulctgqp3jumti",
+          "bytes": 373943518,
+          "files": 17,
+          "verified_at": "2026-08-04T00:11:33Z"
+        },
+        {
+          "series_id": "37e6066c-9997-4939-ac9a-e92685e71cf6",
+          "title": "Infinite Entropy 19",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeicbg4xiensgxclzhzmejtahye6broyfb5ru7gact7h6hajrqljd4y",
+          "bytes": 6626160,
+          "files": 10,
+          "verified_at": "2026-08-04T00:11:45Z"
+        },
+        {
+          "series_id": "398716ae-a05b-43bb-adb8-48e56114af6a",
+          "title": "Vectoria",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeihhbbixxlc3phvir4as6y54t5d777lo6fr3272q5bcuaj4ilj2mpa",
+          "bytes": 1318391739,
+          "files": 29,
+          "verified_at": "2026-08-04T00:15:13Z"
+        },
+        {
+          "series_id": "3a13e193-725f-4a07-b5fa-51f36fc79050",
+          "title": "People Pleaser",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeif4jcuviufllzgduwbmmx7w7vilccczzqu7rrqtoxyd5p7w2jfeya",
+          "bytes": 1186470928,
+          "files": 393,
+          "verified_at": "2026-08-04T00:18:25Z"
+        },
+        {
+          "series_id": "3a9f6d14-d53d-4d5c-b55a-f0e5793d5d0e",
+          "title": "Spectrality (from The Divers, IX)",
+          "artist": null,
+          "exhibition": "the-bardo-unpacking-the-real-a2j",
+          "cid": "bafybeierrxf7ih34ahwnrvjay46fv76iw5lmqdu3f3pq6mozuzfzcityo4",
+          "bytes": 381280648,
+          "files": 17,
+          "verified_at": "2026-08-04T00:18:57Z"
+        },
+        {
+          "series_id": "3aca483a-59b7-4839-b66e-74d5e75c4735",
+          "title": "Infinite Entropy 11",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeic257wji377535f6wj5ain2fuwhw3wsf37phn65rsbuxrqw3ppnma",
+          "bytes": 6973247,
+          "files": 16,
+          "verified_at": "2026-08-04T00:20:07Z"
+        },
+        {
+          "series_id": "3e8f638a-c7e2-403a-98d8-c185411825bd",
+          "title": "Acrylic Interval",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeiagd2jnhomuidaeksivexvbmmpqvaxemdmhz2xgpkhu7cjfmkesxm",
+          "bytes": 464562363,
+          "files": 28,
+          "verified_at": "2026-08-04T00:20:44Z"
+        },
+        {
+          "series_id": "412f980a-0fbc-4458-983a-85a1d81b6371",
+          "title": "Hypothetically Micro",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeieankt47rfuamjp6b6kajriqea72tbirvyihqp4ptwccbuxanxucq",
+          "bytes": 120524083,
+          "files": 6,
+          "verified_at": "2026-08-04T00:21:01Z"
+        },
+        {
+          "series_id": "434b4eab-f8ed-4e75-b80f-5377e08ca430",
+          "title": "Contested Zone",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeidicl46ejxjpe2w6j2bgr55qkfcqerbymz7zutmkfdt7cbvqrs2am",
+          "bytes": 44322819,
+          "files": 15,
+          "verified_at": "2026-08-04T00:21:14Z"
+        },
+        {
+          "series_id": "43c29566-9fad-42ce-aab9-1c4947164d94",
+          "title": "Arrels",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeidjwmuz3a7kkv72i67n75bjgo2rx7ejmg22hm4e6275trzso2643y",
+          "bytes": 500348077,
+          "files": 18,
+          "verified_at": "2026-08-04T00:21:57Z"
+        },
+        {
+          "series_id": "43f6164c-d901-4e87-815a-c6689d05b48f",
+          "title": "Infinite Entropy 5",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeigi4wxi2uisvz4x6kr6c3cvtis7ecun4da3yxe6n7at6wcj26ebfi",
+          "bytes": 6973804,
+          "files": 16,
+          "verified_at": "2026-08-04T00:22:07Z"
+        },
+        {
+          "series_id": "47ab1047-708d-4f36-b5de-68e5995e175f",
+          "title": "Infinite Entropy 15",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeie53f3d2zzcqawwb6vkrxjrp2aqbziym5qryzlvnw7wlkmioaqyje",
+          "bytes": 6626033,
+          "files": 10,
+          "verified_at": "2026-08-04T00:22:16Z"
+        },
+        {
+          "series_id": "47db4cae-c786-4bb3-8735-e932ab81ed7f",
+          "title": "Predictive Art Bot",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeia5dvt44c2qd6clgvq6jpn5bkyaqbf7gh7pmtopk3vr2gmjawe7xq",
+          "bytes": 796814841,
+          "files": 151,
+          "verified_at": "2026-08-04T00:23:22Z"
+        },
+        {
+          "series_id": "48f6b892-d3aa-4eae-87db-040e195e00a5",
+          "title": "Forest Transmission",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeidwj7djbflrcmmlj27mwmyjbt745jeumo64vzq42ggjwirzzacxoi",
+          "bytes": 32840495,
+          "files": 6,
+          "verified_at": "2026-08-04T00:23:35Z"
+        },
+        {
+          "series_id": "496bd7c1-d524-44fd-b8d6-9eb03fb9f320",
+          "title": "Signal of the World",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeiahr2sgd3vakxbgdfhudgd7o3zeyyeiqekhp37lixag6rc36stbv4",
+          "bytes": 261663044,
+          "files": 6,
+          "verified_at": "2026-08-04T00:24:01Z"
+        },
+        {
+          "series_id": "4a58d6e4-d014-4ea3-9837-f7892fd48157",
+          "title": "Venuses (quantum bodies watched by Open Pose algorithm)",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeiboe6htxcqfhkbczn4cm3pbcxnc3qlacrtfj6vkre7r65pwx3acre",
+          "bytes": 203498543,
+          "files": 6,
+          "verified_at": "2026-08-04T00:24:22Z"
+        },
+        {
+          "series_id": "4ac90d22-2b94-4dad-8685-3df950746010",
+          "title": "Infinite Entropy 7",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeih23umej2xwtoshb43c5awowlw2s7xgp2kkibq3mqd3gx2guycote",
+          "bytes": 6973234,
+          "files": 16,
+          "verified_at": "2026-08-04T00:24:32Z"
+        },
+        {
+          "series_id": "4f3fe912-d226-48b1-8120-56566426d110",
+          "title": "Are Smart Machines Alive?",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeie6vlj7z2j67ztz7fy7pxwqlktvm2dujyh5f52cxfbrvwlf4ev26u",
+          "bytes": 1622543605,
+          "files": 6,
+          "verified_at": "2026-08-04T00:27:14Z"
+        },
+        {
+          "series_id": "4f6816b5-3d84-4715-b025-c8a837030b49",
+          "title": "Hatless",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeihqrazspyqdoxrpngewiua6miqtg6txuonfnxvhfccsdp3afr6xji",
+          "bytes": 25881491,
+          "files": 18,
+          "verified_at": "2026-08-04T00:27:25Z"
+        },
+        {
+          "series_id": "4f69d4eb-5f33-4d3b-a0ac-cc4189bf1f83",
+          "title": "Infinite Entropy 2",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeiddzotkgk5zgq2i77rhqs5l3io4gyzi3hl3doy4pbven7pxrqzbii",
+          "bytes": 6973768,
+          "files": 16,
+          "verified_at": "2026-08-04T00:28:34Z"
+        },
+        {
+          "series_id": "500ccc6e-d7ad-443f-a9df-0bf709b3b3c9",
+          "title": "36 Points #27",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeibidw7ai6o26o36myvbykjoespazfogie54o3e427sdbjmn6crtfm",
+          "bytes": 367862680,
+          "files": 36,
+          "verified_at": "2026-08-04T00:29:06Z"
+        },
+        {
+          "series_id": "50aa02eb-dccf-4003-99a2-69a1f62cb337",
+          "title": "Caylx",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeidmh6ydom3pxsuvgzyjatqyluwvos46gpm3aimw5vjrlhswmagyhy",
+          "bytes": 1254937286,
+          "files": 6,
+          "verified_at": "2026-08-04T00:30:51Z"
+        },
+        {
+          "series_id": "51a53d4e-c60f-4582-8edc-c9998ed40a24",
+          "title": "Ultimate Solvers",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeihoraaza7slxryygiusthopg2q5xe2vn4b3pxqp7oadgc6hokde54",
+          "bytes": 376146279,
+          "files": 66,
+          "verified_at": "2026-08-04T00:31:21Z"
+        },
+        {
+          "series_id": "522055e6-e5d8-41b5-8cad-9823c9666e2a",
+          "title": "Estroworld Now: The Quarantine Edition",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeicvqfwxrp2pscpwpohccunn2f4q7pndz74pdrzwp2llcqhxrr46c4",
+          "bytes": 697378111,
+          "files": 37,
+          "verified_at": "2026-08-04T00:32:15Z"
+        },
+        {
+          "series_id": "5440b100-26fe-41b6-b55e-96ff06b5a94a",
+          "title": "The Interfered Microscopy Plot",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeiakdubxwnck4evy5owr2rdys4doxfsraswug2rwricbysaep7w574",
+          "bytes": 17077679826,
+          "files": 11,
+          "verified_at": "2026-08-04T01:00:42Z"
+        },
+        {
+          "series_id": "5472181b-3d22-436b-88fb-bb3e07fa073d",
+          "title": "Satellite",
+          "artist": null,
+          "exhibition": "the-long-cut-bqv",
+          "cid": "bafybeigytoeg4kw6argrw6vhy4erqk2r4ontw56lnkkno2nutkff2jasku",
+          "bytes": 592421069,
+          "files": 7,
+          "verified_at": "2026-08-04T01:01:21Z"
+        },
+        {
+          "series_id": "5af4af6f-1e6b-4e45-95db-7b4de60fe0ca",
+          "title": "enchanting luxuriance",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeigs4ctgxsqylxoxs5hexdgjmb6vzknsclyfrbczpmheqelxexpft4",
+          "bytes": 365815967,
+          "files": 16,
+          "verified_at": "2026-08-04T01:01:47Z"
+        },
+        {
+          "series_id": "5d7e9132-059f-44d9-a6a9-3c8a9b688965",
+          "title": "POST 1",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeig5r7sq6z2e4z64ud46ozybluc2dzn3jstmz6s4rdgh56n2oym6iq",
+          "bytes": 4362830247,
+          "files": 107,
+          "verified_at": "2026-08-04T01:06:19Z"
+        },
+        {
+          "series_id": "5e0a93aa-22d0-4305-8bdd-5806dab5503a",
+          "title": "Endless Monologue",
+          "artist": null,
+          "exhibition": "graph-eg6",
+          "cid": "bafybeift6sgbkz2ce4bxi5srx5cj5oef3fn7deu5m7xhdzxmrpcbikcmqq",
+          "bytes": 3791728017,
+          "files": 1756,
+          "verified_at": "2026-08-04T01:10:07Z"
+        },
+        {
+          "series_id": "5eb92ed1-7e81-4b2f-a24c-8e2a67c085e8",
+          "title": "Lately When I Fly",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeibkzjpgmlst3encr3nnekhydaxvrce7gnbbn2fqefx7x2ncqkjbya",
+          "bytes": 1374652898,
+          "files": 393,
+          "verified_at": "2026-08-04T01:11:56Z"
+        },
+        {
+          "series_id": "6053b698-2016-4c05-9353-6941635c1609",
+          "title": "The Shredded Hologram Rose",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeidi4zayanprs73wm6ctjm42766psmqeuknoncdxdaey5xbvaobwa4",
+          "bytes": 6680392278,
+          "files": 9,
+          "verified_at": "2026-08-04T01:20:18Z"
+        },
+        {
+          "series_id": "61c2c2b6-4f2c-4e1b-9e45-23faf3e76594",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — D",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeih2b3zz3wk7sg6frg77gxy5x65eczgpwrom72acggv3ntd5xfqqnm",
+          "bytes": 279583506,
+          "files": 6,
+          "verified_at": "2026-08-04T01:20:46Z"
+        },
+        {
+          "series_id": "669bc223-2deb-48f3-b5ba-e44d086bee6c",
+          "title": "36 Points #21",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeiekubxeejk4isqqdk3mvzispt3p5lzqwfyjdklklihteouwawuiam",
+          "bytes": 367863371,
+          "files": 36,
+          "verified_at": "2026-08-04T01:21:14Z"
+        },
+        {
+          "series_id": "6835b45f-7f3f-4caf-8a74-d52b35a24df1",
+          "title": "36 Points #36",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeidavyoar65ugcipgv62k4efnm4ak3wq7dpzpluxlofkzzuntn45jq",
+          "bytes": 367857188,
+          "files": 36,
+          "verified_at": "2026-08-04T01:21:39Z"
+        },
+        {
+          "series_id": "685f39aa-f9ca-4bfd-84af-d69ad3f8b2c3",
+          "title": "Plants are everywhere you can’t see them",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeifybay75hl3s4jftjcgt4ejeirtqpf4tr6gfsvozdiduszxctqywq",
+          "bytes": 4187791,
+          "files": 6,
+          "verified_at": "2026-08-04T01:21:47Z"
+        },
+        {
+          "series_id": "6862d0b4-252f-469d-8327-c0d79f8b4a67",
+          "title": "4 ORBS",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeib22w2uqcuz4by4pbks424nxle5d2v7p57baoanxk2mrghgohwdqe",
+          "bytes": 6008505976,
+          "files": 95,
+          "verified_at": "2026-08-04T01:29:30Z"
+        },
+        {
+          "series_id": "69518c54-2bc5-4b90-b606-675529c7593d",
+          "title": "can I go where you go?",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeiekydzjieevnvejyzeylcb537lomykxqirxdzzixsjptnld5teiui",
+          "bytes": 426730822,
+          "files": 29,
+          "verified_at": "2026-08-04T01:30:11Z"
+        },
+        {
+          "series_id": "6a0781b7-93ff-4cef-9a92-6e197990be57",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — H",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeici5d46oflrjrwxkmgyztlardxekpr5pticvcyagqcs22vlkuknqm",
+          "bytes": 161425847,
+          "files": 6,
+          "verified_at": "2026-08-04T01:30:33Z"
+        },
+        {
+          "series_id": "6b095c1c-b367-4f4c-b583-6f0ae975e463",
+          "title": "Each and Every Command",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeicyjrxmqinalnopezucwd2f7qt6hvsz7sgik3mthfr3xk3wnzamom",
+          "bytes": 179874502,
+          "files": 10,
+          "verified_at": "2026-08-04T01:31:50Z"
+        },
+        {
+          "series_id": "6bcc9b62-0ca3-4fdc-8232-0a3f2d4adf13",
+          "title": "peep-o-rama",
+          "artist": null,
+          "exhibition": "the-bardo-unpacking-the-real-a2j",
+          "cid": "bafybeibwtanhwslfpsrie457udacbbkvqiobli4cfilov6kbtna5ybyxde",
+          "bytes": 5043262699,
+          "files": 18,
+          "verified_at": "2026-08-04T01:39:15Z"
+        },
+        {
+          "series_id": "6ceb34ad-a8e2-40af-ada7-121a778ec352",
+          "title": "Contemplating Motion",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeieimhp3lpb54zr27dnjntozwsxvqvoitammkv5qkfjqs6pne4pvsu",
+          "bytes": 25470855619,
+          "files": 16,
+          "verified_at": "2026-08-04T02:08:11Z"
+        },
+        {
+          "series_id": "6d1a279d-0ddc-4067-84e4-0e0e96fd36fb",
+          "title": "Housewives Making Drugs",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeieulfkcysuqtgpg3bpz3ttzdsf4hdop4wbym3yf2netidmnvww2aa",
+          "bytes": 2054654799,
+          "files": 6,
+          "verified_at": "2026-08-04T02:10:26Z"
+        },
+        {
+          "series_id": "6dde453e-259f-49b7-b5db-02c7a41d049b",
+          "title": "Infinite Entropy 21",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeidmclahatecjksuzij3udypgxbhhcvshitgamvwbxhukg3jpyfora",
+          "bytes": 6625960,
+          "files": 10,
+          "verified_at": "2026-08-04T02:10:35Z"
+        },
+        {
+          "series_id": "6e0b8c01-5b11-4ceb-b40a-c1d8efa4a66a",
+          "title": "Minos",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeia56zidt3lqekzcmbwcdbychrnaua7ovo7ajxwdgk27rqemxy5n7i",
+          "bytes": 728911206,
+          "files": 45,
+          "verified_at": "2026-08-04T02:11:25Z"
+        },
+        {
+          "series_id": "6f5db274-ea1f-47b6-82ab-13b0ad650d36",
+          "title": "36 Points #03",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeiaovhpygo6at2svrxbmlsfwyvzuwhcxxoarfpbpyyacx6infa4j2i",
+          "bytes": 367858041,
+          "files": 36,
+          "verified_at": "2026-08-04T02:11:50Z"
+        },
+        {
+          "series_id": "71e492dd-e8e6-4b1e-8bf1-ee6d8708e04e",
+          "title": "What’s Inside Your Heart?",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeidx55bbgrs4btysw5qqb7ber7lew6rj4pacclg3h3cp5icuppjqcy",
+          "bytes": 1421945454,
+          "files": 395,
+          "verified_at": "2026-08-04T02:13:50Z"
+        },
+        {
+          "series_id": "725023bf-1604-4f3b-8e57-100500682b29",
+          "title": "Sketches in Iron",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeig3rxzsua6lhk2ec4rrludgrehph3au3qrbqln2sqsizs7u4rdxjq",
+          "bytes": 1981124979,
+          "files": 9,
+          "verified_at": "2026-08-04T02:17:54Z"
+        },
+        {
+          "series_id": "7462201d-7fd6-4ee9-83f6-4e4b35c39de1",
+          "title": "There once was a jellyfish ...",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeiewdtlsn2u6z6rzgy5hsvktlr7ji4gshnlpiehnzs7cnivc6demmi",
+          "bytes": 569488906,
+          "files": 6,
+          "verified_at": "2026-08-04T02:18:39Z"
+        },
+        {
+          "series_id": "746f680d-9a6c-4125-9486-3271bdbe7e6e",
+          "title": "Sigils",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeif7kl7iehevionejdw67kce3hrw3i32vbjy35n3u7gndl2nl2fnz4",
+          "bytes": 1244898638,
+          "files": 6,
+          "verified_at": "2026-08-04T02:20:03Z"
+        },
+        {
+          "series_id": "7764ae91-0392-48fb-b68c-796d701bed08",
+          "title": "Earmark",
+          "artist": null,
+          "exhibition": "the-bardo-unpacking-the-real-a2j",
+          "cid": "bafybeiflzhzqrxhibhs3v6krmnxkqf2i5zizpy4ew7daoddzldji34uevm",
+          "bytes": 2633395084,
+          "files": 630,
+          "verified_at": "2026-08-04T02:23:26Z"
+        },
+        {
+          "series_id": "78850fcd-afca-4757-a9c6-9c847cb3c49d",
+          "title": "The One Who Lived Yesterday",
+          "artist": null,
+          "exhibition": "the-long-cut-bqv",
+          "cid": "bafybeih4sxrbaatq5c5dk5byitrjssd2jlch4revihkyyzihdfjgizjhr4",
+          "bytes": 850896028,
+          "files": 6,
+          "verified_at": "2026-08-04T02:24:22Z"
+        },
+        {
+          "series_id": "78e56727-5b72-4f98-bbef-67ed004a635d",
+          "title": "36 Points #35",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeih3ietvcvra4eroraxgjbl3zoommzfe3bwzneobr574d4lqjum22u",
+          "bytes": 367858611,
+          "files": 36,
+          "verified_at": "2026-08-04T02:24:46Z"
+        },
+        {
+          "series_id": "79cb077a-355b-4694-a787-f023abf070de",
+          "title": "ᖴᗩᑕIᗩᒪᔕ I",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeic2gf5uhyqtke3g3kxd2ydnmintpnamjmkztos5aiumzy5uwgsyqy",
+          "bytes": 7268918998,
+          "files": 9,
+          "verified_at": "2026-08-04T02:33:15Z"
+        },
+        {
+          "series_id": "7ad28960-94f5-465f-b586-9d7834da476b",
+          "title": "36 Points #15",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeiaozarvquwdhcparzyqrcaekuam3umuilhlxf42vugi62y27hvxnq",
+          "bytes": 367861566,
+          "files": 36,
+          "verified_at": "2026-08-04T02:34:38Z"
+        },
+        {
+          "series_id": "7b77f5d5-fefc-4a77-a40c-e9e8e5f8f9cb",
+          "title": "Rewilded Topography #1 ",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeigy6l47vgui4z5f5cot2rpycspngari34ldf2ynecfwkeve3tmk74",
+          "bytes": 39077586234,
+          "files": 9,
+          "verified_at": "2026-08-04T03:27:38Z"
+        },
+        {
+          "series_id": "7ba57167-a13e-4033-b07e-c7094f74410c",
+          "title": "Embryogenesis",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeicjxkhpyk5ojyw6zit6d4c4a6dwtybzkzrqp7hjb2ehwe36ei7oce",
+          "bytes": 16646490522,
+          "files": 8,
+          "verified_at": "2026-08-04T03:48:00Z"
+        },
+        {
+          "series_id": "7e2aceea-c9f0-4afc-a4c6-8d37dda61d02",
+          "title": "36 Points #22",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeicwhw2pl4zgedl3j7womi2muwsmsmveg4qi7i2k5jmlqpgpq7ea7u",
+          "bytes": 367862516,
+          "files": 36,
+          "verified_at": "2026-08-04T03:48:22Z"
+        },
+        {
+          "series_id": "7e92539c-65ce-426b-a243-9b043d0defda",
+          "title": "36 Points #25",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeibe5hzxrgni2v6wbx6wybkirfs23wti77cy5pk3vdz4mzw3hsn3bi",
+          "bytes": 367863873,
+          "files": 36,
+          "verified_at": "2026-08-04T03:48:41Z"
+        },
+        {
+          "series_id": "81c8f5d2-9f23-4584-8ee5-f7c975dc7951",
+          "title": "36 Points #11",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeieeesftnsithyhto44i2vme2rfqls2auub4oa2r42kknqfa5a7vpi",
+          "bytes": 367854914,
+          "files": 36,
+          "verified_at": "2026-08-04T03:49:02Z"
+        },
+        {
+          "series_id": "821dd86a-8764-441f-af58-95c857a7c4d3",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — B",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeiglbibh37slgehm44l4l7j6fdbuu5xw2bmc6l3jxwf4h4yn63iu6u",
+          "bytes": 149314986,
+          "files": 6,
+          "verified_at": "2026-08-04T03:49:17Z"
+        },
+        {
+          "series_id": "83c776c3-262e-4f1d-95f9-97f6d2ccb7cd",
+          "title": "Fragments of Self",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeigzivh4xfvykmngitsonfrzla33wg5gyj4k6pseshjbgatebz6xmu",
+          "bytes": 2204078812,
+          "files": 7,
+          "verified_at": "2026-08-04T03:51:30Z"
+        },
+        {
+          "series_id": "8711ddf0-0474-4a8d-a5ec-30c7f42977df",
+          "title": "Daemon (chaos)",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeifdrgmic7h3oco5cri7j2dm2xq3dkw7zkgwzlcliukxu3d3fxvf7u",
+          "bytes": 302189138,
+          "files": 6,
+          "verified_at": "2026-08-04T03:51:52Z"
+        },
+        {
+          "series_id": "8718cfaf-3a37-4112-bc66-c3654d2fb302",
+          "title": "Pixie",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeigpqo26mvaxijlitvyifi5r2fzqwrpuafhuhwedhjcjqdutkkht3a",
+          "bytes": 15301766280,
+          "files": 12,
+          "verified_at": "2026-08-04T04:08:50Z"
+        },
+        {
+          "series_id": "87eafff7-a8c6-4d3f-bc51-3e23bc745125",
+          "title": "Infinite Entropy 1",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeieibnz2w3g2lmrkerkw5s2fopsodkr7kuzwerxoowgxsq3zq2uhbu",
+          "bytes": 7319565,
+          "files": 22,
+          "verified_at": "2026-08-04T04:09:00Z"
+        },
+        {
+          "series_id": "89c348c1-6e78-4e00-ac3f-f58c9e732731",
+          "title": "Mutant Bagua",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeiaf2flxg3beijmsvlvrgqvjvhccmu6htjri7iuntoa7ohmwhbijoq",
+          "bytes": 812414754,
+          "files": 36,
+          "verified_at": "2026-08-04T04:09:47Z"
+        },
+        {
+          "series_id": "8d97e575-0837-4092-bca1-10d58195e414",
+          "title": "hedgerow still life",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeicgodciymtufs265gzsoxcvfmct6yrlvlzywjtdqbb27t5fchr5ea",
+          "bytes": 39968420,
+          "files": 6,
+          "verified_at": "2026-08-04T04:09:57Z"
+        },
+        {
+          "series_id": "8fc2a19f-4393-4fa4-aee0-91c365232cef",
+          "title": "Infinite Entropy 12",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeiakqt6qkyt5zleohpnzfbgbjestpucdhgecl7t24x5vf6n4psa2li",
+          "bytes": 6974073,
+          "files": 16,
+          "verified_at": "2026-08-04T04:10:06Z"
+        },
+        {
+          "series_id": "90b82f85-dda3-417b-8af3-7e2d9a8756ba",
+          "title": "Movie on 06-03-22 at 1.00 PM",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeiej5izkmfqfpurwz3yztupggjd5rgcp2jyp43kbqmsqsq4erghlwe",
+          "bytes": 3881831971,
+          "files": 9,
+          "verified_at": "2026-08-04T04:14:39Z"
+        },
+        {
+          "series_id": "91a3ea94-f606-40a9-9e39-611bdcb46fdd",
+          "title": "Just in case",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeielda3tqfkjdpjwqkbvmc476emexjp32nyjijex7vekdr3mrry2gm",
+          "bytes": 5663241,
+          "files": 6,
+          "verified_at": "2026-08-04T04:14:48Z"
+        },
+        {
+          "series_id": "92a0c691-c281-4a93-ae1f-48d5eacd0ee3",
+          "title": "Leaves of Manifold, of Red and Gold",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeieggigrkkj6ta5hhvpuppsnp63hepaaprbrfnyxettiwlu2zipzoe",
+          "bytes": 80809827,
+          "files": 7,
+          "verified_at": "2026-08-04T04:15:01Z"
+        },
+        {
+          "series_id": "93544620-dff8-4ae5-8194-3f527e8cc91e",
+          "title": "Contrafictionary",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeieu2pn2d5jj2vdj5walkwxgraxf6fuwkxzqrlqfouwzgpfhldm6a4",
+          "bytes": 605477748,
+          "files": 28,
+          "verified_at": "2026-08-04T04:15:44Z"
+        },
+        {
+          "series_id": "94c4b51e-3c29-4568-9545-0556b290e14b",
+          "title": "36 Points #12",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeica5xymlytcddeqadjdcrtbfocjjefbs5n6xiq6hxoayugiagb67m",
+          "bytes": 367859938,
+          "files": 36,
+          "verified_at": "2026-08-04T04:16:09Z"
+        },
+        {
+          "series_id": "96f1663b-5216-4758-aa7f-3a70e6d9d45b",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Generative Study 1",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeicyfrsbg6t3xvcq7ybr5vjwkjpxtblhumvrqfl5uqssuwh46pyvla",
+          "bytes": 9481635050,
+          "files": 6,
+          "verified_at": "2026-08-04T04:27:00Z"
+        },
+        {
+          "series_id": "9841c727-f5c8-40e4-b995-0716eeff843f",
+          "title": "Daemon (cene)",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeidtiywaimofnd5hpqjkfdmycfqqj5vpglh5wvmxtvv7b2cpv754qy",
+          "bytes": 312606017,
+          "files": 6,
+          "verified_at": "2026-08-04T04:27:24Z"
+        },
+        {
+          "series_id": "9849f146-aef6-4614-9f8e-6bbf82fba520",
+          "title": "Bindigrl",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeiazohczudfjrdebq3oq5zgbtaxw3lcrc6o7mezvyu5txc5w6lmdjy",
+          "bytes": 5211641,
+          "files": 7,
+          "verified_at": "2026-08-04T04:27:31Z"
+        },
+        {
+          "series_id": "9983bf66-380e-4af3-bee9-237c492f18a0",
+          "title": "uneasy dream",
+          "artist": null,
+          "exhibition": "social-codes-pcl",
+          "cid": "bafybeigxyznfndn4oq6ugjjkyit3dubuhao2pqu5qrr4ft77u6wkyziknq",
+          "bytes": 366164849,
+          "files": 25,
+          "verified_at": "2026-08-04T04:27:57Z"
+        },
+        {
+          "series_id": "99d373e5-cc9d-45e8-8aa5-1ed47e481791",
+          "title": "(The illusion of) depth of knowledge",
+          "artist": null,
+          "exhibition": "graph-eg6",
+          "cid": "bafybeibisamrcykrgb7q4txzdddmofqnpkhbnz54pobqttddu3sx4x6qey",
+          "bytes": 483431025,
+          "files": 594,
+          "verified_at": "2026-08-04T04:28:47Z"
+        },
+        {
+          "series_id": "9ce5936e-a888-4302-a998-146823306098",
+          "title": "Puzzle",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeiawppq5i47xhmoqt6fye7y2z6ad3tn7zhn6cdtilxenkex6wprhvq",
+          "bytes": 1429084154,
+          "files": 393,
+          "verified_at": "2026-08-04T04:30:30Z"
+        },
+        {
+          "series_id": "9d72a792-cd60-40b6-a8aa-59bc41a9cacb",
+          "title": "Social Capital Fights",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeieybj2u7lfl6yccux7fi3b7povwubuttjyqz6dxhbhjikrju44yui",
+          "bytes": 403640417,
+          "files": 7,
+          "verified_at": "2026-08-04T04:30:53Z"
+        },
+        {
+          "series_id": "9ddfcfcf-2e67-480d-9d3f-feb885acbafb",
+          "title": "36 Points #26",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeihhk7saxmepmzykc5fkuvqneelq5vcut7p6gjcbuhy6bapx7szdze",
+          "bytes": 367861797,
+          "files": 36,
+          "verified_at": "2026-08-04T04:31:16Z"
+        },
+        {
+          "series_id": "a187efae-f936-4363-8f77-61b650548144",
+          "title": "I Don’t Need an iPhone",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeidzh42sgs5c7b752ejo5qy72yfhnic5e6p4xef53ewkcheigabaqq",
+          "bytes": 1400627651,
+          "files": 397,
+          "verified_at": "2026-08-04T04:33:47Z"
+        },
+        {
+          "series_id": "a1b6689f-5236-471a-97a6-70ea0879dd42",
+          "title": "Emergence",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeidjvuuqd4rcjdqrk3u4z2urjsu5zdbehsww3gntwft7o6elueciqu",
+          "bytes": 13132371,
+          "files": 36,
+          "verified_at": "2026-08-04T04:33:56Z"
+        },
+        {
+          "series_id": "a2ba079e-319b-425a-b3df-6bb68c1b7343",
+          "title": "36 Points #02",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeihgtuqckjlmwlrt6443nuse5qis4ricbfhr3eqhvzelkhfaybr3tu",
+          "bytes": 367912530,
+          "files": 43,
+          "verified_at": "2026-08-04T04:34:19Z"
+        },
+        {
+          "series_id": "a3d23452-f377-4d0e-9a67-ecce7a182927",
+          "title": "Tapestry",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeih6qo7lin5btznnkyzund4tf5smuc7dfwkqlhqtpcaz35orcfymam",
+          "bytes": 316228962,
+          "files": 9,
+          "verified_at": "2026-08-04T04:34:42Z"
+        },
+        {
+          "series_id": "a566dd50-6194-4e88-8aec-59cebbc1ed55",
+          "title": "A Rose by Any Other Name",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeickuux7rjvdfppzz7elpr2j22ob4dzj5puukuizn22g6mhvxsfigm",
+          "bytes": 17680243820,
+          "files": 571,
+          "verified_at": "2026-08-04T04:53:52Z"
+        },
+        {
+          "series_id": "a7d428ec-48e2-492b-a6f1-36d7cadf3da7",
+          "title": "The Future of Your Digital Space",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeicekxy4c4ftpcwtljf2tjyfm5op5jgtnep3y3r3ddnor7owf4mcwm",
+          "bytes": 14819525,
+          "files": 8,
+          "verified_at": "2026-08-04T04:54:03Z"
+        },
+        {
+          "series_id": "abf1fd61-b911-402b-9e2e-d7dcf96c4d82",
+          "title": "Sketches in Iron",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeibiuacko6m3mu6kiqar77t2gr74kwgvo3tbslzekoh7gewkvqkjaa",
+          "bytes": 1756927079,
+          "files": 11,
+          "verified_at": "2026-08-04T04:56:09Z"
+        },
+        {
+          "series_id": "adc4221c-4f00-4193-ac82-c4d9b1a0b681",
+          "title": "Kiki.object",
+          "artist": null,
+          "exhibition": "the-bardo-unpacking-the-real-a2j",
+          "cid": "bafybeic4rofxoonb3izbevqnvd5lgeehxer6u5thee2h2eehuwfynz6ujm",
+          "bytes": 126644830,
+          "files": 21,
+          "verified_at": "2026-08-04T04:56:26Z"
+        },
+        {
+          "series_id": "af4fe2af-67bb-4440-9885-621d5c3bf965",
+          "title": "Picnic 002",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeice7up3tvdszmosb6efryeitgijbclsa5schmwbum2js5m3ifzbfe",
+          "bytes": 8591182,
+          "files": 7,
+          "verified_at": "2026-08-04T04:56:36Z"
+        },
+        {
+          "series_id": "b0cd5f03-3a5b-4be3-9c58-b05d2b388c5a",
+          "title": "36 Points #30",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeigsivruuabqti5uhzch4mbghzmzlia6y6xpq2fv4rhg2lmtruxugu",
+          "bytes": 367859822,
+          "files": 36,
+          "verified_at": "2026-08-04T04:57:01Z"
+        },
+        {
+          "series_id": "b3dacae7-dcc3-40e1-9dd4-9e2047398c01",
+          "title": "Rose",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeif6cp53jrc2kfqjvm5kxk7mszp333h2z2miwduj7kswgdokks7jti",
+          "bytes": 461864577,
+          "files": 6,
+          "verified_at": "2026-08-04T04:57:38Z"
+        },
+        {
+          "series_id": "b4a46d9c-fa16-4a2c-a11d-03b49d5b1e63",
+          "title": "Infinite Entropy 17",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeigve2vxjndo5otog643oldxirwhkrisb2z4g5tjfi62mb5jzg6yuy",
+          "bytes": 6625456,
+          "files": 10,
+          "verified_at": "2026-08-04T04:57:47Z"
+        },
+        {
+          "series_id": "bb118c17-1444-4c39-9587-64aa126d6f58",
+          "title": "Cyberflesh Girlmonster-4 Recuperated Stills",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeigfviaq4me5kn3t7scd727r2prtd742xncx65b7b2aqt7ojw5z7ni",
+          "bytes": 8168964,
+          "files": 6,
+          "verified_at": "2026-08-04T04:57:56Z"
+        },
+        {
+          "series_id": "bfecf42e-41e0-46a7-a948-435c5439d574",
+          "title": "36 Points #04",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeietdmp4qqz4ff7ap6udg55ojdd4a7yrsvfgh7fjc23t3h4zf2htae",
+          "bytes": 367860409,
+          "files": 36,
+          "verified_at": "2026-08-04T04:58:23Z"
+        },
+        {
+          "series_id": "c328998f-27d4-496f-acea-7c971416110e",
+          "title": "Every Icon: BlockPrint",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeiecs6igub4xpl3oy6h32b7hianrat45bgd73w24hbf3l62ywcvxci",
+          "bytes": 6499698999,
+          "files": 8,
+          "verified_at": "2026-08-04T05:07:07Z"
+        },
+        {
+          "series_id": "c32b4f0b-d3dc-43b8-bce2-011b82e57c97",
+          "title": "36 Points #07",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeigohkc5ahfmgvlrsauenotffqbqaiyqf72ujk3utxhkzm423wwjwu",
+          "bytes": 367863753,
+          "files": 36,
+          "verified_at": "2026-08-04T05:07:34Z"
+        },
+        {
+          "series_id": "c35a9579-e93c-4c57-9b02-7a923d8fd66a",
+          "title": "Malade Imaginaire",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeic23crmkvj65cr3gcdwggibvgrr57yholog5r2x5mzjo5k5vngkq4",
+          "bytes": 255467686,
+          "files": 10,
+          "verified_at": "2026-08-04T05:07:58Z"
+        },
+        {
+          "series_id": "c3b2c10b-91c6-4e2f-83bc-fcb5068e98be",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — C",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeic2xk2bmtz2omz2jy4sybtltbxwznzp6ozaokmmdwgcp3pj5ro7pm",
+          "bytes": 223764696,
+          "files": 6,
+          "verified_at": "2026-08-04T05:09:19Z"
+        },
+        {
+          "series_id": "c40d0e81-c8dd-44a3-9fc8-2caa36101516",
+          "title": "D. Flagellum",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeibxl7dmpqczx5y4axxoqmwjjl3yiair33pteooif6os4ub5hcjfjy",
+          "bytes": 151177520,
+          "files": 6,
+          "verified_at": "2026-08-04T05:09:35Z"
+        },
+        {
+          "series_id": "c4c506d9-a409-471a-bbf9-012bcfb1fa73",
+          "title": "Putins a WASTEMAN",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeic6ux6ijptxx7p56i7ubgio22iarydn7o7ryiodrs4427aylsrc7e",
+          "bytes": 527013627,
+          "files": 6,
+          "verified_at": "2026-08-04T05:10:14Z"
+        },
+        {
+          "series_id": "c4c9bfde-13bc-4cf5-bc4d-817280673ec3",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — E",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeiava7peexwfa2zul3wxlajtxpdaesdtjtpmdpkhm6w3gobmsjmct4",
+          "bytes": 291448081,
+          "files": 6,
+          "verified_at": "2026-08-04T05:10:42Z"
+        },
+        {
+          "series_id": "c66d0636-30c1-4227-819c-0e69924fc7a1",
+          "title": "Marine Emojidiversity",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeibcfdvmxnn36wal5pddhahpcj6paith2nalvhpj6dtpkinewwygka",
+          "bytes": 27431860,
+          "files": 6,
+          "verified_at": "2026-08-04T05:10:53Z"
+        },
+        {
+          "series_id": "c6b9fe72-76f2-4c2e-93b5-5251a5b222f6",
+          "title": "Environment",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeiajtkalsbb6pop24ajc3gyylquwhgacspxib4bhjbohevznvlxtke",
+          "bytes": 10198581118,
+          "files": 7,
+          "verified_at": "2026-08-04T05:25:06Z"
+        },
+        {
+          "series_id": "c974b77f-3734-4952-9cea-1dcd591cc48d",
+          "title": "Blue Veil",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeientzsntutw3ws36zdngk44d5ytz65wmfism4mevsagcmrf3ox4i4",
+          "bytes": 1464525942,
+          "files": 7,
+          "verified_at": "2026-08-04T05:26:55Z"
+        },
+        {
+          "series_id": "ca471793-baf8-43db-bf1a-b811f4608297",
+          "title": "Floralia II",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeiguolfo5yzqen7qalxv5mngx5z7rgfdfvqhl5u2bi5otnuel2awg4",
+          "bytes": 2971602268,
+          "files": 23,
+          "verified_at": "2026-08-04T05:30:44Z"
+        },
+        {
+          "series_id": "cb0fc2d2-1e7b-4a39-b518-2be692a52ffc",
+          "title": "36 Points #28",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeifwrphc6svbetx6ecur4f4cciyrbrf7yjz3gubachnyslqv46753a",
+          "bytes": 367858802,
+          "files": 36,
+          "verified_at": "2026-08-04T05:31:12Z"
+        },
+        {
+          "series_id": "cddc55e9-15b1-453e-9f5f-359171be96b5",
+          "title": "36 Points #13",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeihpeprynlanyswuitig5hks23rp4d7c3ojp3gkd4cbj6dxvuebt64",
+          "bytes": 367861280,
+          "files": 36,
+          "verified_at": "2026-08-04T05:31:38Z"
+        },
+        {
+          "series_id": "ce3a3a9a-e894-40a1-b531-95027b1328eb",
+          "title": "ماه طلعت، Moon-faced",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeiedt7lyjplpmmgdjktphfmruny77v5rjuks43ooj4zs6ozgslo2yy",
+          "bytes": 3442257310,
+          "files": 7,
+          "verified_at": "2026-08-04T05:36:22Z"
+        },
+        {
+          "series_id": "ce7c5624-af01-4a1d-ad77-eee51cb54327",
+          "title": "Temple Lily",
+          "artist": null,
+          "exhibition": "fragments-of-a-hologram-rose-liz",
+          "cid": "bafybeiapw6myktxzvtsytqs3jrodfjgpzivcwxvzaz33kk5eda4iutqevi",
+          "bytes": 3951182465,
+          "files": 6,
+          "verified_at": "2026-08-04T05:41:33Z"
+        },
+        {
+          "series_id": "cee5b80c-af17-44d0-9a56-c17a68f92569",
+          "title": "CHERTI",
+          "artist": null,
+          "exhibition": "graph-eg6",
+          "cid": "bafybeiej3lesjwhtldycq443en7bx2wzri76whtznlpypnjtss432ohu3i",
+          "bytes": 565712556,
+          "files": 1343,
+          "verified_at": "2026-08-04T05:43:37Z"
+        },
+        {
+          "series_id": "cf435a8a-c4df-4606-9acc-809217ab367b",
+          "title": "24/7",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeihaz7fqji5f7a2w3cevq5cw45puqbsgsuqh2gkzielig6qiuehrha",
+          "bytes": 1260048954,
+          "files": 6,
+          "verified_at": "2026-08-04T05:45:09Z"
+        },
+        {
+          "series_id": "cf44b110-3b40-471a-8415-c805c80baae9",
+          "title": "Infinite Entropy 9",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeif6xns3qhmvai6g2h6dfo46ihigu3wucnkdk57klt76d7g4l4gsle",
+          "bytes": 6974017,
+          "files": 16,
+          "verified_at": "2026-08-04T05:46:20Z"
+        },
+        {
+          "series_id": "cf4a1884-2d79-4875-bba1-20206a8a489c",
+          "title": "36 Points #31",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeievbllpvqitrta627yl6awnieonat5fpexydkfezz6pm4cg2fnpvy",
+          "bytes": 367860393,
+          "files": 36,
+          "verified_at": "2026-08-04T05:46:46Z"
+        },
+        {
+          "series_id": "d0a3c28f-7e45-4a53-bb8a-ea8677f1da91",
+          "title": "Rewilded Topography #1 ",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeiaevw2mo4yj4uc7ftnezka7zguwqsb7iduc5buhy6xlomadvjppry",
+          "bytes": 39379546486,
+          "files": 10,
+          "verified_at": "2026-08-04T06:53:11Z"
+        },
+        {
+          "series_id": "d137c01a-2c3b-427e-8de4-a7e5677aaeda",
+          "title": "Hypothetically Macro",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeig6rcf2u2ei3p7qjzc47c6j4i43d4kk2vct2peyoasw2knqw4pd7q",
+          "bytes": 140412866,
+          "files": 8,
+          "verified_at": "2026-08-04T06:53:29Z"
+        },
+        {
+          "series_id": "d26432cc-df0d-42c3-94db-098332b438b6",
+          "title": "Neighbors",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeics72asrmvgajudujcpc4mz3oprzfjgayls5yb54hqqfbbefwmipa",
+          "bytes": 1385947132,
+          "files": 9,
+          "verified_at": "2026-08-04T06:55:01Z"
+        },
+        {
+          "series_id": "d35cdb38-917f-42f3-9914-e276dc5f0ded",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — A",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeiauc3rxmakxayejpeq5yss4clapfcci74jby7hf2m73anjzbvtt4q",
+          "bytes": 293598045,
+          "files": 6,
+          "verified_at": "2026-08-04T06:55:23Z"
+        },
+        {
+          "series_id": "d6e1e0f1-7a9d-46f1-a691-bf0604e755b5",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Fluid Dreams",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeieehrcp4bqilppgnaj45auvrtg4v4rwj5dlycdmzpi24tihl45fyu",
+          "bytes": 9370059675,
+          "files": 6,
+          "verified_at": "2026-08-04T07:07:36Z"
+        },
+        {
+          "series_id": "d7f80e10-a227-4272-bd58-2da08703d460",
+          "title": "Vague Recollection",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeie4qnsnkvjho73vptbxwrki7oxx3e26falu6r2qfqlyrhbunps4zm",
+          "bytes": 388369419,
+          "files": 12,
+          "verified_at": "2026-08-04T07:08:08Z"
+        },
+        {
+          "series_id": "dc560d90-2d89-45be-a639-ebc3ab496f43",
+          "title": "36 Points #32",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeihm6vz6ipaptke2pyda4fdqs62gymrtvvwwpwj24fsvn5ahuodfqy",
+          "bytes": 367860108,
+          "files": 36,
+          "verified_at": "2026-08-04T07:09:28Z"
+        },
+        {
+          "series_id": "dc8dddb8-7b4e-4d60-80da-071b92444514",
+          "title": "Model Illusion",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeibtidpltkb33zzplqgpgrda7viurn4yhydnus3g5kxlc4xfi7vh6y",
+          "bytes": 625260907,
+          "files": 27,
+          "verified_at": "2026-08-04T07:12:06Z"
+        },
+        {
+          "series_id": "de81b4e2-0ece-4969-bb0f-2adb62cb2d4e",
+          "title": "neural swarm",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeig5cxrfb74enus44qipxl4ihwpiptwfnja6waa4s5vwzkvnx7vrhq",
+          "bytes": 82222601,
+          "files": 6,
+          "verified_at": "2026-08-04T07:13:19Z"
+        },
+        {
+          "series_id": "de90a7b8-c71c-4ffd-8f3f-365796469bc0",
+          "title": "In Search of Your Digital Self",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeihjkbcyfatatmkrpwxsf4wuomwuiz3xodvevrdq637ihv72thogpe",
+          "bytes": 10410389,
+          "files": 6,
+          "verified_at": "2026-08-04T07:13:28Z"
+        },
+        {
+          "series_id": "df0fce01-b539-4e05-8087-68f3b371c8a8",
+          "title": "Every Icon: BlockPrint",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeihinh2dkpuduhdr626quxlzemw5cluftcrmthdwe3eb6s2fdgb2oa",
+          "bytes": 4369480338,
+          "files": 14,
+          "verified_at": "2026-08-04T07:19:49Z"
+        },
+        {
+          "series_id": "df6a7f8d-effe-4b0f-99e0-62a5924e5ee6",
+          "title": "Infinite Entropy 24",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeidacnfic5rhudbkulbkihtbm6y2jdkec7y6bflomd2ua6l7jtnn24",
+          "bytes": 6626182,
+          "files": 10,
+          "verified_at": "2026-08-04T07:19:58Z"
+        },
+        {
+          "series_id": "e15a896b-84f6-442d-be9e-3faeb088bfb0",
+          "title": "36 Points #20",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeibitfclh2suz5ql5t4to42qlhhj3elmdiqkeh2doiwtpbj26beuuu",
+          "bytes": 367859604,
+          "files": 36,
+          "verified_at": "2026-08-04T07:20:27Z"
+        },
+        {
+          "series_id": "e1b87ae6-d871-4e70-8df1-f9cd7dbd09f9",
+          "title": "Fragments:30.2051 N, 90.1121 W",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeievbvlqss4rg7qx3x3dns66rfsz4rayh5eer2hm2xusv7uolub7yi",
+          "bytes": 127572059,
+          "files": 6,
+          "verified_at": "2026-08-04T07:20:44Z"
+        },
+        {
+          "series_id": "e362fa91-c218-45df-8167-d7e7c3440052",
+          "title": "Unsupervised — Machine Hallucinations — MoMA Dreams — F",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeif2sbjbzt54ue3opszbyg2cq4w3x757tybdayejihl2vdiluwunmi",
+          "bytes": 125350849,
+          "files": 6,
+          "verified_at": "2026-08-04T07:21:00Z"
+        },
+        {
+          "series_id": "e496c840-27ce-4988-80a3-e99cd123d107",
+          "title": "36 Points #14",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeih2zze4nhv4fifj7bazsdndlooxwst5o5con7chcglsdlvdz64rgm",
+          "bytes": 367856016,
+          "files": 36,
+          "verified_at": "2026-08-04T07:22:22Z"
+        },
+        {
+          "series_id": "e5437c4c-e32c-40e4-9b0a-074db2d11a6a",
+          "title": "36 Points #06",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeifgbobdoee74dfoxtodgmi3o3ov3xqspbs76f6cirdxjqds7ykgyi",
+          "bytes": 367859210,
+          "files": 36,
+          "verified_at": "2026-08-04T07:23:47Z"
+        },
+        {
+          "series_id": "e601569d-5611-4a82-93ba-a7f55b260001",
+          "title": "Unsupervised — Data Universe — MoMA",
+          "artist": null,
+          "exhibition": "unsupervised-sla",
+          "cid": "bafybeiawrkxqiht7iyqkt3rljwcmmau52mvkaclojeziqoigcx775mdetm",
+          "bytes": 1252203391,
+          "files": 6,
+          "verified_at": "2026-08-04T07:25:14Z"
+        },
+        {
+          "series_id": "e6041b92-79ff-4ebe-a9b1-b9e7b089046d",
+          "title": "Blooming Valetudinarian",
+          "artist": null,
+          "exhibition": "field-guide-sss",
+          "cid": "bafybeic5h4j4jmfxylujkstwkbf4p7iahgavdywm632istqpg7rxx7fque",
+          "bytes": 80870879,
+          "files": 7,
+          "verified_at": "2026-08-04T07:25:29Z"
+        },
+        {
+          "series_id": "e7252d16-c248-4de0-aade-433e9e7d2484",
+          "title": "Chaos Blocks",
+          "artist": null,
+          "exhibition": "graph-eg6",
+          "cid": "bafybeie6lzmdqpe37wetks7ve7y3frpkchdkhag4apdnjcoojblipz5sla",
+          "bytes": 446333753,
+          "files": 312,
+          "verified_at": "2026-08-04T07:26:14Z"
+        },
+        {
+          "series_id": "e885a572-1acc-4b0c-9c63-c3f8e49bd302",
+          "title": "Aufgezeichnete Luft",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeic3aawt2dt45x5q3meex3azvp7gs2xsyuz45rmx7tvinajdms3tfe",
+          "bytes": 671126394,
+          "files": 27,
+          "verified_at": "2026-08-04T07:28:09Z"
+        },
+        {
+          "series_id": "e9aab828-96ae-4d16-b155-6bb9fded9f34",
+          "title": "Slipstream 001",
+          "artist": null,
+          "exhibition": "the-bardo-unpacking-the-real-a2j",
+          "cid": "bafybeiet5epjhrkoatc6bvg2djbiysbq66o2anranjkyzycuhu64haxyhe",
+          "bytes": 105255212,
+          "files": 6,
+          "verified_at": "2026-08-04T07:28:25Z"
+        },
+        {
+          "series_id": "e9c74592-8483-4511-adb2-16ef4730ca1a",
+          "title": "36 Points Display Edition",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeig3bmwlzbqdr4qmne4y7ylg4jzwblx6lqiwrudpbatylxycf5ovgi",
+          "bytes": 365140302,
+          "files": 14,
+          "verified_at": "2026-08-04T07:28:53Z"
+        },
+        {
+          "series_id": "ebe3df0f-f765-410e-b2fa-edd39dcf5369",
+          "title": "3 ORBS",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeigtt4moe32rr7gu4oqy4gfmhpj4zf7lsmxbmvkofdscnz7jezo7wa",
+          "bytes": 6098903324,
+          "files": 319,
+          "verified_at": "2026-08-04T07:34:41Z"
+        },
+        {
+          "series_id": "ec014e95-c9de-4d2e-b464-d95c3f7ae19c",
+          "title": "Glissbob",
+          "artist": null,
+          "exhibition": "polyarrythmia-dbb",
+          "cid": "bafybeiashvfbhybrvsgjo37vcbhw6h4i2ucqa7347pay5wb2zr2kjajwuy",
+          "bytes": 449938835,
+          "files": 27,
+          "verified_at": "2026-08-04T07:35:22Z"
+        },
+        {
+          "series_id": "ed25109e-3e36-429d-aafd-a9cd12f854fb",
+          "title": "Infinite Entropy 3",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeidhndufg74y7igurso346l34dg5cxyk4k6cx4dvh42vvhg2bzbe3a",
+          "bytes": 6973970,
+          "files": 16,
+          "verified_at": "2026-08-04T07:35:32Z"
+        },
+        {
+          "series_id": "edc8b7d3-e95c-4056-93d3-d29d1258195f",
+          "title": "Loner",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeihcwkgikgqx444pv6omzt7vdjzqmiqrbidw7vxo3csvhmrebyrhg4",
+          "bytes": 1641428101,
+          "files": 395,
+          "verified_at": "2026-08-04T07:37:59Z"
+        },
+        {
+          "series_id": "ee826cf5-9273-4b58-850c-0615668d9e2d",
+          "title": "Infinite Entropy 22",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeih6jdk6c7iz7bxdbnw25ra4z7nr2gwpinlgzqnd2vhbut466hocsa",
+          "bytes": 6626438,
+          "files": 10,
+          "verified_at": "2026-08-04T07:38:09Z"
+        },
+        {
+          "series_id": "f004b2e2-91bf-4517-8815-faea12a3f062",
+          "title": "36 Points #24",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeidn3vuac4eiyqa5ug5pkdkan3xp22hvqzcskkusk3pnxdqood4f5q",
+          "bytes": 367864634,
+          "files": 36,
+          "verified_at": "2026-08-04T07:38:36Z"
+        },
+        {
+          "series_id": "f00cd40d-0fe5-4805-953f-9a52ff6da2ac",
+          "title": "TimeTravellerTM Trailer",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeihkgvv7l752qcpdi47v77wtzwdwufebl2spukhm2avcjyz54birg4",
+          "bytes": 72195829,
+          "files": 6,
+          "verified_at": "2026-08-04T07:38:50Z"
+        },
+        {
+          "series_id": "f0750b82-282e-4eed-bdba-c4fb023fb684",
+          "title": "Infinite Entropy 16",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeicoxwrcpi2tr63ebywwk5rfpdync72rrxkyy4ymtwitnyl4icrgsu",
+          "bytes": 6626188,
+          "files": 10,
+          "verified_at": "2026-08-04T07:39:00Z"
+        },
+        {
+          "series_id": "f0cf5ba9-4d45-45a7-aafa-a340ccb1dca8",
+          "title": "Mommy Wow",
+          "artist": null,
+          "exhibition": "ten-whistlegraphs-thv",
+          "cid": "bafybeigv2puw2ximac36gyghvv67tvdm7prjmkff3742thjieirbzukpgm",
+          "bytes": 475753658,
+          "files": 393,
+          "verified_at": "2026-08-04T07:39:48Z"
+        },
+        {
+          "series_id": "f128ae45-67bf-41f7-bef6-cdb30ec3c02b",
+          "title": "36 Points #29",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeigxnjbnsvu27zq6diy2kntnyemk2dsdg5ydyibpixr75tols2t55e",
+          "bytes": 367859516,
+          "files": 36,
+          "verified_at": "2026-08-04T07:40:12Z"
+        },
+        {
+          "series_id": "f27c6217-e4c0-4f82-b8b7-d38c8653b0dd",
+          "title": "Solstice Sky Dream",
+          "artist": null,
+          "exhibition": "reflections-in-the-water-9ov",
+          "cid": "bafybeifiqu2kpctqlsefgjo4tlgavi6t45wz4qhiur6sf3yw262amuccq4",
+          "bytes": 852242693,
+          "files": 6,
+          "verified_at": "2026-08-04T07:41:22Z"
+        },
+        {
+          "series_id": "f2db8c40-a2fb-4a93-be03-75ce3b3133f3",
+          "title": "What do you want me to say?",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeiap4hionam65txvvbzvk5trk6cydzwjm7yfkbzkbprnm6x6z25kru",
+          "bytes": 848489224,
+          "files": 107,
+          "verified_at": "2026-08-04T07:42:14Z"
+        },
+        {
+          "series_id": "f3170ca8-2a0d-49ac-b307-d20fbfb15b0d",
+          "title": "Patterns of Activation (gardens of the galaxy)",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeia6h53xfyi3ght27ojg5x4qk6wucmtldr4pis4nlkij4gjketbiru",
+          "bytes": 310423760,
+          "files": 8,
+          "verified_at": "2026-08-04T07:42:40Z"
+        },
+        {
+          "series_id": "f421b0af-2ebc-4fa3-a9c1-de2ae7662c3e",
+          "title": "36 Points #33",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeiat3o2cd3two65t4ai4m6iacrzio5kxrkp7cfisrw53ba4r4ca3l4",
+          "bytes": 367866101,
+          "files": 36,
+          "verified_at": "2026-08-04T07:43:03Z"
+        },
+        {
+          "series_id": "f4cf4ad5-b654-48d3-8ea0-85ec65eb17fa",
+          "title": "36 Points #05",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeicemfddfrldlz7u3her7d23rotfgujjbpqkzfrpkbvm2dg2sb4u6i",
+          "bytes": 367860149,
+          "files": 36,
+          "verified_at": "2026-08-04T07:43:29Z"
+        },
+        {
+          "series_id": "f503f9fe-276c-4519-92b7-8a2239cfa489",
+          "title": "Fractura",
+          "artist": null,
+          "exhibition": "for-your-eyes-only-qpg",
+          "cid": "bafybeicuxvu74piuhpkmld333qjmknqlnplzgudl67rvppmupwgs6fs5wa",
+          "bytes": 13132843,
+          "files": 8,
+          "verified_at": "2026-08-04T07:43:38Z"
+        },
+        {
+          "series_id": "f548cb77-a829-42ea-b097-3b54603a0d8f",
+          "title": "Picnic 001",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeia3khfqwo55ldrbnhtywih2zypqnwsursmdaanvve2lfkhxsyvvbi",
+          "bytes": 10382304,
+          "files": 7,
+          "verified_at": "2026-08-04T07:43:47Z"
+        },
+        {
+          "series_id": "f5f51874-1c4c-42f8-9433-423fd791d6a8",
+          "title": "IKU: Expand, an interface",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeigkppmsp2c4lyedoprdb6izltpouk3ywuz3f5gwulexlfplp2rrsa",
+          "bytes": 29549436,
+          "files": 7,
+          "verified_at": "2026-08-04T07:43:58Z"
+        },
+        {
+          "series_id": "f65cb7b3-89e2-47eb-9e73-3b371105e15e",
+          "title": "36 Points #01",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeihmp6yyugpztxujedettnssphom2hsluhlvk2k2xgxlbq3pdq2xxy",
+          "bytes": 368002970,
+          "files": 50,
+          "verified_at": "2026-08-04T07:44:21Z"
+        },
+        {
+          "series_id": "f6d4f5f8-7f31-48c9-871e-b2cf4d4270aa",
+          "title": "Mirror Arm",
+          "artist": null,
+          "exhibition": "p1x3l-n36",
+          "cid": "bafybeieoft34zixtyvma4bsozefetikcp4wuh77yabdycv5ae6u6w6zc6y",
+          "bytes": 10456202,
+          "files": 12,
+          "verified_at": "2026-08-04T07:44:31Z"
+        },
+        {
+          "series_id": "f8d24d67-7cd9-4465-9665-2c063ae4e073",
+          "title": "A la recherche de l'information perdue",
+          "artist": null,
+          "exhibition": "wetware-tkl",
+          "cid": "bafybeigpb2o5axk4h5uo7flhss7qbk5gvqye3eme7zbphagjknmn5qtxxy",
+          "bytes": 176871255,
+          "files": 9,
+          "verified_at": "2026-08-04T07:44:49Z"
+        },
+        {
+          "series_id": "f97bf0da-0630-4847-952a-902060b8081c",
+          "title": "Infinite Entropy 6",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeib7mpj6as3blyxvzmr5vtykcmccfa5jlco62nvw7j3whkubmoka34",
+          "bytes": 6973988,
+          "files": 16,
+          "verified_at": "2026-08-04T07:45:58Z"
+        },
+        {
+          "series_id": "faa504eb-868c-4134-a7b2-eef051b9abbc",
+          "title": "it's a matter of perspective",
+          "artist": null,
+          "exhibition": "the-bardo-unpacking-the-real-a2j",
+          "cid": "bafybeiesrktgfogq73eti5wp56g76gsqtggrnuabtrbauusohwamuodcnq",
+          "bytes": 412560390,
+          "files": 24,
+          "verified_at": "2026-08-04T07:46:30Z"
+        },
+        {
+          "series_id": "fd2cbf3b-152e-4ed1-b2ae-21f65b2e2d0f",
+          "title": "Movie on 06-03-22 at 1.00 PM",
+          "artist": null,
+          "exhibition": "on-screen-presence-kpb",
+          "cid": "bafybeiawycz3flztfssluvmezuonbs6ttid4s5e5qbgzl7blpxxqjihjt4",
+          "bytes": 4957353088,
+          "files": 8,
+          "verified_at": "2026-08-04T07:53:13Z"
+        },
+        {
+          "series_id": "fe324a25-a5b3-4b17-bae4-8d4109f01fe7",
+          "title": "Infinite Entropy 18",
+          "artist": null,
+          "exhibition": "infinite-entropy-xhj",
+          "cid": "bafybeihuuv44w6lmh6qngjo46ykmwyxw2cr2ptovsnv7gfuneqvwsgrv3q",
+          "bytes": 6626275,
+          "files": 10,
+          "verified_at": "2026-08-04T07:53:23Z"
+        },
+        {
+          "series_id": "fe63cbf2-7377-4497-919b-853dd22c63e7",
+          "title": "Neonumens",
+          "artist": null,
+          "exhibition": "instructions-follow-f1c",
+          "cid": "bafybeid3oolfuq6ehl65zskasluwazkvigdtytktbo65wxi4ynpzj7xqae",
+          "bytes": 266741710,
+          "files": 6,
+          "verified_at": "2026-08-04T07:54:43Z"
+        },
+        {
+          "series_id": "ff673a40-0bfb-4ac9-b6a3-2d9cc8385463",
+          "title": "36 Points #09",
+          "artist": null,
+          "exhibition": "primordium-i8m",
+          "cid": "bafybeicdnesa46ttad3ebst4c53qstpygwhwgwr6l6ricnsecdlm4etijy",
+          "bytes": 367856360,
+          "files": 36,
+          "verified_at": "2026-08-04T07:55:08Z"
+        }
+      ]
+    },
+    {
+      "id": "a2p",
+      "description": "Media of a2p (2019-2020), the artist-to-artist experiment Feral File grew out of. 144 works across two generations; archives at a2p.bitmark.com. Synced from the original storage and byte-verified 2026-08-03.",
+      "items": [
+        {
+          "label": "a2p 1.0 media (art-trading-assets-preview-livenet)",
+          "cid": "bafybeicpzu5662p244agrni3dowebgnnidlcjmt6yxmfk4bp4r2zc5zn2y",
+          "bytes": 3700396877,
+          "files": 170
+        },
+        {
+          "label": "a2p 2.0 media (art-trading-v2-live)",
+          "cid": "bafybeifvvqoomhreylzrkm3f25oymfv4brp4wy2pxiaywm4i2huu6vrrje",
+          "bytes": 4071203627,
+          "files": 149
+        },
+        {
+          "label": "a2p trade originals (trade-art-trading-livenet)",
+          "cid": "bafybeifc7skzcg7ivlsl5g2kusnf5izwgdwg4dbcgly3uhz7ir3t32olgi",
+          "bytes": 7590613247,
+          "files": 161
+        }
+      ]
+    },
+    {
+      "id": "bitmark-blockchain-archive",
+      "description": "The retired Bitmark blockchain (2014-2025), preserved per github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive: chain data on IPFS, Merkle root on Ethereum, timestamp on Bitcoin. Re-pinned on Feral File's archival node 2026-08-03.",
+      "items": [
+        {
+          "label": "chain archive metadata + data",
+          "cid": "QmQeLXYbeB5kzoZQhLwoRhSaXAovc6Kp9didBasVDRuVHe"
+        },
+        {
+          "label": "Merkle proof file",
+          "cid": "QmUTivb8fhJyNF1MvPXU1swyc8Eonf9eTeVm7uxPkiKaxK"
+        }
+      ]
+    },
+    {
+      "id": "hls-master-playlists",
+      "description": "HLS master playlists for 184 video works (FeralVerse, On Screen Presence) whose stream files were never placed on IPFS — the masters are preserved here; full video repackaging as directory CIDs is open remediation.",
+      "items": [
+        {
+          "label": "FeralVerse master A",
+          "cid": "QmRGwoEnB4inboActrRsNAEiJzXL8LUwLrCYcUCgAEBxMQ"
+        },
+        {
+          "label": "FeralVerse master B",
+          "cid": "Qmf8bvobDWMTmauvhgFKWNhZKUe4ufDY16a6qk1KLSgM74"
+        },
+        {
+          "label": "On Screen Presence master",
+          "cid": "QmQJAa9uC5Fc3gFzNnb8CHNMgJq7NgtNF1SHs9x7YvbjM4"
+        }
+      ]
+    }
+  ]
+}

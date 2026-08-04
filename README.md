@@ -57,3 +57,28 @@ Cloudflare Pages (same pattern as docs.feralfile.com): build command
 Type roles and colors follow `feralfile-client/design/web.tokens.json`.
 PP Mori is licensed and not committed here; the CSS falls back to
 Helvetica until the deploy wires the hosted fonts.
+
+## The Feral File Archive Registry
+
+`contracts/FeralFileArchiveRegistry.sol` — the on-chain pointer to
+`archive-manifest.json` (built by `tools/build_archive_manifest.py`, pinned
+on the archival node). Root on Ethereum, data on IPFS — the same pattern as
+the Bitmark blockchain archive.
+
+Current manifest CID:
+`bafkreihjjtrhsk5gufrnbneg2w2jwdypthbdnij5ooadzupqhq6ll3szum`
+
+Deploy (ten minutes, Remix path):
+
+1. remix.ethereum.org → new file → paste the contract → compile with
+   0.8.24+.
+2. Deploy tab → Injected Provider (the deploying wallet, Ethereum mainnet)
+   → Deploy.
+3. Call `setManifest("bafkreihjjtrhsk5gufrnbneg2w2jwdypthbdnij5ooadzupqhq6ll3szum")`.
+4. Verify the source on Etherscan (single file, MIT, 0.8.24).
+5. `transferOwnership(<Feral File Safe address>)`, then from the Safe
+   (Transaction Builder) call `acceptOwnership()`.
+
+Updating later: rebuild the manifest, `ipfs add` it on the archival node,
+call `setManifest(<new cid>)` from the Safe. Every prior CID stays readable
+in the `ManifestUpdated` event history.

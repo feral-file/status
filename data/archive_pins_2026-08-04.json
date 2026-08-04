@@ -1,0 +1,32 @@
+{
+  "as_of": "2026-08-04",
+  "note": "Pins on ff-pin-1 beyond the Bitmark-era series manifest. All byte-verified on add except the Bitmark chain archive and HLS masters, which were pinned recursively from their existing CIDs (integrity guaranteed by the CID itself).",
+  "collections": [
+    {
+      "id": "a2p",
+      "description": "Media of a2p (2019-2020), the artist-to-artist experiment Feral File grew out of. 144 works across two generations; archives at a2p.bitmark.com. Synced from the original storage and byte-verified 2026-08-03.",
+      "items": [
+        {"label": "a2p 1.0 media (art-trading-assets-preview-livenet)", "cid": "bafybeicpzu5662p244agrni3dowebgnnidlcjmt6yxmfk4bp4r2zc5zn2y", "bytes": 3700396877, "files": 170},
+        {"label": "a2p 2.0 media (art-trading-v2-live)", "cid": "bafybeifvvqoomhreylzrkm3f25oymfv4brp4wy2pxiaywm4i2huu6vrrje", "bytes": 4071203627, "files": 149},
+        {"label": "a2p trade originals (trade-art-trading-livenet)", "cid": "bafybeifc7skzcg7ivlsl5g2kusnf5izwgdwg4dbcgly3uhz7ir3t32olgi", "bytes": 7590613247, "files": 161}
+      ]
+    },
+    {
+      "id": "bitmark-blockchain-archive",
+      "description": "The retired Bitmark blockchain (2014-2025), preserved per github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive: chain data on IPFS, Merkle root on Ethereum, timestamp on Bitcoin. Re-pinned on Feral File's archival node 2026-08-03.",
+      "items": [
+        {"label": "chain archive metadata + data", "cid": "QmQeLXYbeB5kzoZQhLwoRhSaXAovc6Kp9didBasVDRuVHe"},
+        {"label": "Merkle proof file", "cid": "QmUTivb8fhJyNF1MvPXU1swyc8Eonf9eTeVm7uxPkiKaxK"}
+      ]
+    },
+    {
+      "id": "hls-master-playlists",
+      "description": "HLS master playlists for 184 video works (FeralVerse, On Screen Presence) whose stream files were never placed on IPFS — the masters are preserved here; full video repackaging as directory CIDs is open remediation.",
+      "items": [
+        {"label": "FeralVerse master A", "cid": "QmRGwoEnB4inboActrRsNAEiJzXL8LUwLrCYcUCgAEBxMQ"},
+        {"label": "FeralVerse master B", "cid": "Qmf8bvobDWMTmauvhgFKWNhZKUe4ufDY16a6qk1KLSgM74"},
+        {"label": "On Screen Presence master", "cid": "QmQJAa9uC5Fc3gFzNnb8CHNMgJq7NgtNF1SHs9x7YvbjM4"}
+      ]
+    }
+  ]
+}
