@@ -66,13 +66,22 @@ def main():
         [p["synced_at"] for p in pins] + [extra["as_of"] + "T00:00:00Z"]
     )
 
+    # Registry identity tuple (chain + address + runtime code hash) — written
+    # to data/registry.json after deployment; a byte-identical clone cannot
+    # fake the tuple's address, and the code hash pins the audited artifact.
     registry_path = DATA / "registry.json"
     registry = (
         json.loads(registry_path.read_text())
         if registry_path.exists()
-        else {"chain": "eip155:1", "address": None,
+        else {"chain": "eip155:1", "address": None, "runtime_code_hash": None,
               "note": "unset until deployment; rebuild after data/registry.json exists"}
     )
+
+    # Content-side history chain: each manifest names its predecessor's CID
+    # (data/previous-manifest.txt, absent for v1), so the version chain is
+    # walkable from IPFS alone, without the contract.
+    prev_path = DATA / "previous-manifest.txt"
+    previous = prev_path.read_text().strip() if prev_path.exists() else None
 
     manifest = {
         "name": "Feral File Archive",
@@ -83,9 +92,11 @@ def main():
             "Feral File; the current CID of this document is recorded in the "
             "FeralFileArchiveRegistry contract on Ethereum."
         ),
+        "schema_version": 1,
         "site": "https://status.feralfile.com",
         "data_as_of": data_as_of,
         "registry": registry,
+        "previous_manifest": previous,
         "collections": [
             {
                 "id": "bitmark-era-series",

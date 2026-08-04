@@ -1,13 +1,16 @@
 {
   "name": "Feral File Archive",
   "description": "Content-addressed, byte-verified copies of works Feral File preserves. Every CID below can be pinned by anyone; each copy held anywhere makes the works more permanent. Published by Feral File; the current CID of this document is recorded in the FeralFileArchiveRegistry contract on Ethereum.",
+  "schema_version": 1,
   "site": "https://status.feralfile.com",
   "data_as_of": "2026-08-04T07:55:08Z",
   "registry": {
     "chain": "eip155:1",
     "address": null,
+    "runtime_code_hash": null,
     "note": "unset until deployment; rebuild after data/registry.json exists"
   },
+  "previous_manifest": null,
   "collections": [
     {
       "id": "bitmark-era-series",

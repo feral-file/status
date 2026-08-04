@@ -13,17 +13,20 @@ pragma solidity 0.8.24;
 ///         registry against copies. The canonical address is also published
 ///         at https://status.feralfile.com.
 ///
-///         The full CID history is kept in contract storage (`historyAt`),
-///         not only in event logs, so on-chain readers and post-EIP-4444
-///         clients can always reconstruct it.
+///         Contract storage is the permanence mechanism: the full CID
+///         history and its timestamps live in state (`historyAt`,
+///         `historyTimeAt`), readable forever with plain calls. Event logs
+///         are a redundant audit trail, not the recovery path.
 ///
 ///         Semantics worth knowing:
 ///         - `version() == 0` means the manifest has never been set; the
 ///           empty `manifest` string then means "unset", not "empty".
 ///         - `transferOwnership(address(0))` cancels a pending transfer.
-///         - If the owner (a Gnosis Safe) is ever lost, the contract
+///         - While the owner (a Gnosis Safe) remains operable, only it can
+///           update the manifest. If the owner is ever lost, the contract
 ///           freezes read-only at the last CID — the intended failure mode
-///           for an archive pointer. Continuity would be a new registry,
+///           for an archive pointer; continuity is institutional, not
+///           mechanical. Continuity would be a new registry,
 ///           announced at the site above.
 ///         - Assets force-sent to this contract are unrecoverable by design;
 ///           it holds nothing and recovers nothing.
@@ -41,6 +44,7 @@ contract FeralFileArchiveRegistry {
     uint64 public updatedAt;
 
     string[] private _history;
+    uint64[] private _historyTimes;
 
     event ManifestUpdated(uint256 indexed version, string cid);
     event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);
@@ -49,6 +53,8 @@ contract FeralFileArchiveRegistry {
     error NotOwner();
     error NotPendingOwner();
     error InvalidCID();
+    error TransferPending();
+    error NoSuchVersion();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
@@ -60,13 +66,17 @@ contract FeralFileArchiveRegistry {
         emit OwnershipTransferred(address(0), msg.sender);
     }
 
-    /// @notice Update the manifest pointer. CIDs must be plain base58/base32
-    ///         alphanumerics (no scheme prefix, no whitespace), 46-100 chars —
-    ///         rejects "", "ipfs://…", and copy-paste artifacts like trailing
-    ///         newlines before they become permanent history.
+    /// @notice Update the manifest pointer. CIDs must be plain multibase
+    ///         alphanumerics (no scheme prefix, no whitespace), 32-256 chars —
+    ///         a shape check that rejects "", "ipfs://…", and copy-paste
+    ///         artifacts; semantic CID validity is the release tooling's job.
+    ///         Reverts while an ownership transfer is pending, so the archive
+    ///         cannot change under a handoff the new owner already reviewed
+    ///         (cancel the transfer first for an urgent update).
     function setManifest(string calldata cid) external onlyOwner {
+        if (pendingOwner != address(0)) revert TransferPending();
         bytes calldata b = bytes(cid);
-        if (b.length < 46 || b.length > 100) revert InvalidCID();
+        if (b.length < 32 || b.length > 256) revert InvalidCID();
         for (uint256 i; i < b.length; ++i) {
             bytes1 c = b[i];
             if (!((c >= 0x30 && c <= 0x39) || (c >= 0x41 && c <= 0x5A) || (c >= 0x61 && c <= 0x7A))) {
@@ -75,6 +85,7 @@ contract FeralFileArchiveRegistry {
         }
         manifest = cid;
         _history.push(cid);
+        _historyTimes.push(uint64(block.timestamp));
         updatedAt = uint64(block.timestamp);
         emit ManifestUpdated(_history.length, cid);
     }
@@ -87,6 +98,20 @@ contract FeralFileArchiveRegistry {
     /// @notice Manifest CID at index `i` (0 = first ever set).
     function historyAt(uint256 i) external view returns (string memory) {
         return _history[i];
+    }
+
+    /// @notice Timestamp at which history index `i` became canonical.
+    function historyTimeAt(uint256 i) external view returns (uint64) {
+        return _historyTimes[i];
+    }
+
+    /// @notice Manifest CID by 1-based version number, matching the
+    ///         `ManifestUpdated` event's `version` field (which is 1-based,
+    ///         while `historyAt` is 0-indexed — this accessor exists so no
+    ///         indexer ever has to remember that).
+    function historyAtVersion(uint256 v) external view returns (string memory) {
+        if (v == 0 || v > _history.length) revert NoSuchVersion();
+        return _history[v - 1];
     }
 
     /// @notice Two-step transfer, so ownership can move to the Feral File

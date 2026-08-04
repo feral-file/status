@@ -92,6 +92,25 @@ first — it retires every Transaction Builder unknown for ~nothing):
    after step 5. The loop must close in both directions (page → address,
    manifest → address) or a $5 byte-identical clone is indistinguishable.
 
+Post-audit additions (2026-08-04, two external adversarial passes folded):
+
+- Before `setManifest`, fetch the manifest CID back through an INDEPENDENT
+  public gateway and byte-compare against the local file — a valid CID does
+  not prove the right bytes were pinned.
+- After deploy, archive the full build package in `contracts/build/`:
+  Standard JSON compiler input/output, exact compiler build, creation +
+  runtime bytecode, runtime code hash, deploy tx + receipt. Etherscan is
+  publication, not the twenty-year archive.
+- Record the runtime code hash in `data/registry.json` — the registry's
+  identity is the tuple (chain, address, code hash), not the address alone.
+- Review the Safe's configuration before transfer (owners, threshold,
+  modules, guards): the Safe's modules ARE part of the owner. Snapshot it.
+- Copy the Safe address from the Safe UI, never retype it; confirm
+  `pendingOwner()` reads exactly the Safe in the same sitting — a mistyped
+  but live address could accept the transfer.
+- Review the Solidity known-bugs list for the exact compiler at deploy time;
+  pinned ≠ automatically safe.
+
 Updating later: refresh the data, rebuild, `ipfs add` with the same flags,
 `setManifest` from the Safe. Every prior CID stays readable on-chain via
 `historyAt(i)` — not only in event logs.
