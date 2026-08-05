@@ -1,0 +1,168 @@
+{
+  "as_of": "2026-08-05",
+  "source": "feralfile.com public API: /api/exhibitions (mintBlockchain=bitmark), /api/artworks per exhibition, classified by artwork chain field; see feral-file/feral-file#3463; re-verified 2026-08-05, zero changes from 2026-08-03",
+  "exhibitions": [
+    {
+      "slug": "the-experiment-6jy",
+      "title": "The Experiment",
+      "works": 209,
+      "migrated_ethereum": 209,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 0
+    },
+    {
+      "slug": "wetware-tkl",
+      "title": "WETWARE",
+      "works": 891,
+      "migrated_ethereum": 54,
+      "migrated_tezos": 123,
+      "swap_initiated": 0,
+      "still_bitmark": 714
+    },
+    {
+      "slug": "on-screen-presence-kpb",
+      "title": "On Screen Presence",
+      "works": 515,
+      "migrated_ethereum": 336,
+      "migrated_tezos": 0,
+      "swap_initiated": 1,
+      "still_bitmark": 178
+    },
+    {
+      "slug": "ten-whistlegraphs-thv",
+      "title": "Ten Whistlegraphs",
+      "works": 70,
+      "migrated_ethereum": 45,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 25
+    },
+    {
+      "slug": "infinite-entropy-xhj",
+      "title": "Infinite Entropy",
+      "works": 50,
+      "migrated_ethereum": 24,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 26
+    },
+    {
+      "slug": "primordium-i8m",
+      "title": "Primordium",
+      "works": 177,
+      "migrated_ethereum": 108,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 69
+    },
+    {
+      "slug": "field-guide-sss",
+      "title": "Field Guide",
+      "works": 1010,
+      "migrated_ethereum": 635,
+      "migrated_tezos": 246,
+      "swap_initiated": 0,
+      "still_bitmark": 129
+    },
+    {
+      "slug": "for-your-eyes-only-qpg",
+      "title": "For Your Eyes Only",
+      "works": 1508,
+      "migrated_ethereum": 705,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 803
+    },
+    {
+      "slug": "graph-eg6",
+      "title": "–GRAPH",
+      "works": 186,
+      "migrated_ethereum": 175,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 11
+    },
+    {
+      "slug": "unsupervised-sla",
+      "title": "Unsupervised",
+      "works": 5916,
+      "migrated_ethereum": 5261,
+      "migrated_tezos": 0,
+      "swap_initiated": 1,
+      "still_bitmark": 654
+    },
+    {
+      "slug": "polyarrythmia-dbb",
+      "title": "Polyarrythmia",
+      "works": 819,
+      "migrated_ethereum": 414,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 405
+    },
+    {
+      "slug": "reflections-in-the-water-9ov",
+      "title": "Reflections in the Water",
+      "works": 1068,
+      "migrated_ethereum": 382,
+      "migrated_tezos": 333,
+      "swap_initiated": 2,
+      "still_bitmark": 351
+    },
+    {
+      "slug": "p1x3l-n36",
+      "title": "P1×3L",
+      "works": 310,
+      "migrated_ethereum": 229,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 81
+    },
+    {
+      "slug": "instructions-follow-f1c",
+      "title": "Instructions Follow",
+      "works": 912,
+      "migrated_ethereum": 550,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 362
+    },
+    {
+      "slug": "the-long-cut-bqv",
+      "title": "The Long Cut",
+      "works": 532,
+      "migrated_ethereum": 371,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 161
+    },
+    {
+      "slug": "fragments-of-a-hologram-rose-liz",
+      "title": "Fragments of a Hologram Rose",
+      "works": 858,
+      "migrated_ethereum": 650,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 208
+    },
+    {
+      "slug": "the-bardo-unpacking-the-real-a2j",
+      "title": "The Bardo: Unpacking the Real",
+      "works": 1407,
+      "migrated_ethereum": 719,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 688
+    },
+    {
+      "slug": "social-codes-pcl",
+      "title": "Social Codes",
+      "works": 760,
+      "migrated_ethereum": 670,
+      "migrated_tezos": 0,
+      "swap_initiated": 0,
+      "still_bitmark": 90
+    }
+  ]
+}

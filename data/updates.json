@@ -2,7 +2,7 @@
   {
     "date": "2026-08-05",
     "title": "The Feral File Archive is anchored on Ethereum",
-    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p, and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. For the archived collections, the registry on Ethereum points to their IPFS manifest with no Feral File server in the path; the works' own token references do not yet point at these copies — that reference phase is open. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
+    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p (the 2019-2020 artist-to-artist exchange Feral File grew out of; 144 works across two generations), and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. For the archived collections, the registry on Ethereum points to their IPFS manifest with no Feral File server in the path; the works' own token references do not yet point at these copies — that reference phase is open. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
   },
   {
     "date": "2026-08-04",
