@@ -2,7 +2,7 @@
   {
     "date": "2026-08-05",
     "title": "The Feral File Archive is anchored on Ethereum",
-    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p, and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. From any work to its archival copy: token to Ethereum to IPFS, with no Feral File server in the path. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
+    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p, and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. For the archived collections, the registry on Ethereum points to their IPFS manifest with no Feral File server in the path; the works' own token references do not yet point at these copies — that reference phase is open. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
   },
   {
     "date": "2026-08-04",
@@ -12,7 +12,7 @@
   {
     "date": "2026-08-03",
     "title": "First full census of Ethereum and Tezos works",
-    "body": "Every file of every edition — 35,008 works, 106,392 files — was fetched through the public gateways wallets and browsers use. 17,563 works have all media content-addressed and resolving on ipfs.io. 184 works have content-addressed media that currently fails on a public gateway. 17,261 works' media lives only on our CDN; they join the Bitmark-era works on the remediation path. These checks measure the artwork files; the metadata link and rendering are not yet measured."
+    "body": "Every file of every edition — 35,008 works, 106,392 files — was fetched through the public gateways wallets and browsers use. 17,563 works have all media content-addressed and resolving on ipfs.io. 184 works have content-addressed media that currently fails on a public gateway. 17,255 works' media was reachable only from our CDN, and 6 works depended on a third-party platform (figures corrected 2026-08-05 from the first published 17,261); they join the Bitmark-era works on the remediation path. These checks measure the artwork files; the metadata link and rendering are not yet measured."
   },
   {
     "date": "2026-08-03",

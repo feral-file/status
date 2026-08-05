@@ -317,6 +317,7 @@ def catalog_rows(exhibitions, census, bucket3):
             "independent": c.get("independent", 0),
             "gateway_gap": c.get("gateway_gap", 0),
             "dependent": c.get("dependent", 0) + bm,
+            "third_party": c.get("third_party", 0),
         }
         g = member_of.get(e["slug"])
         if g is None:
@@ -332,7 +333,7 @@ def catalog_rows(exhibitions, census, bucket3):
             rows.append(merged)
         else:
             m = by_group[key]
-            for k in ("works", "independent", "gateway_gap", "dependent"):
+            for k in ("works", "independent", "gateway_gap", "dependent", "third_party"):
                 m[k] += row[k]
             m["start"] = min(m["start"], row["start"])
     return rows
@@ -344,16 +345,22 @@ def registry_paragraph(registry):
                 "the registry address will be published here.")
     a = registry["address"]
     return (
-        f'Every archival copy above is indexed by the Feral File Archive '
-        f'manifest, and the manifest\u2019s address is recorded on Ethereum '
-        f'in the <a href="https://etherscan.io/address/{a}">'
-        f'FeralFileArchiveRegistry</a> at <code>{a}</code>, owned by Feral '
-        f'File\u2019s custody Safe. Current manifest: '
+        f'The archival copies above are indexed by the Feral File Archive '
+        f'manifest, whose current IPFS CID is recorded on Ethereum in the '
+        f'<a href="https://etherscan.io/address/{a}#code">'
+        f'FeralFileArchiveRegistry</a> at <code>{a}</code> (source verified '
+        f'on Etherscan), owned by Feral File\u2019s 2-of-3 custody Safe '
+        f'<code>0xA741D850B8B4e684c6F78e9615BD5b33B37AcFcF</code>. The owner '
+        f'can only append new manifest versions; every prior version stays '
+        f'readable from contract storage, and the contract has no upgrade or '
+        f'destruction path. Current manifest: '
         f'<code>{registry["manifest_cid"]}</code> (version '
-        f'{registry["version"]}, published {registry["published"]}). Resolve '
-        f'the manifest on IPFS, and every work\u2019s copy is one hop away '
-        f'\u2014 no Feral File server in the path. The registry keeps its '
-        f'full version history in contract storage.'
+        f'{registry["version"]}, published {registry["published"]}). What '
+        f'this guarantees: Ethereum records which manifest is current; the '
+        f'manifest and the copies stay available only while pinned, like '
+        f'everything on this page. The works\u2019 own token references do '
+        f'not yet point at these copies \u2014 that is the open reference '
+        f'phase above.'
     )
 
 
@@ -366,22 +373,25 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
         b = census["buckets"]
         tile1 = tile(
             n(b.get("independent", 0)),
-            "works that resolve without Feral File",
-            f"Every content-addressed media file verified on ipfs.io, {esc(census['date'])}.",
+            "works whose media resolves through public gateways",
+            f"Every content-addressed media file answered the "
+            f"{esc(census['date'])} probe on ipfs.io. Who holds the copies "
+            "is not measured \u2014 co-pinning is what makes this durable.",
         )
         tile2 = tile(
             n(b.get("gateway_gap", 0)),
-            "works that should resolve without us, but currently fail",
-            "HLS video works: the master playlist is content-addressed "
-            "and resolves, but its stream files are unreachable from any "
-            "gateway. The video currently plays only from our CDN.",
+            "works whose content-addressed media failed the gateway probe",
+            f"HLS video: master playlists answered, but their stream files "
+            f"failed on every gateway tested ({esc(census['date'])}). The "
+            "stream files are reachable only from our CDN.",
         )
         tile3_note = (
             f"{n(bucket3['works_on_bitmark'])} Bitmark-era works plus "
-            f"{n(b.get('dependent', 0))} works on Ethereum and Tezos whose "
-            "media lives only on our CDN. A further "
-            f"{n(b.get('third_party', 0))} depend on a third-party platform "
-            "instead of us. Details and remediation below."
+            f"{n(b.get('dependent', 0))} on Ethereum and Tezos whose "
+            "published media references point only at our CDN. A further "
+            f"{n(b.get('third_party', 0))} depend on a third-party platform. "
+            "Verified archival copies exist for every Bitmark-era series "
+            "(2026-08-04); the published references are not yet updated."
         )
         census_note = ""
     else:
@@ -410,12 +420,13 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 
     tile3 = tile(
         n(dep_total) if census else n(bucket3["works_on_bitmark"]),
-        "works that depend entirely on Feral File",
+        "works whose published media depends entirely on Feral File",
         tile3_note,
     )
 
     catalog_html = ""
     if census:
+        cat_data = catalog_rows(exhibitions, census, bucket3)
         cat_rows = "\n".join(
             f"""        <tr>
           <td><span class="dated">{esc(r["start"])}</span> <a href="https://feralfile.com/exhibitions/{esc(r["slug"])}">{esc(r["title"])}</a></td>
@@ -423,18 +434,37 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
           <td class="num">{n(r["independent"])}</td>
           <td class="num">{n(r["gateway_gap"])}</td>
           <td class="num">{n(r["dependent"])}</td>
+          <td class="num">{n(r["third_party"])}</td>
         </tr>"""
-            for r in catalog_rows(exhibitions, census, bucket3)
+            for r in cat_data
         )
+        cat_totals = {k: sum(r[k] for r in cat_data) for k in ("works","independent","gateway_gap","dependent","third_party")}
+        cat_rows += f"""
+        <tr>
+          <td><strong>All exhibitions</strong></td>
+          <td class="num"><strong>{n(cat_totals["works"])}</strong></td>
+          <td class="num"><strong>{n(cat_totals["independent"])}</strong></td>
+          <td class="num"><strong>{n(cat_totals["gateway_gap"])}</strong></td>
+          <td class="num"><strong>{n(cat_totals["dependent"])}</strong></td>
+          <td class="num"><strong>{n(cat_totals["third_party"])}</strong></td>
+        </tr>"""
         catalog_html = f"""
   <section id="catalog">
     <h2>Every exhibition</h2>
     <p>The whole catalog, oldest first: every published exhibition, how many
     works it holds, and what each work&rsquo;s media depends on today. The
-    same three states as the tiles above.</p>
+    same states as the tiles above, plus the third-party class. Counting
+    note: this table counts the works the census measured (the indexer's
+    view) plus never-migrated Bitmark-era works; the Bitmark-era table below
+    counts works enumerated from the public API. The two sources diverge by
+    exactly one work (Field Guide: one migrated token absent from the
+    census). Unsupervised here merges its three MoMA burn-mint records; the
+    table below lists the original exhibition entity alone. Source:
+    <span class="dated">data/census/&hellip;.csv + bitmark enumeration
+    files, all published under Data.</span></p>
     <table>
       <thead>
-        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Resolve without us</th><th class="num">Failing gateways</th><th class="num">Depend on us</th></tr>
+        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Resolving via gateways</th><th class="num">Failing probe</th><th class="num">Depend on us</th><th class="num">Third party</th></tr>
       </thead>
       <tbody>
 {cat_rows}
@@ -475,14 +505,13 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     pin_para = ""
     if ps and ps["all_verified"]:
         pin_para = f"""
-    <p>The first step is done. As of {esc(ps["as_of"])}, every one of the
+    <p>Archival-copy phase, completed {esc(ps["as_of"])}: every one of the
     {n(ps["series"])} Bitmark-era series has a content-addressed copy &mdash;
     {ps["bytes"] / 1e9:.0f}&nbsp;GB added to IPFS and verified byte-for-byte
-    against the original files. The addresses are published in
-    <a href="data/{esc(ps["file"])}">the manifest</a>, so anyone can hold a
-    copy of any work. The works&rsquo; own references still point at our
-    CDN, so they remain counted as depending on us until those references
-    change &mdash; the copies exist; the links come next.</p>"""
+    against the origin files (source:
+    <a href="data/{esc(ps["file"])}">{esc(ps["file"])}</a>). The works&rsquo;
+    own published references still point at our CDN, so they remain counted
+    as depending on us until the reference phase completes.</p>"""
 
     eth_dep_para = ""
     if census:
@@ -513,10 +542,12 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 <header>
   <p class="brand"><a href="https://feralfile.com">Feral File</a></p>
   <h1>Status</h1>
-  <p class="lede">Every work we&rsquo;ve published, and whether it still
-  works. Checked from the outside &mdash; the way a collector&rsquo;s wallet
-  or browser fetches art. The raw data lives beside this page, in
-  <a href="data/status.json">JSON</a> and <a href="#data">CSV</a>.</p>
+  <p class="lede">Every work we&rsquo;ve published, and what its survival
+  depends on &mdash; measured from the outside, file by file, the way a
+  collector&rsquo;s wallet or browser fetches art. Today these checks cover
+  the artwork files; the metadata link and rendering are not yet measured,
+  and the page says so wherever it matters. The raw data lives beside this
+  page, in <a href="data/status.json">JSON</a> and <a href="#data">CSV</a>.</p>
 </header>
 
 <main>
@@ -530,19 +561,24 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     when every link in that chain answers.</p>
     <p>Each link has a keeper. The blockchain keeps the token, the contract,
     and anything stored on chain. Content-addressed files can be kept by
-    anyone who cares to pin them, including collectors. Whatever remains
-    depends on Feral File&rsquo;s own servers. The fewer links that need us,
-    the more permanent the work &mdash; and that is what this page watches:
-    how many works still need us, and for which links.</p>
+    anyone who cares to pin them, including collectors. Anything neither on
+    chain nor content-addressed depends on whichever server hosts it &mdash;
+    for most works here ours, for six a third-party platform. The fewer
+    links that require our servers, the less a work&rsquo;s availability
+    depends on Feral File.</p>
     <p>One honest limit is worth stating, because it is widely
-    misunderstood: putting a file on IPFS does not copy it anywhere. A work
-    stays available only while someone, somewhere, keeps a copy. What
+    misunderstood: publishing a file on IPFS does not ensure anyone else
+    holds a copy. A work stays available only while someone, somewhere,
+    keeps one. What
     content addressing adds is that every copy is equal and verifiable
     &mdash; a copy on a collector&rsquo;s computer counts exactly as much as
     one on ours, and none can be altered without detection. So when this
-    page publishes a work&rsquo;s content address, keeping that work alive
-    becomes something any collector, museum, or archive can do with one
-    command, without asking our permission. That is the invitation.</p>
+    page publishes a work&rsquo;s content address, holding a byte-identical
+    copy of its tested media becomes something any collector, museum, or
+    archive can do without asking our permission. The command is one line:
+    <code>ipfs pin add &lt;address&gt;</code>. That preserves the files this
+    page tested &mdash; not yet the metadata path or the work&rsquo;s
+    rendering, which are the next layers of this work.</p>
   </section>
 
   <section class="tiles" aria-label="Summary">
@@ -563,16 +599,21 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     safe. What remained exposed was the artwork files themselves. Works later
     collected on Ethereum or Tezos were migrated and carry content-addressed
     copies; the {n(bucket3["works_on_bitmark"])} works never migrated &mdash;
-    across {n(bucket3["series_count"])} series in
-    {bucket3["exhibitions_affected"]} exhibitions &mdash; have their only
-    media copy on our content delivery network (cdn.feralfileassets.com).
-    Those files were last verified reachable on {esc(probe["date"])}:
+    across {n(bucket3["series_count"])} series, in the
+    {bucket3["exhibitions_affected"]} of {len(bucket3["exhibitions"])}
+    Bitmark-era exhibitions with at least one unmigrated work &mdash; have
+    published media references that point only to our content delivery
+    network (cdn.feralfileassets.com). Those references last answered a
+    probe on {esc(probe["date"])}:
     {n(probe["resolving"])} of {n(probe["total"])} series resolved (one probe
     per series; editions of a series share files).</p>{eth_dep_para}
-    <p>A single copy behind our servers is not what we promise. Remediation
-    is in progress and targeted within 2&ndash;3 months: every work gets a
-    content-addressed copy that resolves independently of our infrastructure,
-    or a dated exception with an owner and a migration path.</p>{pin_para}
+    <p>A published reference that only our servers can answer is not what
+    we promise. Remediation runs in two phases. The archival-copy phase
+    completed 2026-08-04: every series has a byte-verified content-addressed
+    copy. The reference phase &mdash; making each work&rsquo;s own published
+    reference resolve independently of our infrastructure &mdash; is open,
+    target 2026-11-01; any exception will name the work, the reason, a
+    responsible person at Feral File, and a review date.</p>{pin_para}
     <table>
       <thead>
         <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Not yet migrated</th><th class="num">On Ethereum</th><th class="num">On Tezos</th></tr>
@@ -602,11 +643,14 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     <p>Two different promises hide inside &ldquo;it still works.&rdquo; A work
     <strong>resolves</strong> when every reference in its chain can be fetched
     from public infrastructure. These checks currently measure the
-    <strong>artwork files</strong>: every file of every edition is requested
-    over the public gateways wallets and browsers use (ipfs.io, dweb.link,
-    ipfs.feralfile.com), with ordinary headers and redirects. A file counts as
-    resolving only when a public gateway serves it &mdash; our own
-    infrastructure answering is not enough.</p>
+    <strong>artwork files</strong>, as HTTP HEAD probes: content-addressed
+    references through named public gateways (ipfs.io, dweb.link,
+    ipfs.feralfile.com), and CDN or third-party references directly from
+    their stated hosts. A content-addressed file counts as resolving only
+    when a public gateway answers for it &mdash; our own infrastructure
+    answering is not enough. Bitmark-era media was probed once per series
+    entry file (editions of a series share files); Ethereum and Tezos works
+    were probed per enumerated file reference.</p>
     <p>Known gap, found 2026-08-03: HLS video is followed only to its master playlist; the stream files it references are not yet traversed, and for the works flagged above they are not on IPFS at all.</p>
     <p>Not yet measured: the <strong>metadata link</strong> &mdash; whether
     each token&rsquo;s on-chain reference is itself content-addressed &mdash;
@@ -614,8 +658,10 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     renders the way the artist intended. What is stored on chain is not
     probed: it survives with the chain itself. Bitmark-era works are
     enumerated from the public Feral File API by each work&rsquo;s on-chain
-    location. This page is regenerated from the raw data on every update; no
-    number on it is typed by hand.</p>
+    location. This page is regenerated on every update by the open build in
+    <a href="https://github.com/feral-file/status">feral-file/status</a>
+    from the data files published below; no number on it is typed by
+    hand.</p>
   </section>
 
   <section id="archive">
@@ -655,8 +701,8 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
     probe = bucket3["series_probe"]
     if census:
         b = census["buckets"]
-        b1 = f"{b.get('independent', 0):,} works (every content-addressed media file verified on ipfs.io, {census['date']})"
-        b2 = f"{b.get('gateway_gap', 0):,} works (HLS video: master playlist resolves, stream files unreachable from any gateway — video plays only from our CDN)"
+        b1 = f"{b.get('independent', 0):,} works (every content-addressed media file answered the {census['date']} HEAD probe on ipfs.io; who holds the copies is not measured)"
+        b2 = f"{b.get('gateway_gap', 0):,} works (HLS video: master playlists answered, stream files failed on every gateway tested; stream files reachable only from our CDN)"
         b3_extra = (
             f" Plus {b.get('dependent', 0):,} works on Ethereum and Tezos whose "
             f"media likewise lives only on our CDN (discovered {census['date']}); "
@@ -689,18 +735,22 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
     pin_md = ""
     if ps and ps["all_verified"]:
         pin_md = (
-            f" DONE for every series as of {ps['as_of']}: all {ps['series']} series"
-            f" have byte-verified content-addressed copies ({ps['bytes']/1e9:.0f} GB;"
-            f" addresses in {SITE_URL}/data/{ps['file']})."
+            f" Archival-copy phase completed {ps['as_of']}: all {ps['series']}"
+            f" series have byte-verified content-addressed copies"
+            f" ({ps['bytes']/1e9:.0f} GB; addresses in {SITE_URL}/data/{ps['file']})."
         )
     upd = "\n".join(f"- **{u['date']} — {u['title']}.** {u['body']}" for u in updates)
     if registry:
         reg_md = (
             f"Registry on Ethereum: {registry['address']} (FeralFileArchiveRegistry, "
-            f"owned by Feral File's custody Safe). Current manifest: "
+            f"source-verified; owned by Feral File's 2-of-3 custody Safe "
+            f"0xA741D850B8B4e684c6F78e9615BD5b33B37AcFcF; owner can only append "
+            f"manifest versions, prior versions immutable in contract storage, no "
+            f"upgrade or destruction path). Current manifest: "
             f"{registry['manifest_cid']} (version {registry['version']}, published "
-            f"{registry['published']}). Resolve the manifest on IPFS; every copy is "
-            f"one hop away, with no Feral File server in the path."
+            f"{registry['published']}). Ethereum records which manifest is current; "
+            f"the manifest and copies stay available only while pinned. The works' "
+            f"own token references do not yet point at these copies."
         )
     else:
         reg_md = "Being anchored on Ethereum; address publishes here."
@@ -721,34 +771,42 @@ they run. A work is alive when every link in that chain answers.
 
 Each link has a keeper. The blockchain keeps the token, the contract, and
 anything stored on chain. Content-addressed files can be kept by anyone who
-cares to pin them. Whatever remains depends on Feral File's own servers. The
-fewer links that need us, the more permanent the work. This page watches how
-many works still need us, and for which links.
+cares to pin them. Anything neither on chain nor content-addressed depends
+on whichever server hosts it — for most works here ours, for six a
+third-party platform. The fewer links that require our servers, the less a
+work's availability depends on Feral File.
 
-One honest limit, because it is widely misunderstood: putting a file on IPFS
-does not copy it anywhere. A work stays available only while someone,
-somewhere, keeps a copy. What content addressing adds is that every copy is
+One limit, widely misunderstood: publishing a file on IPFS does not ensure
+anyone else holds a copy. A work stays available only while someone,
+somewhere, keeps one. What content addressing adds is that every copy is
 equal and verifiable — a collector's copy counts exactly as much as ours,
 and none can be altered without detection. When this page publishes a work's
-content address, keeping that work alive becomes something any collector,
-museum, or archive can do with one command, without asking our permission.
-That is the invitation.
+content address, holding a byte-identical copy of its tested media is one
+command for any collector, museum, or archive: ipfs pin add <address>. That
+preserves the files this page tested — not yet the metadata path or the
+work's rendering.
 
 ## Works, by what their media depends on
 
 1. Resolve without Feral File: {b1}
 2. Should resolve without us, but currently fail on public gateways: {b2}
-3. Depend entirely on Feral File: {bucket3["works_on_bitmark"]:,} Bitmark-era
-   works across {bucket3["series_count"]:,} series in
-   {bucket3["exhibitions_affected"]} exhibitions (as of {bucket3["as_of"]}),
-   sole media copy on cdn.feralfileassets.com. Their ownership records are
-   already safe: the Bitmark blockchain (retired 2025) was preserved as a
-   verifiable archive — data on IPFS, Merkle root on Ethereum, timestamp on
-   Bitcoin (https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive).{b3_extra}
-   Last CDN probe {probe["date"]}: {probe["resolving"]:,} of
-   {probe["total"]:,} series resolved (one probe per series; editions share
-   files). Remediation targeted within 2-3 months: a content-addressed copy
-   per work, or a dated exception with an owner.{pin_md}
+3. Published media references depend entirely on Feral File:
+   {bucket3["works_on_bitmark"]:,} Bitmark-era works across
+   {bucket3["series_count"]:,} series, in the
+   {bucket3["exhibitions_affected"]} of 18 Bitmark-era exhibitions with at
+   least one unmigrated work (as of {bucket3["as_of"]}); their published
+   references point only to cdn.feralfileassets.com. Byte-verified archival
+   copies exist for every series as of 2026-08-04 (pin manifest under
+   Data); the references themselves are not yet updated. Ownership records
+   are archived and independently anchored — data on IPFS, Merkle root on
+   Ethereum, timestamp on Bitcoin
+   (https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive) — though
+   the archive too stays available only while someone retains it.{b3_extra}
+   Last reference probe {probe["date"]}: {probe["resolving"]:,} of
+   {probe["total"]:,} series answered (one probe per series entry file;
+   editions share files). Reference-phase remediation target 2026-11-01;
+   exceptions will name the work, reason, responsible person, and review
+   date.{pin_md}
 {catalog_section}
 ## Bitmark-era exhibitions
 
@@ -774,11 +832,20 @@ update.
 
 {reg_md}
 
+## Check a work you own
+
+The page at {SITE_URL} has a per-work lookup: paste a token ID (Ethereum,
+Tezos, or 64-char Bitmark ID) and see that work's file-by-file state and,
+for Bitmark-era works, its archival copy address. The same data is in
+data/work_index.json + data/works/ (sharded JSON, documented in the repo).
+
 ## Data
 
-- {SITE_URL}/data/status.json
+- {SITE_URL}/data/status.json — every number on this page, structured
+- {SITE_URL}/data/pin_manifest_2026-08-04.csv — archival copies: series → CID
+- {SITE_URL}/data/census/token_census_20260803T182523Z.csv.gz — the full probe, one row per file
+- Bitmark enumeration + per-series probes + exhibition totals: named at {SITE_URL}/#data
 - {SITE_URL}/feed.xml (RSS, one entry per update)
-- CSVs listed at {SITE_URL}/#data
 
 ## Updates
 
