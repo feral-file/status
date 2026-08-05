@@ -6,9 +6,8 @@
   "data_as_of": "2026-08-04T07:55:08Z",
   "registry": {
     "chain": "eip155:1",
-    "address": null,
-    "runtime_code_hash": null,
-    "note": "unset until deployment; rebuild after data/registry.json exists"
+    "address": "0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e",
+    "runtime_code_hash": "0x34c949097393ef69b6cdea3452634b9b0953f15c93cc71bab6ffe6dde5e87d28"
   },
   "previous_manifest": null,
   "collections": [
