@@ -8,10 +8,14 @@ pragma solidity 0.8.24;
 ///
 ///         `manifest` holds the IPFS CID of `archive-manifest.json`, which
 ///         maps each archived collection and series to its content-addressed
-///         copy, and names this contract's own address — resolve the
-///         manifest and check that it points back here to authenticate the
-///         registry against copies. The canonical address is also published
-///         at https://status.feralfile.com.
+///         copy, and names this contract's own address. That back-pointer
+///         does one narrow job: a byte-identical clone of this contract
+///         cannot point at the authentic manifest, because the manifest
+///         names this address, not the clone's. It does not by itself prove
+///         which registry is Feral File's — a cloner can close the same
+///         loop with a forged manifest. The canonical anchor is
+///         institutional: the address published at
+///         https://status.feralfile.com and in Feral File's records.
 ///
 ///         Contract storage is the permanence mechanism: the full CID
 ///         history and its timestamps live in state (`historyAt`,
@@ -97,11 +101,13 @@ contract FeralFileArchiveRegistry {
 
     /// @notice Manifest CID at index `i` (0 = first ever set).
     function historyAt(uint256 i) external view returns (string memory) {
+        if (i >= _history.length) revert NoSuchVersion();
         return _history[i];
     }
 
     /// @notice Timestamp at which history index `i` became canonical.
     function historyTimeAt(uint256 i) external view returns (uint64) {
+        if (i >= _historyTimes.length) revert NoSuchVersion();
         return _historyTimes[i];
     }
 

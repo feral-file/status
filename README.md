@@ -82,7 +82,11 @@ first — it retires every Transaction Builder unknown for ~nothing):
    then from the Safe (Transaction Builder) call `acceptOwnership()`
    (selector `0x79ba5097` if the ABI doesn't auto-load).
 5. Confirm `owner()` = the Safe and `pendingOwner()` = zero address.
-6. Write `data/registry.json`: `{"chain": "eip155:1", "address": "0x…"}`.
+6. Write `data/registry.json`: `{"chain": "eip155:1", "address": "0x…",
+   "runtime_code_hash": "0x…"}`. **The CID signed in step 7 MUST come from
+   this post-deploy rebuild** — a manifest with `"address": null` must never
+   go on-chain (a clone could point at the same CID). The draft CID from
+   before deployment is for rehearsal only.
    Rebuild the manifest (now names its own registry), then on the archival
    node: `ipfs add -Q --cid-version 1 archive-manifest.json` — exactly those
    flags; different flags give a different CID for identical bytes.
