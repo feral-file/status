@@ -650,7 +650,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 """
 
 
-def build_markdown(bucket3, census, exhibitions, updates, generated_at):
+def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry=None):
     """The whole page as plain Markdown — the cheap read for a model."""
     probe = bucket3["series_probe"]
     if census:
@@ -694,6 +694,16 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at):
             f" addresses in {SITE_URL}/data/{ps['file']})."
         )
     upd = "\n".join(f"- **{u['date']} — {u['title']}.** {u['body']}" for u in updates)
+    if registry:
+        reg_md = (
+            f"Registry on Ethereum: {registry['address']} (FeralFileArchiveRegistry, "
+            f"owned by Feral File's custody Safe). Current manifest: "
+            f"{registry['manifest_cid']} (version {registry['version']}, published "
+            f"{registry['published']}). Resolve the manifest on IPFS; every copy is "
+            f"one hop away, with no Feral File server in the path."
+        )
+    else:
+        reg_md = "Being anchored on Ethereum; address publishes here."
     return f"""# Feral File Status
 
 Every work we've published, and whether it still works — checked from the
@@ -760,6 +770,10 @@ renders as the artist intended). On-chain data is not probed: it survives
 with the chain itself. The page is regenerated from the raw data on every
 update.
 
+## The Feral File Archive
+
+{reg_md}
+
 ## Data
 
 - {SITE_URL}/data/status.json
@@ -798,7 +812,13 @@ def build_llms_txt(bucket3):
 
 ## Updates
 
-- [RSS feed]({SITE_URL}/feed.xml): one entry per change to this page
+- [RSS feed]({SITE_URL}/feed.xml): one entry per update
+
+## On-chain
+
+- Registry: 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e (Ethereum mainnet,
+  FeralFileArchiveRegistry) — current archive-manifest CID, plus full version
+  history in contract storage.
 """
 
 
@@ -952,7 +972,7 @@ def main():
     )
     (PUBLIC / "feed.xml").write_text(build_feed(updates, now))
     (PUBLIC / "status.md").write_text(
-        build_markdown(bucket3, census, exhibitions, updates, generated_at)
+        build_markdown(bucket3, census, exhibitions, updates, generated_at, registry)
     )
     (PUBLIC / "llms.txt").write_text(build_llms_txt(bucket3))
     (PUBLIC / "robots.txt").write_text(ROBOTS_TXT)
