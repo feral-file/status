@@ -1,0 +1,6 @@
+{
+  "version": 1,
+  "manifest_cid": "bafkreichag5umurwbrldem6estvstngdxfcyja5w4jnk7k65thxlteceky",
+  "published": "2026-08-05",
+  "note": "Page-display record of on-chain publications. NOT a manifest-generator input (adding it there would break byte-reproducibility of published versions)."
+}

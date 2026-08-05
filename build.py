@@ -48,6 +48,18 @@ def latest(pattern):
     return matches[-1] if matches else None
 
 
+def load_registry():
+    reg_path = DATA / "registry.json"
+    pub_path = DATA / "published.json"
+    if not (reg_path.exists() and pub_path.exists()):
+        return None
+    reg = json.loads(reg_path.read_text())
+    pub = json.loads(pub_path.read_text())
+    if not reg.get("address"):
+        return None
+    return {**reg, **{k: pub[k] for k in ("version", "manifest_cid", "published")}}
+
+
 def load_exhibitions():
     path = latest("exhibitions_*.json")
     exs = json.loads(path.read_text())
@@ -326,7 +338,27 @@ def catalog_rows(exhibitions, census, bucket3):
     return rows
 
 
-def render(bucket3, census, exhibitions, updates, generated_at):
+def registry_paragraph(registry):
+    if not registry:
+        return ("The archival copies above are being anchored on Ethereum; "
+                "the registry address will be published here.")
+    a = registry["address"]
+    return (
+        f'Every archival copy above is indexed by the Feral File Archive '
+        f'manifest, and the manifest\u2019s address is recorded on Ethereum '
+        f'in the <a href="https://etherscan.io/address/{a}">'
+        f'FeralFileArchiveRegistry</a> at <code>{a}</code>, owned by Feral '
+        f'File\u2019s custody Safe. Current manifest: '
+        f'<code>{registry["manifest_cid"]}</code> (version '
+        f'{registry["version"]}, published {registry["published"]}). Resolve '
+        f'the manifest on IPFS, and every work\u2019s copy is one hop away '
+        f'\u2014 no Feral File server in the path. The registry keeps its '
+        f'full version history in contract storage.'
+    )
+
+
+def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
+    registry_html = registry_paragraph(registry)
     dep_total = bucket3["works_on_bitmark"] + (
         census["buckets"].get("dependent", 0) if census else 0
     )
@@ -586,6 +618,11 @@ def render(bucket3, census, exhibitions, updates, generated_at):
     number on it is typed by hand.</p>
   </section>
 
+  <section id="archive">
+    <h2>The Feral File Archive</h2>
+    <p>{registry_html}</p>
+  </section>
+
   <section id="data">
     <h2>Data</h2>
     <p>Everything above, machine-readable. Agents welcome: start at
@@ -810,6 +847,7 @@ def main():
     bucket3 = load_bucket3()
     census = load_census()
     exhibitions = load_exhibitions()
+    registry = load_registry()
     updates = sorted(
         json.loads((DATA / "updates.json").read_text()),
         key=lambda u: u["date"],
@@ -899,6 +937,7 @@ def main():
         "exhibitions": (
             catalog_rows(exhibitions, census, bucket3) if census else None
         ),
+        "archive_registry": registry,
         "bitmark_exhibitions": bucket3["exhibitions"],
         "updates": updates,
     }
@@ -906,7 +945,7 @@ def main():
     shard_works = emit_work_shards(census, bucket3, exhibitions)
     print(f"lookup shards: {shard_works} works indexed")
     (PUBLIC / "index.html").write_text(
-        render(bucket3, census, exhibitions, updates, generated_at)
+        render(bucket3, census, exhibitions, updates, generated_at, registry)
     )
     (PUBLIC / "data" / "status.json").write_text(
         json.dumps(status, indent=2, ensure_ascii=False)
