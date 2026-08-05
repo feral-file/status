@@ -1,5 +1,10 @@
 [
   {
+    "date": "2026-08-05",
+    "title": "The Feral File Archive is anchored on Ethereum",
+    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p, and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. From any work to its archival copy: token to Ethereum to IPFS, with no Feral File server in the path. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
+  },
+  {
     "date": "2026-08-04",
     "title": "Every Bitmark-era series now has a verified content-addressed copy",
     "body": "All 215 series — 398 GB, every file of every work whose only copy lived on our CDN — have been added to IPFS and verified byte-for-byte against the originals. The addresses are published in the pin manifest beside this page, so any collector, museum, or archive can hold a copy of any work with one command. The works' own references still point at our CDN; linking them to these copies is the next step."
