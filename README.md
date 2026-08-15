@@ -1,8 +1,18 @@
 # status.feralfile.com
 
-Where every published Feral File work is stored, and whether each copy
-resolves right now. A static page generated from raw check data — the
-public receipt for feral-file/feral-file#3435 and #3463.
+What every published Feral File work's artwork media depends on, and
+whether those referenced files resolve from public infrastructure right
+now. A static page generated from raw check data — the public receipt for
+feral-file/feral-file#3435 and #3463.
+
+Claim boundary: the checks measure the artwork-media layer only. The
+metadata link (whether each token's on-chain reference is itself
+content-addressed) and rendering (whether the work plays as the artist
+intended) are not yet measured. `generated_at` in status.json is the
+page-build time, not the measurement time — probe dates live in the
+`scope` object and each bucket's `as_of`. `tools/check_claims.py` (run by
+`make build`) fails the build if any summary surface drifts past this
+boundary.
 
 ## How it works
 

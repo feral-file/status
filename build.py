@@ -18,7 +18,8 @@ Everything on the page is computed from these files. No number is typed into
 the template by hand.
 
 Framing (decided 2026-08-03): the page is "Feral File Status" — every
-published work, and whether it still works. A published work is a chain of
+published work, and what its survival depends on at the artwork-media
+layer. A published work is a chain of
 references (token -> contract -> metadata -> files -> runtime); the tiles
 measure what each work's survival depends on, AT THE MEDIA LAYER. The census
 fetches metadata through Feral File's own API, so it verifies the artwork
@@ -41,6 +42,35 @@ ROOT = Path(__file__).parent
 DATA = ROOT / "data"
 PUBLIC = ROOT / "public"
 SITE_URL = "https://status.feralfile.com"
+
+# One canonical claim, shared by every summary surface (HTML meta, Markdown,
+# llms.txt, RSS, JSON scope). The measured layer is artwork media; the
+# metadata link and rendering are not yet measured, and every surface that
+# introduces itself must say so in the same breath as the claim.
+CLAIM = (
+    "what its artwork media depends on — checked from the outside, "
+    "the way a collector's wallet or browser fetches art"
+)
+
+
+def measurement_scope(census, bucket3):
+    """The measured boundary + probe dates, published as status.json's scope.
+
+    generated_at is the page-build time; these dates are measurement time.
+    """
+    return {
+        "layer": "artwork_media",
+        "measures": (
+            "resolves, media layer: every artwork file fetchable from the "
+            "public gateways wallets and browsers use"
+        ),
+        "media_probe_as_of": census["date"] if census else None,
+        "bitmark_reference_probe_as_of": bucket3["series_probe"]["date"],
+        "not_yet_measured": [
+            "metadata link: whether each token's on-chain reference is content-addressed",
+            "plays: what resolves also renders as the artist intended",
+        ],
+    }
 
 
 def latest(pattern):
@@ -167,9 +197,10 @@ def load_census():
         buckets[state] += 1
         per_ex[st["ex"]][state] += 1
         per_ex[st["ex"]]["works"] += 1
+    d = path.name.replace("token_census_", "").split("T")[0]
     return {
         "file": path.name,
-        "date": path.name.replace("token_census_", "").split("T")[0],
+        "date": f"{d[:4]}-{d[4:6]}-{d[6:]}",
         "works": len(per_work),
         "buckets": dict(buckets),
         "per_exhibition": {k: dict(v) for k, v in per_ex.items()},
@@ -366,6 +397,7 @@ def registry_paragraph(registry):
 
 def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     registry_html = registry_paragraph(registry)
+    media_probe = census["date"] if census else bucket3["series_probe"]["date"]
     dep_total = bucket3["works_on_bitmark"] + (
         census["buckets"].get("dependent", 0) if census else 0
     )
@@ -376,7 +408,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
             "works whose media resolves through public gateways",
             f"Every content-addressed media file answered the "
             f"{esc(census['date'])} probe on ipfs.io. Who holds the copies "
-            "is not measured \u2014 co-pinning is what makes this durable.",
+            "is not measured. Independent pinning is what makes them durable.",
         )
         tile2 = tile(
             n(b.get("gateway_gap", 0)),
@@ -536,7 +568,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 <link rel="alternate" type="application/rss+xml" title="Feral File status updates" href="feed.xml">
 <link rel="alternate" type="application/json" href="data/status.json">
 <link rel="alternate" type="text/markdown" href="status.md">
-<meta name="description" content="Every work Feral File has published, and whether it still works — checked from the outside, the way a collector's wallet or browser fetches art.">
+<meta name="description" content="Every work Feral File has published, and {CLAIM}.">
 </head>
 <body>
 <header>
@@ -545,8 +577,8 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
   <p class="lede">Every work we&rsquo;ve published, and what its survival
   depends on &mdash; measured from the outside, file by file, the way a
   collector&rsquo;s wallet or browser fetches art. Today these checks cover
-  the artwork files; the metadata link and rendering are not yet measured,
-  and the page says so wherever it matters. The raw data lives beside this
+  the artwork files, last probed {esc(media_probe)}; the metadata link and
+  rendering are not yet measured, and the page says so wherever it matters. The raw data lives beside this
   page, in <a href="data/status.json">JSON</a> and <a href="#data">CSV</a>.</p>
 </header>
 
@@ -566,7 +598,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     for most works here ours, for six a third-party platform. The fewer
     links that require our servers, the less a work&rsquo;s availability
     depends on Feral File.</p>
-    <p>One honest limit is worth stating, because it is widely
+    <p>One limit is worth stating, because it is widely
     misunderstood: publishing a file on IPFS does not ensure anyone else
     holds a copy. A work stays available only while someone, somewhere,
     keeps one. What
@@ -587,7 +619,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
   {census_note}
 {catalog_html}
   <section id="bitmark">
-    <h2>Works that depend entirely on us</h2>
+    <h2>Works whose published media depends entirely on us</h2>
     <p>Feral File&rsquo;s first {len(bucket3["exhibitions"])} exhibitions were
     minted on the Bitmark blockchain, which we built in 2014 and retired in
     2025. The chain itself was preserved as a verifiable archive &mdash; its
@@ -595,8 +627,9 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     href="https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive">the
     Bitmark Archive</a>; <a
     href="https://feralfile.substack.com/p/before-ethereum-before-nfts-there">the
-    story</a>) &mdash; so the ownership records of these works are already
-    safe. What remained exposed was the artwork files themselves. Works later
+    story</a>) &mdash; so the ownership records of these works can be
+    verified without us. What remained exposed was the artwork files
+    themselves. Works later
     collected on Ethereum or Tezos were migrated and carry content-addressed
     copies; the {n(bucket3["works_on_bitmark"])} works never migrated &mdash;
     across {n(bucket3["series_count"])} series, in the
@@ -754,11 +787,13 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
         )
     else:
         reg_md = "Being anchored on Ethereum; address publishes here."
+    media_probe = census["date"] if census else probe["date"]
     return f"""# Feral File Status
 
-Every work we've published, and whether it still works — checked from the
-outside, the way a collector's wallet or browser fetches art. Generated
-{generated_at}. Canonical URL: {SITE_URL}
+Every work we've published, and {CLAIM}. The metadata link and the work's
+rendering are not yet measured — see "What we check" below. Media last
+probed {media_probe}; page generated {generated_at}.
+Canonical URL: {SITE_URL}
 Machine-readable summary: {SITE_URL}/data/status.json
 
 ## What a published work is
@@ -853,16 +888,19 @@ data/work_index.json + data/works/ (sharded JSON, documented in the repo).
 """
 
 
-def build_llms_txt(bucket3):
+def build_llms_txt(bucket3, census):
+    probe_clause = f" (last full media probe {census['date']})" if census else ""
     return f"""# Feral File Status
 
 > Every work Feral File ({SITE_URL.replace("status.", "")}) has published,
-> and whether it still works — checked from the outside, the way a
-> collector's wallet or browser fetches art. A published work is a chain of
-> references (token -> contract -> metadata -> files -> runtime); this site
-> reports whether each link answers and what each work's survival depends
-> on. Static page, no client-side rendering; every number is generated from
-> the raw data files below. Data is served with open CORS.
+> and {CLAIM}. A published work is a chain of references (token ->
+> contract -> metadata -> files -> runtime); this site currently measures
+> the artwork-media layer{probe_clause}: whether each work's referenced
+> artwork files are fetchable from public infrastructure. It does not yet
+> measure whether each token's metadata reference is independently
+> available, or whether the work renders as the artist intended. Static
+> page, no client-side rendering; every number is generated from the raw
+> data files below. Data is served with open CORS.
 
 ## Read this first
 
@@ -922,7 +960,7 @@ def build_feed(updates, generated_at_dt):
 <channel>
   <title>Feral File status</title>
   <link>{SITE_URL}</link>
-  <description>Updates to whether every published Feral File work still works, and what each work's survival depends on.</description>
+  <description>Updates to what each published Feral File work's artwork media depends on, measured from public infrastructure.</description>
   <lastBuildDate>{format_datetime(generated_at_dt)}</lastBuildDate>
 {items}
 </channel>
@@ -1014,13 +1052,7 @@ def main():
                 "remediation": "content-addressed copy per work, targeted 2-3 months from 2026-08-03",
             },
         },
-        "scope": {
-            "measures": "resolves, media layer: every artwork file fetchable from the public gateways wallets and browsers use",
-            "not_yet_measured": [
-                "metadata link: whether each token's on-chain reference is content-addressed",
-                "plays: what resolves also renders as the artist intended",
-            ],
-        },
+        "scope": measurement_scope(census, bucket3),
         "exhibitions": (
             catalog_rows(exhibitions, census, bucket3) if census else None
         ),
@@ -1041,7 +1073,7 @@ def main():
     (PUBLIC / "status.md").write_text(
         build_markdown(bucket3, census, exhibitions, updates, generated_at, registry)
     )
-    (PUBLIC / "llms.txt").write_text(build_llms_txt(bucket3))
+    (PUBLIC / "llms.txt").write_text(build_llms_txt(bucket3, census))
     (PUBLIC / "robots.txt").write_text(ROBOTS_TXT)
     (PUBLIC / "_headers").write_text(HEADERS_FILE)
 
