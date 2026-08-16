@@ -1,0 +1,110 @@
+{
+ "as_of": "2026-08-16",
+ "note": "Pins on ff-pin-1 beyond the Bitmark-era series manifest. All byte-verified on add except the Bitmark chain archive and HLS masters, which were pinned recursively from their existing CIDs (integrity guaranteed by the CID itself).",
+ "collections": [
+  {
+   "id": "a2p",
+   "description": "Media of a2p (2019-2020), the artist-to-artist experiment Feral File grew out of. 144 works across two generations; archives at a2p.bitmark.com. Synced from the original storage and byte-verified 2026-08-03.",
+   "items": [
+    {
+     "label": "a2p 1.0 media (art-trading-assets-preview-livenet)",
+     "cid": "bafybeicpzu5662p244agrni3dowebgnnidlcjmt6yxmfk4bp4r2zc5zn2y",
+     "bytes": 3700396877,
+     "files": 170
+    },
+    {
+     "label": "a2p 2.0 media (art-trading-v2-live)",
+     "cid": "bafybeifvvqoomhreylzrkm3f25oymfv4brp4wy2pxiaywm4i2huu6vrrje",
+     "bytes": 4071203627,
+     "files": 149
+    },
+    {
+     "label": "a2p trade originals (trade-art-trading-livenet)",
+     "cid": "bafybeifc7skzcg7ivlsl5g2kusnf5izwgdwg4dbcgly3uhz7ir3t32olgi",
+     "bytes": 7590613247,
+     "files": 161
+    }
+   ]
+  },
+  {
+   "id": "bitmark-blockchain-archive",
+   "description": "The retired Bitmark blockchain (2014-2025), preserved per github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive: chain data on IPFS, Merkle root on Ethereum, timestamp on Bitcoin. Re-pinned on Feral File's archival node 2026-08-03.",
+   "items": [
+    {
+     "label": "chain archive metadata + data",
+     "cid": "QmQeLXYbeB5kzoZQhLwoRhSaXAovc6Kp9didBasVDRuVHe"
+    },
+    {
+     "label": "Merkle proof file",
+     "cid": "QmUTivb8fhJyNF1MvPXU1swyc8Eonf9eTeVm7uxPkiKaxK"
+    }
+   ]
+  },
+  {
+   "id": "hls-master-playlists",
+   "description": "HLS master playlists for 184 video works (FeralVerse, On Screen Presence) whose stream files were never placed on IPFS — the masters are preserved here; full video repackaging as directory CIDs is open remediation.",
+   "items": [
+    {
+     "label": "FeralVerse master A",
+     "cid": "QmRGwoEnB4inboActrRsNAEiJzXL8LUwLrCYcUCgAEBxMQ"
+    },
+    {
+     "label": "FeralVerse master B",
+     "cid": "Qmf8bvobDWMTmauvhgFKWNhZKUe4ufDY16a6qk1KLSgM74"
+    },
+    {
+     "label": "On Screen Presence master",
+     "cid": "QmQJAa9uC5Fc3gFzNnb8CHNMgJq7NgtNF1SHs9x7YvbjM4"
+    }
+   ]
+  },
+  {
+   "id": "aorist",
+   "description": "Rescue archive of Aorist, a digital-art initiative that ceased operating; Feral File migrated its collections in 2024 and stewards the works. Complete contents of the two surviving storage buckets — originals, renditions, video, and the two IPFS blockstores from the 2024 migration — restored from cold storage, synced, and byte-verified 2026-08-15. One CID per source prefix.",
+   "items": [
+    {
+     "label": "aorist ng-models",
+     "cid": "bafybeiaix5orbepkcgbazsowl6fztmp2ys4djbhr47d2noffq6rndggbkq",
+     "bytes": 378122832,
+     "files": 24
+    },
+    {
+     "label": "aorist ng-images",
+     "cid": "bafybeihgqym3ymlrowvt7dodxozcznijbtrnaowg5ynn246pj4m7x3g67i",
+     "bytes": 4129873434,
+     "files": 9940
+    },
+    {
+     "label": "aorist ng-art-ipfs",
+     "cid": "bafybeicitng5nvk76sj422ankbf7vh4hp5t7w2jzw5r5hjcasqv2i45cwq",
+     "bytes": 17356383572,
+     "files": 66880
+    },
+    {
+     "label": "aorist ng-art-env-02-s3-bucket",
+     "cid": "bafybeigeflcxy7ychcfrdlutspz4xdz7lkfudwrrg5vxz5qemowqdbufl4",
+     "bytes": 67331008441,
+     "files": 6904
+    },
+    {
+     "label": "aorist ng-aor-ipfs",
+     "cid": "bafybeiea554avuft4j65pfo6s4vw24ikzlxwraavqmxtam2qialhb3abfy",
+     "bytes": 92350423623,
+     "files": 278466
+    },
+    {
+     "label": "aorist ng-videos",
+     "cid": "bafybeicmn4vlgjtuuewwrh3vkz3tom6rejykb7inyzbpqphjvjhy4gubjq",
+     "bytes": 239473406656,
+     "files": 24165
+    },
+    {
+     "label": "aorist m-original",
+     "cid": "bafybeidfatg5fydti6ayrbjw2hvt4r76buugzdp4djwgoh53ojl7pd7xqq",
+     "bytes": 189061416,
+     "files": 12
+    }
+   ]
+  }
+ ]
+}

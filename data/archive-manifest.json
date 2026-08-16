@@ -3,13 +3,13 @@
   "description": "Content-addressed, byte-verified copies of works Feral File preserves. Every CID below can be pinned by anyone; each copy held anywhere makes the works more permanent. Published by Feral File; the current CID of this document is recorded in the FeralFileArchiveRegistry contract on Ethereum.",
   "schema_version": 1,
   "site": "https://status.feralfile.com",
-  "data_as_of": "2026-08-04T07:55:08Z",
+  "data_as_of": "2026-08-16T00:00:00Z",
   "registry": {
     "chain": "eip155:1",
     "address": "0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e",
     "runtime_code_hash": "0x34c949097393ef69b6cdea3452634b9b0953f15c93cc71bab6ffe6dde5e87d28"
   },
-  "previous_manifest": null,
+  "previous_manifest": "bafkreichag5umurwbrldem6estvstngdxfcyja5w4jnk7k65thxlteceky",
   "collections": [
     {
       "id": "bitmark-era-series",
@@ -2220,6 +2220,54 @@
         {
           "label": "On Screen Presence master",
           "cid": "QmQJAa9uC5Fc3gFzNnb8CHNMgJq7NgtNF1SHs9x7YvbjM4"
+        }
+      ]
+    },
+    {
+      "id": "aorist",
+      "description": "Rescue archive of Aorist, a digital-art initiative that ceased operating; Feral File migrated its collections in 2024 and stewards the works. Complete contents of the two surviving storage buckets — originals, renditions, video, and the two IPFS blockstores from the 2024 migration — restored from cold storage, synced, and byte-verified 2026-08-15. One CID per source prefix.",
+      "items": [
+        {
+          "label": "aorist ng-models",
+          "cid": "bafybeiaix5orbepkcgbazsowl6fztmp2ys4djbhr47d2noffq6rndggbkq",
+          "bytes": 378122832,
+          "files": 24
+        },
+        {
+          "label": "aorist ng-images",
+          "cid": "bafybeihgqym3ymlrowvt7dodxozcznijbtrnaowg5ynn246pj4m7x3g67i",
+          "bytes": 4129873434,
+          "files": 9940
+        },
+        {
+          "label": "aorist ng-art-ipfs",
+          "cid": "bafybeicitng5nvk76sj422ankbf7vh4hp5t7w2jzw5r5hjcasqv2i45cwq",
+          "bytes": 17356383572,
+          "files": 66880
+        },
+        {
+          "label": "aorist ng-art-env-02-s3-bucket",
+          "cid": "bafybeigeflcxy7ychcfrdlutspz4xdz7lkfudwrrg5vxz5qemowqdbufl4",
+          "bytes": 67331008441,
+          "files": 6904
+        },
+        {
+          "label": "aorist ng-aor-ipfs",
+          "cid": "bafybeiea554avuft4j65pfo6s4vw24ikzlxwraavqmxtam2qialhb3abfy",
+          "bytes": 92350423623,
+          "files": 278466
+        },
+        {
+          "label": "aorist ng-videos",
+          "cid": "bafybeicmn4vlgjtuuewwrh3vkz3tom6rejykb7inyzbpqphjvjhy4gubjq",
+          "bytes": 239473406656,
+          "files": 24165
+        },
+        {
+          "label": "aorist m-original",
+          "cid": "bafybeidfatg5fydti6ayrbjw2hvt4r76buugzdp4djwgoh53ojl7pd7xqq",
+          "bytes": 189061416,
+          "files": 12
         }
       ]
     }
