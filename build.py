@@ -461,7 +461,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
         cat_data = catalog_rows(exhibitions, census, bucket3)
         cat_rows = "\n".join(
             f"""        <tr>
-          <td><span class="dated">{esc(r["start"])}</span> <a href="https://feralfile.com/exhibition/{esc(r["slug"])}">{esc(r["title"])}</a></td>
+          <td><span class="dated">{esc(r["start"])}</span> <a href="https://feralfile.com/exhibitions/shows/{esc(r["slug"])}">{esc(r["title"])}</a></td>
           <td class="num">{n(r["works"])}</td>
           <td class="num">{n(r["independent"])}</td>
           <td class="num">{n(r["gateway_gap"])}</td>
@@ -507,7 +507,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 
     ex_rows = "\n".join(
         f"""        <tr>
-          <td><a href="https://feralfile.com/exhibition/{esc(e["slug"])}">{esc(e["title"])}</a></td>
+          <td><a href="https://feralfile.com/exhibitions/shows/{esc(e["slug"])}">{esc(e["title"])}</a></td>
           <td class="num">{n(e["works"])}</td>
           <td class="num">{n(e["still_bitmark"] + e["swap_initiated"])}</td>
           <td class="num">{n(e["migrated_ethereum"])}</td>
