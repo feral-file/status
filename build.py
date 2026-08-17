@@ -33,6 +33,8 @@ import gzip
 import html
 import json
 import shutil
+import subprocess
+import sys
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
 from email.utils import format_datetime
@@ -1079,6 +1081,13 @@ def main():
 
     kind = f"census {census['file']}" if census else "census pending"
     print(f"built public/ ({kind}, bucket3 as of {bucket3['as_of']})")
+
+    # Claim-boundary guard runs inside the build so every path that builds
+    # — including the Cloudflare Pages deploy, which calls this script
+    # directly — fails on semantic drift, not only local `make build`.
+    subprocess.run(
+        [sys.executable, str(ROOT / "tools" / "check_claims.py")], check=True
+    )
 
 
 if __name__ == "__main__":
