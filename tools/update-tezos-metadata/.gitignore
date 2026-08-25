@@ -1,0 +1,6 @@
+# Operational artifacts — never commit these.
+config.json
+progress.json
+forged-*.hex
+node_modules
+package-lock.json

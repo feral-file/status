@@ -1,0 +1,12 @@
+{
+  "name": "update-tezos-metadata",
+  "private": true,
+  "description": "Manual ops tool: repoint FA2 (FeralfileExhibitionV2 on Tezos) token metadata via update_edition_metadata. No local keys \u2014 the trustee signs inside autonomy-vault (scheme tezos-operation). See README.md.",
+  "type": "module",
+  "dependencies": {
+    "@taquito/local-forging": "^20.0.0",
+    "@taquito/taquito": "^20.0.0",
+    "@taquito/utils": "^20.0.0",
+    "@stablelib/blake2b": "^1.0.1"
+  }
+}

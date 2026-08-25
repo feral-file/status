@@ -23,5 +23,10 @@
     "date": "2026-08-15",
     "title": "Tightened this page's own claims to what the probes measure",
     "body": "Two external audits of this page found summary lines claiming more than the checks prove: the machine-readable mirrors said the site reports \"whether each link answers\" when it measures the artwork-media layer only. Every summary surface (page, Markdown, llms.txt, RSS, status.json) now states the same boundary: artwork media is measured, the metadata link and rendering are not yet. The probe date now appears beside the claim, separate from the page-build time, and a build check fails if any surface drifts past this boundary again."
+  },
+  {
+    "date": "2026-08-25",
+    "title": "The 184 gateway-gap works now resolve; our own gateway serves everything it holds",
+    "body": "Second full census, run on the production monitor this time: 35,008 works, 106,392 files — the same set as 8/3. The 184 works whose media failed on a public gateway on 8/3 were three HLS playlists whose stream files were never on IPFS; each is now a plain MP4 on IPFS, and every affected token's on-chain reference (50 on Ethereum, 142 on Tezos) points at it. Separately, ipfs.feralfile.com had failed 4,448 probes on 8/3 — 44 thumbnail files that were never pinned on it; they are pinned now and it failed 0 probes today. Works with all media content-addressed and resolving on ipfs.io: 17,563 → 17,752. Three files failed on ipfs.io at probe time (two HTTP 410, one timeout) and resolved on a re-check the same day; they stay in today's numbers as measured. 21 of the works are held by a Feral File contract and were skipped by the monitor's own walk; they were probed on 2026-08-26 with the same scanner and every file resolved on all three gateways, and their rows are in the same data file."
   }
 ]

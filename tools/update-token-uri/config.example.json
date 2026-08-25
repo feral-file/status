@@ -1,0 +1,10 @@
+{
+  "$comment": "Copy to config.json (gitignored). tokenBaseURI is optional \u2014 only for base-uri-tx. See README.md.",
+  "chainId": 1,
+  "contract": "0xaDB387798599f5777CD0531c2ECb36007C1D1a51",
+  "senderAddress": "0xbeb9f810862c40a144925f568b1853d72acc492f",
+  "senderAccount": "FILL_ME_vault_account_number_of_the_trustee",
+  "metadataGateway": "https://ipfs.feralfile.com/ipfs/",
+  "updates": "../../ops/3435-hls-fix/rewilded-metadata-fix/result.csv",
+  "tokenBaseURI": "https://ipfs.feralfile.com/ipfs/"
+}

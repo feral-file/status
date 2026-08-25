@@ -415,9 +415,10 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
         tile2 = tile(
             n(b.get("gateway_gap", 0)),
             "works whose content-addressed media failed the gateway probe",
-            f"HLS video: master playlists answered, but their stream files "
-            f"failed on every gateway tested ({esc(census['date'])}). The "
-            "stream files are reachable only from our CDN.",
+            f"At least one content-addressed media file failed the "
+            f"{esc(census['date'])} probe on ipfs.io. Each is listed "
+            "per file in the census data; some are transient gateway "
+            "errors, some are files not pinned anywhere public.",
         )
         tile3_note = (
             f"{n(bucket3['works_on_bitmark'])} Bitmark-era works plus "
@@ -686,7 +687,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     answering is not enough. Bitmark-era media was probed once per series
     entry file (editions of a series share files); Ethereum and Tezos works
     were probed per enumerated file reference.</p>
-    <p>Known gap, found 2026-08-03: HLS video is followed only to its master playlist; the stream files it references are not yet traversed, and for the works flagged above they are not on IPFS at all.</p>
+    <p>Known gap, found 2026-08-03 and closed 2026-08-25: HLS video was followed only to its master playlist, and for 184 works the stream files were never on IPFS. Those works now reference plain MP4s on IPFS (on-chain and in our records); the census still does not traverse HLS playlists, so any future HLS reference would show up here as a gateway failure, not as a pass.</p>
     <p>Not yet measured: the <strong>metadata link</strong> &mdash; whether
     each token&rsquo;s on-chain reference is itself content-addressed &mdash;
     and whether a work <strong>plays</strong>, meaning what resolves also
@@ -737,7 +738,7 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
     if census:
         b = census["buckets"]
         b1 = f"{b.get('independent', 0):,} works (every content-addressed media file answered the {census['date']} HEAD probe on ipfs.io; who holds the copies is not measured)"
-        b2 = f"{b.get('gateway_gap', 0):,} works (HLS video: master playlists answered, stream files failed on every gateway tested; stream files reachable only from our CDN)"
+        b2 = f"{b.get('gateway_gap', 0):,} works (at least one content-addressed media file failed the {census['date']} HEAD probe on ipfs.io; listed per file in the census data)"
         b3_extra = (
             f" Plus {b.get('dependent', 0):,} works on Ethereum and Tezos whose "
             f"media likewise lives only on our CDN (discovered {census['date']}); "

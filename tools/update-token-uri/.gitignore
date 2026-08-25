@@ -1,0 +1,9 @@
+# Operational artifacts — never commit these.
+# config.json names a live operation; vault-tx-* contain signed, relay-ready
+# transactions (a nonce-bound bearer instrument until mined).
+config.json
+txreq-*.json
+vault-tx-*.json
+progress.json
+node_modules
+package-lock.json
