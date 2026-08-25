@@ -1,2 +1,11 @@
 public/
 __pycache__/
+
+# ops tooling
+**/.omc/
+node_modules/
+package-lock.json
+# downloaded originals — re-fetched by each gen.py
+ops/*/*-metadata-fix/src/
+# local media scratch (the MP4s live on the CDN and on IPFS by CID)
+hls/

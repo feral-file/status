@@ -1,0 +1,10 @@
+{
+  "$comment": "Copy to config.json (gitignored). See README.md.",
+  "rpcUrl": "https://rpc.tzkt.io/mainnet",
+  "contract": "KT1JCd3QHFgNZRatQuniDi8evTtyuhKFb3DC",
+  "senderAddress": "tz1fcVFFVujFmnDsWEV1nhGukJTkgXtDKZmm",
+  "senderAccount": "FILL_ME_vault_account_number_of_the_trustee",
+  "metadataGateway": "https://ipfs.feralfile.com/ipfs/",
+  "updates": "../../ops/3435-hls-fix/feralverse-metadata-fix/result.csv",
+  "batchSize": 20
+}

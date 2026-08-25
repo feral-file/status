@@ -1,0 +1,9 @@
+{
+  "name": "update-token-uri",
+  "private": true,
+  "description": "Manual ops tool: repoint FeralfileExhibitionV2 token metadata (updateArtworkEditionIPFSCid) at replacement IPFS metadata directories. No local keys — the trustee account signs inside autonomy-vault. See README.md.",
+  "type": "module",
+  "dependencies": {
+    "ethers": "^6.13.0"
+  }
+}
