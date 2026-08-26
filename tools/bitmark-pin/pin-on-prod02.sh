@@ -20,11 +20,25 @@ FF_PIN_1=${FF_PIN_1:-/ip4/167.172.246.239/tcp/4001/p2p/12D3KooWAdUhAD3u59bBRZrPA
 
 curl -sf -X POST "$A/id" >/dev/null || { echo "no kubo API at $A — open the tunnel first" >&2; exit 1; }
 echo "storage before: $(curl -s -X POST "$A/repo/stat?human=true")"
-echo "peering with ff-pin-1: $(curl -s -X POST "$A/swarm/connect?arg=$FF_PIN_1")"
+PEER=${FF_PIN_1##*/p2p/}
+# A long-lived connection to ff-pin-1 can go stale (2026-08-27: connected,
+# 80 ms latency, yet no bitswap exchange until the connection was re-made).
+# Re-establish it before every series; it costs a round trip.
+repeer() {
+  curl -s -X POST "$A/swarm/disconnect?arg=$FF_PIN_1" >/dev/null 2>&1 || true
+  curl -s -X POST "$A/swarm/disconnect?arg=/ip4/${FF_PIN_1#/ip4/}" >/dev/null 2>&1 || true
+  curl -s -X POST "$A/swarm/connect?arg=$FF_PIN_1"
+}
+echo "peering with ff-pin-1: $(repeer)"
+# prove blocks actually flow before starting: fetch the first series' root
+first=$(sed -n 2p "$MANIFEST" | cut -d, -f2)
+curl -sf -m 60 -X POST "$A/block/stat?arg=$first" >/dev/null || { echo "ff-pin-1 connected but not serving blocks (root of $first timed out) — see feral-file#3435 2026-08-27" >&2; exit 1; }
+echo "block flow ok"
 
 n=0; total=$(($(wc -l < "$MANIFEST") - 1))
 tail -n +2 "$MANIFEST" | while IFS=, read -r sid cid bytes files rest; do
   n=$((n+1))
+  repeer >/dev/null
   t0=$(date +%s)
   # no timeout: a 20 GB series can take a while; progress=false keeps the JSON small
   res=$(curl -s -m 0 -X POST "$A/pin/add?arg=$cid&progress=false")
