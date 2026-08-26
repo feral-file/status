@@ -21,29 +21,55 @@ FF_PIN_1=${FF_PIN_1:-/ip4/167.172.246.239/tcp/4001/p2p/12D3KooWAdUhAD3u59bBRZrPA
 curl -sf -X POST "$A/id" >/dev/null || { echo "no kubo API at $A — open the tunnel first" >&2; exit 1; }
 echo "storage before: $(curl -s -X POST "$A/repo/stat?human=true")"
 PEER=${FF_PIN_1##*/p2p/}
-# A long-lived connection to ff-pin-1 can go stale (2026-08-27: connected,
-# 80 ms latency, yet no bitswap exchange until the connection was re-made).
-# Re-establish it before every series; it costs a round trip.
+STALL_SECS=${STALL_SECS:-180}      # no bytes received for this long => reconnect and retry the series
+# A long-lived connection to ff-pin-1 goes stale (2026-08-27, twice: connected,
+# wantlist populated, zero bitswap exchange). Disconnecting by peer id drops
+# every transport (the stale one is usually QUIC); reconnect over TCP.
 repeer() {
-  curl -s -X POST "$A/swarm/disconnect?arg=$FF_PIN_1" >/dev/null 2>&1 || true
-  curl -s -X POST "$A/swarm/disconnect?arg=/ip4/${FF_PIN_1#/ip4/}" >/dev/null 2>&1 || true
+  curl -s -X POST "$A/swarm/disconnect?arg=/p2p/$PEER" >/dev/null 2>&1 || true
+  sleep 2
   curl -s -X POST "$A/swarm/connect?arg=$FF_PIN_1"
 }
+recv_bytes() { curl -s -X POST "$A/bitswap/stat" | python3 -c 'import json,sys;print(json.load(sys.stdin)["DataReceived"])'; }
 echo "peering with ff-pin-1: $(repeer)"
-# prove blocks actually flow before starting: fetch the first series' root
 first=$(sed -n 2p "$MANIFEST" | cut -d, -f2)
 curl -sf -m 60 -X POST "$A/block/stat?arg=$first" >/dev/null || { echo "ff-pin-1 connected but not serving blocks (root of $first timed out) — see feral-file#3435 2026-08-27" >&2; exit 1; }
 echo "block flow ok"
 
+# pin one CID with a stall watchdog; returns 0 when kubo reports the pin
+pin_with_watchdog() {
+  local cid=$1 attempt=1
+  while :; do
+    local out; out=$(mktemp)
+    curl -s -m 0 -X POST "$A/pin/add?arg=$cid&progress=false" > "$out" &
+    local cpid=$! last=$(recv_bytes) idle=0
+    while kill -0 "$cpid" 2>/dev/null; do
+      sleep 30
+      local now; now=$(recv_bytes)
+      if [[ "$now" == "$last" ]]; then idle=$((idle+30)); else idle=0; last=$now; fi
+      if (( idle >= STALL_SECS )); then
+        echo "  stall: no bytes for ${idle}s on $cid (attempt $attempt) — re-peering" | tee -a pin.log >&2
+        kill "$cpid" 2>/dev/null; wait "$cpid" 2>/dev/null; rm -f "$out"
+        repeer >/dev/null; attempt=$((attempt+1)); continue 2
+      fi
+    done
+    wait "$cpid"; local res; res=$(cat "$out"); rm -f "$out"
+    case "$res" in *'"Pins"'*) echo "$res"; return 0;; esac
+    echo "  pin add returned: ${res:-<empty>} (attempt $attempt) — re-peering" | tee -a pin.log >&2
+    (( attempt >= 5 )) && return 1
+    repeer >/dev/null; attempt=$((attempt+1)); sleep 10
+  done
+}
+
 n=0; total=$(($(wc -l < "$MANIFEST") - 1))
 tail -n +2 "$MANIFEST" | while IFS=, read -r sid cid bytes files rest; do
   n=$((n+1))
-  repeer >/dev/null
   t0=$(date +%s)
-  # no timeout: a 20 GB series can take a while; progress=false keeps the JSON small
-  res=$(curl -s -m 0 -X POST "$A/pin/add?arg=$cid&progress=false")
-  printf '%s [%d/%d] %s %s %sB %ds %s\n' "$(date -u +%FT%TZ)" "$n" "$total" "$sid" "$cid" "$bytes" "$(( $(date +%s) - t0 ))" "$res" | tee -a pin.log
-  case "$res" in *'"Pins"'*) ;; *) echo "  ^ not pinned — stopping; fix and rerun (already-pinned series are skipped instantly)" >&2; exit 1;; esac
+  if res=$(pin_with_watchdog "$cid"); then
+    printf '%s [%d/%d] %s %s %sB %ds %s\n' "$(date -u +%FT%TZ)" "$n" "$total" "$sid" "$cid" "$bytes" "$(( $(date +%s) - t0 ))" "$res" | tee -a pin.log
+  else
+    echo "$(date -u +%FT%TZ) [$n/$total] $sid $cid FAILED after retries — stopping; rerun to resume" | tee -a pin.log >&2; exit 1
+  fi
 done
 
 echo "storage after: $(curl -s -X POST "$A/repo/stat?human=true")"
