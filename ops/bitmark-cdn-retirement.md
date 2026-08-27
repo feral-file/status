@@ -21,6 +21,26 @@ The 5,903 sit on **17 contracts, all `FeralfileExhibitionV2`** (Unsupervised 4,3
 
 Why they are CDN: the Cadence-era migration wrote CDN URLs into each token's `metadata.json`. V2 `tokenURI` = `https://ipfs.bitmark.com/ipfs/<swaps.ipfs_cid>/metadata.json`, an immutable directory — so the fix is the one already executed for On Screen Presence's 50 editions: a new directory per token and `updateArtworkEditionIPFSCid(tokenId, newCid)`.
 
+## Spot check of the classification (2026-08-28, 7 tokens, on-chain via `tokenURI` → `metadata.json`)
+
+| Census class | Token | On-chain `animation_url` / `image` | Verdict |
+|---|---|---|---|
+| cdn | Unsupervised …12551783 | `cdn.feralfileassets.com/previews/…` / `cdn…/thumbnails/…` | confirmed |
+| cdn | On Screen Presence …06566827 | CDN / CDN | confirmed |
+| cdn | Primordium …35090312 | CDN / `imagedelivery.net/…` | confirmed (image is Cloudflare Images, also non-IPFS) |
+| all-ipfs | For Your Eyes Only …78215162 | `ipfs://Qmc47A…` / `ipfs://QmTUus…` | confirmed |
+| all-ipfs | The Bardo …77500370 | `ipfs://QmbTnb…?edition_number=200&…` / `ipfs://QmXESF…` | confirmed |
+| other:cid,other | Ten Whistlegraphs …65013560 | **`ipfs://QmWkJw…?edition_number=3…`** / `ipfs://QmUH8J…` | **census wrong**: the API applied `metadata.alternativePreviewURI` (`aesthetic.computer`); chain is IPFS |
+| other:other | Instructions Follow …23053778 | none / `imagedelivery.net/…` | image-medium work, `image` on Cloudflare Images — non-IPFS, must be fixed too |
+
+Lesson: for Ethereum V2 the census reads `GET /api/contracts/…` — which serves the token's `metadata.json` from IPFS but then overlays `alternativePreviewURI` and rewrites `ipfs://` to the gateway. It is right about CDN-vs-IPFS in the common case but not authoritative. **The fix list must be built from the chain**: `tokenURI(tokenId)` → fetch → classify `animation_url` and `image` (rule: fixed if either is not `ipfs://`). `imagedelivery.net` images count as non-IPFS.
+
+### Verification for the next agent, before generating anything
+
+1. For every migrated Ethereum token of a Bitmark-era exhibition (the 11,537 in `migrated_bitmark_works_media_hosting_2026-08-25.csv`, or the export from step 0), read `tokenURI` on-chain (batch `eth_call`s through a paid RPC — public ones rate-limit and this network DNS-blocks several), fetch `metadata.json` from `ipfs.bitmark.com`, and record `animation_url`, `image`, and the directory CID actually on chain.
+2. Compare with `swaps.ipfs_cid` from the DB export: any mismatch means the DB is behind the chain (or vice versa) and that token goes on a separate list.
+3. The corrected fix list replaces the census-derived 5,903. Expect it to be close but not identical (the `other` classes will shrink; `imagedelivery.net` images will add some).
+
 ## Goal 1 — future swaps (verify, don't build)
 
 The current swap code already does the right thing: `internal/tasks/swap.go swapTokenToEthereum` → `swap.GenerateMetadata` reads `artwork.PreviewIPFSRef.IpfsURI` and `artwork.ThumbnailIPFSRef.IpfsURI` and **errors** (`Missing preview IPFS` / `Missing thumbnail IPFS`) rather than falling back to the CDN; the Tezos path (`GenerateTezosTokenMetadataToIPFS`) resolves the same `ipfs_reference` rows. The CDN URLs in the 5,903 predate this code.
@@ -28,7 +48,7 @@ The current swap code already does the right thing: `internal/tasks/swap.go swap
 So goal 1 reduces to: **every still-Bitmark work must have both reference rows before it is swapped.**
 
 - Preview: done — all 4,959 `preview_uri`s have rows (215 CIDs, pinned).
-- Thumbnail: **check** — their `thumbnail_uri` is an `imagedelivery.net` URL; if no `ipfs_reference` row exists the swap task fails at metadata generation (safe, but blocks the migration). Query in `ops/3435-hls-fix/db/` (`check-bitmark-thumbnail-refs.sql`); if rows are missing, run the existing `EnsureIPFSReferenceByURI` task for each distinct `thumbnail_uri` (pushes the Cloudflare image to prod-02 and writes the row — server code, not ours).
+- Thumbnail: **checked 2026-08-28** (`ops/3435-hls-fix/db/check-bitmark-thumbnail-refs.sql`): works 4,959, missing preview refs 0, missing thumbnail refs 0. Nothing to push.
 - Acceptance: the first swap after this check is inspected on Etherscan/tzkt — `animation_url` and `image` are `ipfs://`; the census then classifies it `independent`.
 
 ## Goal 2 — the 5,903 already-swapped tokens
@@ -65,6 +85,8 @@ Census on prod-02; the 5,903 move from `dependent` to `independent`; status.fera
 
 Exit for goal 2: census `dependent` = 0 for every Bitmark-era exhibition's migrated tokens.
 
+Decisions taken 2026-08-28: the DB export (step 0) is **not** run yet — next agent starts there. `image` rule: use the thumbnail's `ipfs_reference` CID (the On Screen Presence procedure); if a series' thumbnail reference is missing, run `EnsureIPFSReferenceByURI` first — never leave a CDN or `imagedelivery.net` URL in regenerated metadata.
+
 ## Out of scope (recorded so it is not lost)
 
 - The 17,247 CDN-dependent Ethereum works in **non-Bitmark** exhibitions (crystalline work 9,048, Unsupervised's native V2 editions are inside the 5,903 above, I KNOW 669, …): different cause (no `ipfs_reference` rows at all; V3+/V4 API-served metadata). Separate plan.
@@ -79,3 +101,25 @@ goal 1 check (thumbnail refs) ─┐
                                ├─► step 0 export ─► step 1 generate ─► step 2 pin ─► step 3 chain (17 contracts, smallest first) ─► step 4 DB ─► step 5 census
 existing tools + procedure ────┘
 ```
+
+## Context for the next agent — what has been done and where things stand (2026-08-28)
+
+Thread: feral-file/feral-file#3435. Everything below is on `feral-file/status` branch `tools/step2-archive-mirror` (PR #4, pending merge) unless noted.
+
+**Done, verified**
+- 184 "gateway-gap" works (3 HLS playlists): MP4s pinned; 50 ETH editions re-pointed via `updateArtworkEditionIPFSCid`, 142 Tezos via `update_edition_metadata`; DB updated. Census 8/25: gateway-gap 184 → 0. Tools: `tools/update-token-uri` (ETH V2, vault-signed), `tools/update-tezos-metadata` (FA2, vault-signed), `tools/db-sql/gen-token-sql.py`; records in `ops/3435-hls-fix/`.
+- prod-02 (`ipfs.feralfile.com` = `ipfs.bitmark.com`, kubo 0.39): volume 1000 GB / StorageMax 900 GB (ff-deploy#27 merged); all 215 Bitmark-era series mirrored from ff-pin-1 (verify 215/215); every DB-referenced (73,385) and chain-referenced (198) CID pinned — they had been unpinned cache, alive only because the container runs without `--enable-gc` (ff-deploy#28, docs, pending merge). 74,311 recursive pins. Sweep provider announces everything.
+- ff-pin-1 (custody node, Sean's box, Brandon co-operator via DO console; Canon `ops/archival-node.md` is the contract and the change log): kubo 0.32.1, `Reprovider.Strategy=roots`, ConnMgr 100/250, `/root/provide-roots.sh` (retry ×3) on cron 03:00 UTC announces the ~230 roots because 0.32's reprovider never completes. Archive probe: ipfs.io 228/230. Planned: upgrade to kubo 0.39, then `Strategy=all`, retire the loop. Not scheduled.
+- `ipfs_reference` cleanup: 157 rows rebuilt, 9 truncated orphans deleted (`ops/3435-hls-fix/db/`).
+- Bitmark-era reference layer: all 4,959 not-yet-migrated works have preview and thumbnail `ipfs_reference` rows; the 215 preview CIDs are pinned and resolve on our gateway and ipfs.io.
+
+**Pending merges** (all reviewed by Brandon, awaiting his click): status PR #3 (census retry), PR #4 (this branch), ff-deploy PR #28 (docs).
+
+**Open**
+- This plan's goal 2 (5,903-ish tokens) — start with the chain-side verification above, then step 0.
+- Unpin superseded HLS metadata on prod-02 (50 ETH dirs, 142 Tezos JSONs, 3 playlists) once nothing references them.
+- ff-pin-1 kubo upgrade; scheduled archive probe (tool exists, not scheduled).
+- agentic-workflows #47 (monitor skips contract-held tokens) and #48 (retry a single failed gateway probe).
+- Out of scope but recorded: 17,247 CDN-dependent ETH works in non-Bitmark exhibitions (no `ipfs_reference` rows; V3+/V4 API-served metadata).
+
+**How to work on prod-02**: `make ipfs-port-forward ENV=prod HOST=prod-02` in ff-deploy (kubo API at 127.0.0.1:5001, gateway 8080); `make ssh ENV=prod HOST=prod-02` for the host. Never run `ipfs repo gc` there. Public RPCs from this network: `https://1rpc.io/eth` works via curl; `publicnode.com`/`flashbots.net` are DNS-blocked by the router; Python `urllib` hits cert mismatches for the same reason — use curl or a paid RPC.
