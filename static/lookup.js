@@ -114,6 +114,8 @@ async function lookup(q) {
   out.textContent = "";
   q = q.trim();
   if (!q) return;
+  const walletKind = detectWallet(q);
+  if (walletKind) return walletLookup(q, walletKind, out);
   out.textContent = "checking…";
   try {
     const index = await loadIndex();

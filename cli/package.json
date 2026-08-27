@@ -1,0 +1,18 @@
+{
+  "name": "@feralfile/keep",
+  "version": "0.0.1",
+  "description": "Pin every published Feral File work a wallet holds to your own IPFS node.",
+  "type": "module",
+  "bin": {
+    "feralfile-keep": "./bin/keep.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/keep.js",
+    "README.md"
+  ],
+  "license": "MIT",
+  "private": true
+}
