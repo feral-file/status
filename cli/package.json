@@ -1,7 +1,7 @@
 {
   "name": "@feralfile/keep",
   "version": "0.0.1",
-  "description": "Pin every published Feral File work a wallet holds to your own IPFS node.",
+  "description": "Hold your own copies of the art you collect — pin the blockchain-native artwork a wallet holds to your own IPFS node.",
   "type": "module",
   "bin": {
     "feralfile-keep": "./bin/keep.js"
@@ -11,7 +11,8 @@
   },
   "files": [
     "bin/keep.js",
-    "README.md"
+    "README.md",
+    "ARCHITECTURE.md"
   ],
   "license": "MIT",
   "private": true
