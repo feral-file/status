@@ -22,10 +22,18 @@ stores TWO rows for those: the path alone → ipfs://<cid>/<path>, and the
 full uri → ipfs://<cid>/<path>?<query>. The generator does the same, so the
 rows are indistinguishable from ones the server would have written.
 
+Scope: works not yet migrated (state still_bitmark or swap_initiated). The
+enumeration only lists those; migrated works of the same series share the
+same preview files and ALREADY have ipfs_reference rows (the server added
+each file to IPFS at migration time and minted metadata from those URIs).
+The SQL therefore uses ON CONFLICT DO NOTHING — it fills gaps and never
+rewrites a row a minted token may depend on — and prints the existing rows
+first so the operator sees exactly which uris are skipped.
+
 What it does NOT touch: thumbnails (imagedelivery.net, not in the archive),
 artworks.preview_uri itself (still the CDN path — the site keeps playing
 from the CDN; ipfs_reference is the layer the on-chain metadata is built
-from), and any DB row for works already migrated off Bitmark.
+from), and any existing ipfs_reference row.
 """
 import argparse, csv, glob, os, random, sys, urllib.request, collections
 root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -36,7 +44,7 @@ a = ap.parse_args()
 enum = a.enumeration or sorted(glob.glob(os.path.join(root, 'data/bitmark_enumeration_*.csv')))[-1]
 pinm = a.pin_manifest or sorted(glob.glob(os.path.join(root, 'data/pin_manifest_*.csv')))[-1]
 cid_of = {r['series_id']: r['cid'] for r in csv.DictReader(open(pinm))}
-works = [r for r in csv.DictReader(open(enum)) if r['state'] == 'still_bitmark']
+works = [r for r in csv.DictReader(open(enum)) if r['state'] in ('still_bitmark', 'swap_initiated')]  # anything not yet migrated
 refs = {}  # preview_uri -> (ipfs_uri, series_id)
 missing = collections.Counter(); skipped = 0
 for w in works:
@@ -64,12 +72,15 @@ if a.verify:
     if bad: sys.exit(f'{bad}/{len(sample)} sample targets did not resolve — pin the series on prod-02 first, or the path shape is wrong')
     print(f'-- verified {len(sample)} random targets on {a.gateway}', file=sys.stderr)
 print('-- Bitmark-era reference phase: map CDN preview paths to their archived IPFS copies (feral-file#3435)')
-print('-- Idempotent: ON CONFLICT updates ipfs_uri. Run inside a transaction and compare counts before COMMIT.')
+print('-- Gap-fill only: ON CONFLICT DO NOTHING. Existing rows (migrated editions of the same series) are listed, never rewritten.')
 print('BEGIN;')
-print(f"SELECT count(*) AS existing FROM ipfs_reference WHERE uri IN ({','.join(chr(39)+p+chr(39) for p in sorted(refs))});")
+uris = ','.join(chr(39)+p+chr(39) for p in sorted(refs))
+print(f"SELECT uri, ipfs_uri FROM ipfs_reference WHERE uri IN ({uris}) ORDER BY uri;  -- rows that will be SKIPPED")
+print(f"SELECT count(*) AS existing FROM ipfs_reference WHERE uri IN ({uris});")
 print('INSERT INTO ipfs_reference (uri, ipfs_uri, created_at, updated_at) VALUES')
 vals = [f"  ('{p}', '{u}', now(), now())" for p, (u, sid) in sorted(refs.items())]
 print(',\n'.join(vals))
-print('ON CONFLICT (uri) DO UPDATE SET ipfs_uri = EXCLUDED.ipfs_uri, updated_at = now();')
-print(f'-- expect INSERT 0 {len(refs)}')
+print('ON CONFLICT (uri) DO NOTHING;')
+print(f'-- expect INSERT 0 ({len(refs)} - existing)')
+print(f"SELECT count(*) AS now_present FROM ipfs_reference WHERE uri IN ({uris});  -- expect {len(refs)}")
 print('-- COMMIT;  -- after review')

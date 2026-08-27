@@ -9,6 +9,6 @@ python3 tools/bitmark-reference/gen-sql.py --verify 20 > bitmark-reference.sql  
 psql … -f bitmark-reference.sql                                                  # review counts, then COMMIT
 ```
 
-1,927 rows for 4,955 works (215 path rows + 1,712 query rows, the server's two-row convention
-for software previews). Does not touch `artworks.preview_uri` (the site keeps playing from the
+1,931 rows for 4,959 not-yet-migrated works (215 path rows + 1,712 query rows, the server's two-row convention
+for software previews). Gap-fill only (`ON CONFLICT DO NOTHING`): rows that already exist — the migrated editions of the same series minted from them — are listed and skipped, never rewritten. Does not touch `artworks.preview_uri` (the site keeps playing from the
 CDN) or thumbnails (imagedelivery.net, not in the archive).
