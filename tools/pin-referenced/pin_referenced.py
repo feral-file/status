@@ -32,7 +32,7 @@ except Exception as e: sys.exit(f'no kubo API at {a.api}: {e}')
 print(f'{len(cids)} CIDs; {len(pinned)} recursive pins on the node now', file=sys.stderr)
 
 def one(cid):
-    if cid in pinned: return cid, 'yes', 'already', ''
+    if cid in pinned: return cid, 'yes', 'yes', 'already pinned'
     try: api(f'block/stat?arg={urllib.parse.quote(cid)}&offline=true', 30); present = 'yes'
     except urllib.error.HTTPError as e:
         body = e.read().decode()[:80]
