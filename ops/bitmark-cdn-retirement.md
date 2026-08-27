@@ -1,94 +1,81 @@
-# Retiring the CDN as the only copy — execution plan
+# Bitmark-era works: every migrated token's metadata points at CIDs — execution plan
 
-*Drafted 2026-08-28 from the 2026-08-25 census and the feral-file-server code. Owner: Brandon (infra), with Hieu for server changes. Tracks feral-file/feral-file#3435 (reference phase) and #3463.*
+*Drafted 2026-08-28 from the 2026-08-25 census and feral-file-server. Owner: Brandon. Tracks feral-file/feral-file#3435 (reference phase) and #3463.*
 
-## Goal
+Scope is deliberately narrow. Whether feralfile.com or FF1 fetch from the CDN is not this plan's concern. Two goals only:
 
-No published work's media is reachable **only** through `cdn.feralfileassets.com` (CloudFront `d1l3yxhqoo0dav.cloudfront.net`). Every reference a wallet, indexer, FF1 or the site follows resolves to a content-addressed copy — `ipfs.feralfile.com` first, any public gateway as fallback — so the CDN becomes an optional cache and can be switched off without a work going dark. Measured by the census: the "depend entirely on us" bucket goes to 0 for Ethereum/Tezos works, and the Bitmark-era bucket shrinks as #3463's migrations land.
+1. **Every future Bitmark → Ethereum/Tezos swap mints metadata whose media resources are `ipfs://` CIDs, never CDN URLs.**
+2. **Every already-swapped token whose on-chain metadata still points at the CDN gets its on-chain data updated to CIDs.**
 
-## Where the CDN is load-bearing today
+The bytes are already published: all 215 Bitmark-era series are pinned on prod-02 (mirrored from the custody node) and every `ipfs_reference` CID for these works is pinned and announced (74,311 recursive pins, 2026-08-28).
 
-Two different populations, two different mechanisms.
+## Audit (census 2026-08-25, Bitmark-era exhibitions only)
 
-| Population | Count (census 2026-08-25) | How the CDN gets into the reference | What consumes it |
-|---|---|---|---|
-| **A. Ethereum works whose on-chain metadata points at the CDN** | **17,247 works, 24 exhibitions**, all ETH (crystalline work 9,048 · Unsupervised 4,310 · I KNOW 669 · Peer to Peer 611 · Chain Reaction 600 · Social Codes 278 · Field Guide 251 · …) | V3+/V4 `tokenURI` = `https://feralfile.com/api/contracts/<c>/tokens/<id>`. The server builds `animation_url`/`image` from `ipfs_reference`; when no row exists it falls back to `thumbnail.GetPreviewURL` = CloudFront URL. These exhibitions have **no `ipfs_reference` rows** (13,944 artworks without one, per the DB check on 2026-08-28). | Wallets, OpenSea, ff-indexer-v2 (→ FF1, DP-1 feeds), the token-health sweep |
-| **B. Bitmark-chain works (no on-chain metadata)** | **4,959 works, 215 series** | `artworks.preview_uri` is a CDN-relative path; the web client prepends `cloudFrontEndpoint`; the FF API's `previewURI` is consumed by the indexer and FF1. Their `ipfs_reference` rows exist (215 `Qm…` CIDs, pinned on prod-02 2026-08-28) but nothing *serves* them because there is no metadata layer to put `ipfs://` into. | feralfile.com, FF1 via the indexer, DP-1 feeds |
+| | Works | Media in on-chain metadata |
+|---|---|---|
+| Migrated to Tezos | 701 | **701 all `ipfs://`** — nothing to do |
+| Migrated to Ethereum | 11,537 | 5,634 all `ipfs://` · **5,903 point at the CDN** (`animation_url` 5,096 rows, `image` 4,986 rows; 878 `image` rows on `imagedelivery.net`, 45 `animation_url` on other hosts) |
+| Still on Bitmark | 4,959 | no on-chain metadata (goal 1 covers them when they swap) |
 
-Resource shapes on the CDN (population A): `animation_url` html 9,789 · `image` jpg 10,579 · `animation_url` mp4 4,745 · directory previews 6,752 · png 464. Thumbnails on `imagedelivery.net` (Cloudflare Images, 872 rows) are a third dependency and out of scope here.
+The 5,903 sit on **17 contracts, all `FeralfileExhibitionV2`** (Unsupervised 4,310 · Social Codes 278 · Field Guide 251 · The Bardo 151 · Fragments of a Hologram Rose 146 · For Your Eyes Only 124 · Reflections in the Water 116 · –GRAPH 89 · P1×3L 84 · The Long Cut 79 · On Screen Presence 73 · Instructions Follow 52 · Ten Whistlegraphs 45 · Primordium 40 · Polyarrythmia 28 · WETWARE 22 · Infinite Entropy 15). Per-token list: `ops/3435-hls-fix/migrated_bitmark_works_media_hosting_2026-08-25.csv`; contracts: `migrated_bitmark_contracts_2026-08-28.csv`.
 
-What is **already done** and this plan builds on: prod-02 holds and pins every CID the DB or the chain references (74,311 recursive pins), mirrors the 215 Bitmark-era series from the custody node, and announces everything with kubo 0.39's sweep provider; the archive manifest CIDs resolve from ipfs.io (228/230).
+Why they are CDN: the Cadence-era migration wrote CDN URLs into each token's `metadata.json`. V2 `tokenURI` = `https://ipfs.bitmark.com/ipfs/<swaps.ipfs_cid>/metadata.json`, an immutable directory — so the fix is the one already executed for On Screen Presence's 50 editions: a new directory per token and `updateArtworkEditionIPFSCid(tokenId, newCid)`.
 
-## Principles
+## Goal 1 — future swaps (verify, don't build)
 
-1. **The reference changes, not the bytes.** Every file is pushed to IPFS as-is (same `ipfs add` path the server already uses, `pin=true`), so a CID is a proof of the same content the CDN served.
-2. **Serve from our gateway, fall back to any.** New references are `ipfs://<cid>/…` in metadata (the API rewrites to `https://ipfs.feralfile.com/ipfs/…` on the way out, as it does today for V2). The site and FF1 get the gateway URL; a wallet that prefers its own gateway can.
-3. **CDN stays up until the census says nothing needs it.** No cut-over by calendar.
-4. **Population A first** — it is the one whose *on-chain* promise is currently broken; B is a site/indexer routing question and partly dissolves with #3463.
+The current swap code already does the right thing: `internal/tasks/swap.go swapTokenToEthereum` → `swap.GenerateMetadata` reads `artwork.PreviewIPFSRef.IpfsURI` and `artwork.ThumbnailIPFSRef.IpfsURI` and **errors** (`Missing preview IPFS` / `Missing thumbnail IPFS`) rather than falling back to the CDN; the Tezos path (`GenerateTezosTokenMetadataToIPFS`) resolves the same `ipfs_reference` rows. The CDN URLs in the 5,903 predate this code.
 
-## Phase 1 — Population A: give every Ethereum work an `ipfs_reference` (server + infra)
+So goal 1 reduces to: **every still-Bitmark work must have both reference rows before it is swapped.**
 
-The server already contains the mechanism: `internal/tasks/ipfs.go ensureIPFSReferenceForURI` downloads the file (or the software folder) from S3, `ipfs add`s it to prod-02 and upserts the row(s) — the same code that produced the 23,252 rows that exist. It just was never run for these exhibitions.
+- Preview: done — all 4,959 `preview_uri`s have rows (215 CIDs, pinned).
+- Thumbnail: **check** — their `thumbnail_uri` is an `imagedelivery.net` URL; if no `ipfs_reference` row exists the swap task fails at metadata generation (safe, but blocks the migration). Query in `ops/3435-hls-fix/db/` (`check-bitmark-thumbnail-refs.sql`); if rows are missing, run the existing `EnsureIPFSReferenceByURI` task for each distinct `thumbnail_uri` (pushes the Cloudflare image to prod-02 and writes the row — server code, not ours).
+- Acceptance: the first swap after this check is inspected on Etherscan/tzkt — `animation_url` and `image` are `ipfs://`; the census then classifies it `independent`.
 
-1. **Enumerate** (read-only SQL, Hieu or Brandon): every `artworks` row in an exhibition with `mint_blockchain in ('ethereum')` whose `preview_uri`/`thumbnail_uri` has no `ipfs_reference` row, grouped by exhibition and series, with sizes from S3 (`aws s3 ls --summarize` per series prefix). Expected ≈ 13,944 artworks over 24 exhibitions; software series share a folder per series, so distinct pushes are far fewer than artworks.
-2. **Capacity check** (Brandon): prod-02 has ~250 GB free under `StorageMax` 900 GB. If the enumeration exceeds ~200 GB, resize first (ff-deploy: volume + `storage_max`, same runbook as PR #27).
-3. **Run the push** (Hieu): a one-off task/CLI that calls `ensureIPFSReferenceForURI` per distinct `preview_uri` (path-only for software, the query rows follow the server's two-row convention automatically), exhibition by exhibition, smallest first. Log `uri → ipfs_uri`. This is the server's own code path, so what it writes is exactly what a fresh publish would write.
-4. **Verify** (Brandon): `tools/pin-referenced` against a fresh DB export → present + pinned; `tools/archive-probe`-style HEAD of a sample through `ipfs.feralfile.com` and ipfs.io.
-5. **Flip the metadata** — nothing to deploy: `GET /api/contracts/<c>/tokens/<id>` reads `ipfs_reference` at request time, so wallets and the indexer see `ipfs://` on their next fetch. For OpenSea, trigger the existing refresh task (`internal/tasks/opensea.go`) per exhibition.
-6. **Measure**: run the census (`docker compose … run token-health census` on prod-02); population A should move from `dependent` to `independent` exhibition by exhibition. Publish the delta on status.feralfile.com.
+## Goal 2 — the 5,903 already-swapped tokens
 
-Exit: census `dependent` count for Ethereum/Tezos = 0 (was 17,247).
+Same procedure as `ops/3435-hls-fix/rewilded-metadata-fix` + `tools/update-token-uri`, generalised to 17 contracts.
 
-## Phase 2 — Population B: stop routing Bitmark-era previews through the CDN
+### Step 0 — export (DB, read-only)
 
-The reference rows exist; the consumers do not use them.
+`ops/3435-hls-fix/db/export-v2-cdn-tokens.sql`: per token — contract, token id, artwork id, edition index, current `swaps.ipfs_cid`, `preview_uri` → its `ipfs_reference.ipfs_uri`, `thumbnail_uri` → its `ipfs_reference.ipfs_uri`. Rows where either reference is missing are listed separately: they need `EnsureIPFSReferenceByURI` first (goal 1's check, same fix).
 
-1. **API**: add a resolved preview URL to the artwork payload — `previewURL` = `https://ipfs.feralfile.com/ipfs/<cid>/<path>` when an `ipfs_reference` row exists for `preview_uri`, else the CloudFront URL as today. One field, additive, no client change required to ship it. (Server: `dto/artwork.go`, the same `PreviewIPFSRef` relation `swap.go` already loads.)
-2. **Web client**: `getArtworkPreview` prefers `previewURL` when present (`feralfile-client/src/app/core/logic/artwork.logic.ts`). Behind an environment flag; roll out per exhibition by watching gateway error rates.
-3. **Indexer / FF1 / DP-1**: ff-indexer-v2 reads the FF API; confirm it takes `previewURL` (or resolves `ipfs://`) so FF1 playlists point at the gateway rather than the CDN. Coordinate with #3485 (render probe) so "plays" is measured on the new URL.
-4. **Migration path stays primary**: #3463 moves these works to Ethereum/Tezos with `ipfs://` metadata; each migrated series leaves population B for good. Phase 2 is the interim so a CDN outage cannot dark them meanwhile.
+### Step 1 — generate (local, `tools/v2-metadata-regen`, to be written from `rewilded-metadata-fix/gen.py`)
 
-Exit: no `cdn.feralfileassets.com` URL in any FF API response for a Bitmark-era work; FF1 playlists for those works carry gateway URLs.
+For each token: fetch `https://ipfs.bitmark.com/ipfs/<old cid>/metadata.json`, replace **only** `animation_url` (→ preview reference) and `image` (→ thumbnail reference; for image-medium series the server puts the preview in `image`, mirror that), byte-preserve everything else, write `dirs/<contract>/<tokenId>/metadata.json`, emit `plan.csv`. Diff a sample against the originals: exactly two lines change.
 
-## Phase 3 — Gateway as the primary media origin (infra)
+### Step 2 — pin (tunnel)
 
-Once the site and FF1 fetch from `ipfs.feralfile.com`, prod-02 is in the serving path for all Bitmark-era and (via wallets) Ethereum media.
+`pin.sh` as before (`wrap-with-directory`, CIDv0 like the originals) → `result.csv` (`contract, token_id, old_cid, new_cid`). Then `tools/pin-referenced` on the new CIDs to confirm, and a gateway HEAD of each `<new>/metadata.json` (must be 200: `ipfs.bitmark.com` is `NoFetch`).
 
-1. **Edge cache in front of the gateway**: proxy `ipfs.feralfile.com` through Cloudflare (orange-cloud the DNS record; ff-deploy's Caddy stays the origin). Content-addressed paths are immutable, so cache TTLs can be long (`Cache-Control: public, max-age=29030400, immutable` — kubo already sets this for `/ipfs/` paths). This is the CDN's job done by a cache that is *not* the source of truth.
-2. **Origin headroom**: prod-02 is a single droplet; measure bandwidth (VictoriaMetrics: Caddy/ipfs container egress) before and after Phase 2 rollout; size up or add a second gateway node from the same pinset if needed.
-3. **Announce policy**: keep `Reprovider.Strategy=all` on prod-02 (sweep provider completes); ff-pin-1 to `all` after its kubo upgrade. Public-gateway fallback then works for every block, not only roots.
-4. **Monitoring**: token-health daily sweep already probes `ipfs://` through `ipfs.feralfile.com` first; add a gateway 5xx/latency alert in Grafana.
+### Step 3 — chain (`tools/update-token-uri`, per contract)
 
-Exit: a synthetic outage of the CDN (block `cdn.feralfileassets.com` in a test client) leaves every sampled work playable.
+- One `config.json` per contract: `contract`, `senderAddress` (the trustee — read `trustee()` per contract; the vault-held `0xbeb9f8…492f` is expected on all 17, verify), `senderAccount`, `updates` = that contract's slice of `result.csv`.
+- `preflight` per contract (on-chain `ipfsCID` must equal the csv's old value; new metadata servable; dry-run passes; uniqueness).
+- Trial `run-all.mjs --limit 1` on the smallest contract (Infinite Entropy, 15), verify on Etherscan and through the gateway, then `run-all.mjs` contract by contract, smallest first, Unsupervised (4,310) last.
+- Cost: ~55k gas × 5,903 ≈ 3.2×10⁸ gas; at ~1.1 gwei ≈ 0.36 ETH from the trustee. Quiet-window check on `eth_tx` before each contract (the trustee is the platform account).
+- Nonces: `run-all.mjs` is strictly sequential and waits for 2 confirmations per tx; ~15 s/tx → Unsupervised alone is ~18 h. Acceptable; it resumes from `progress.json`.
 
-## Phase 4 — Retire
+### Step 4 — DB
 
-1. Census + probe show 0 CDN-only works across Ethereum/Tezos and every Bitmark-era series has a gateway route.
-2. CloudFront distribution → read-only for 30 days, watching 4xx on the CDN hostname (anything still hitting it is an unknown consumer).
-3. Remove `cloudFrontEndpoint` fallback from the client; `thumbnail.GetPreviewURL` returns the gateway form; S3 stays as the cold origin for `ensureIPFSReferenceForURI` and the archive `pin_works.sh`.
-4. Update Canon `reference/dependency-register.md` (the CDN row) and status.feralfile.com's method text.
+`UPDATE swaps SET ipfs_cid = <new> WHERE contract_address = … AND token = … AND ipfs_cid = <old>` (generated like `tools/db-sql/gen-token-sql.py`). The API serves `<ipfs_cid>/metadata.json` on the next request; trigger the OpenSea refresh task per contract.
 
-## Order and dependencies
+### Step 5 — measure
+
+Census on prod-02; the 5,903 move from `dependent` to `independent`; status.feralfile.com gets an update entry. `tools/archive-probe`-style HEAD of a sample of new metadata dirs on ipfs.io.
+
+Exit for goal 2: census `dependent` = 0 for every Bitmark-era exhibition's migrated tokens.
+
+## Out of scope (recorded so it is not lost)
+
+- The 17,247 CDN-dependent Ethereum works in **non-Bitmark** exhibitions (crystalline work 9,048, Unsupervised's native V2 editions are inside the 5,903 above, I KNOW 669, …): different cause (no `ipfs_reference` rows at all; V3+/V4 API-served metadata). Separate plan.
+- Site / FF1 / DP-1 routing through the CDN.
+- `imagedelivery.net` thumbnails as a dependency beyond what goal 1 needs.
+- ff-pin-1 kubo upgrade (tracked in #3435).
+
+## Order
 
 ```
-Phase 1 (A: push refs)  ──►  census shows dependent → 0 for ETH  ──┐
-Phase 2 (B: API + client + indexer)  ──►  FF1/site off CDN  ────────┼──►  Phase 3 (edge cache, capacity)  ──►  Phase 4 (retire)
-#3463 migrations (shrinks B)  ────────────────────────────────────┘
+goal 1 check (thumbnail refs) ─┐
+                               ├─► step 0 export ─► step 1 generate ─► step 2 pin ─► step 3 chain (17 contracts, smallest first) ─► step 4 DB ─► step 5 census
+existing tools + procedure ────┘
 ```
-
-Phase 1 and 2 are independent and can run in parallel; Phase 3 must land before Phase 2's client flag goes to 100%.
-
-## Open questions to settle before Phase 1 starts
-
-- **Size of population A on S3** — decides whether prod-02 needs another resize first.
-- **Software previews with per-edition `?edition_number` queries** (crystalline work et al.): confirm `ensureIPFSReferenceForURI` handles the folder push + two-row convention for V4 works the same way it did for Tezos software (it should — same function).
-- **OpenSea refresh throughput** — 17k tokens; the existing task batches, but check rate limits.
-- **imagedelivery.net thumbnails** (872 rows) — separate follow-up; the site's grid thumbnails would still be a Cloudflare Images dependency after this plan.
-
-## What already exists to reuse
-
-- `tools/pin-referenced` — verify/pin every referenced CID after each push batch.
-- `tools/archive-probe` — public-gateway resolution of archive roots; adapt for a sample of population A.
-- `tools/census-rescan` — re-probe a subset without a full census.
-- The census itself (prod-02, `run --rm token-health census`) — the acceptance test for every phase.
-- ff-deploy PR #27 runbook — the volume resize sequence.
