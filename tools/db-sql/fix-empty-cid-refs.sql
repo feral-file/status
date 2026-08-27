@@ -50,3 +50,9 @@ ORDER BY a.series_id, a.index;
 
 -- ROLLBACK;  -- if the counts are off
 COMMIT;
+
+-- Applied 2026-08-28: broken=157, fixable=157, UPDATE 157, still_broken 0.
+-- (The DB export had counted 166 non-CID refs; the other 9 were 45-character
+-- truncated Qm CIDs on orphaned '…/index.html' rows from 2022-12 uploads —
+-- no artwork or server lookup path used them; deleted the same day after
+-- checking each series' current path row, query rows and unique thumbnails.)
