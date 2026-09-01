@@ -680,14 +680,19 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
   </section>
 
   <section id="lookup">
-    <h2>Look up a work</h2>
+    <h2>Look up a work &mdash; or a whole wallet</h2>
     <p>Paste a token ID &mdash; the number in your wallet or on the
     work&rsquo;s page &mdash; and see exactly what that work&rsquo;s media
-    depends on, file by file, from the same data as everything above.
-    (Search by wallet address is not built yet; token ID only.)</p>
+    depends on, file by file, from the same data as everything above. Or
+    paste a wallet address (Ethereum <code>0x&hellip;</code> or Tezos
+    <code>tz&hellip;</code>) to see every published work it holds and get a
+    pin list &mdash; one file of content addresses, ready for
+    <code>ipfs pin add</code> &mdash; so you can hold your own copies.
+    Wallet holdings are read from public indexers directly by your browser;
+    this site has no server and never sees the address.</p>
     <form id="lookup-form">
       <input id="lookup-input" type="text" inputmode="text" autocomplete="off"
-             placeholder="Token ID" aria-label="Token ID">
+             placeholder="Token ID or wallet address" aria-label="Token ID or wallet address">
       <button type="submit">Check</button>
     </form>
     <div id="lookup-result" aria-live="polite"></div>
@@ -745,6 +750,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 <footer>
   <p>Generated {esc(generated_at)} &middot; <a href="https://feralfile.com">feralfile.com</a></p>
 </footer>
+<script src="static/wallet.js"></script>
 <script src="static/lookup.js"></script>
 </body>
 </html>
@@ -895,8 +901,15 @@ update.
 
 The page at {SITE_URL} has a per-work lookup: paste a token ID (Ethereum,
 Tezos, or 64-char Bitmark ID) and see that work's file-by-file state and,
-for Bitmark-era works, its archival copy address. The same data is in
-data/work_index.json + data/works/ (sharded JSON, documented in the repo).
+for Bitmark-era works, its archival copy address. Paste a wallet address
+(0x… or tz…) instead and the page enumerates every published work the
+wallet holds (Blockscout for Ethereum, TzKT for Tezos, called from the
+browser — no backend) and emits a pin list: unique content addresses, one
+per line, ready for `ipfs pin add`. Works with no published content
+address are reported as such, never silently dropped; Bitmark-era works
+cannot be enumerated from a wallet and keep the token-ID path. The same
+data is in data/work_index.json + data/works/ (sharded JSON, documented
+in the repo).
 
 ## Data
 

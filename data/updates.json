@@ -1,15 +1,5 @@
 [
   {
-    "date": "2026-08-05",
-    "title": "The Feral File Archive is anchored on Ethereum",
-    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p (the 2019-2020 artist-to-artist exchange Feral File grew out of; 144 works across two generations), and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. For the archived collections, the registry on Ethereum points to their IPFS manifest with no Feral File server in the path; the works' own token references do not yet point at these copies — that reference phase is open. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
-  },
-  {
-    "date": "2026-08-04",
-    "title": "Every Bitmark-era series now has a verified content-addressed copy",
-    "body": "All 215 series — 398 GB, every file of every work whose only copy lived on our CDN — have been added to IPFS and verified byte-for-byte against the originals. The addresses are published in the pin manifest beside this page, so any collector, museum, or archive can hold a copy of any work with one command. The works' own references still point at our CDN; linking them to these copies is the next step."
-  },
-  {
     "date": "2026-08-03",
     "title": "First full census of Ethereum and Tezos works",
     "body": "Every file of every edition — 35,008 works, 106,392 files — was fetched through the public gateways wallets and browsers use. 17,563 works have all media content-addressed and resolving on ipfs.io. 184 works have content-addressed media that currently fails on a public gateway. 17,255 works' media was reachable only from our CDN, and 6 works depended on a third-party platform (figures corrected 2026-08-05 from the first published 17,261); they join the Bitmark-era works on the remediation path. These checks measure the artwork files; the metadata link and rendering are not yet measured."
@@ -20,6 +10,16 @@
     "body": "Published the complete list of works whose only copy sits behind Feral File's own servers: 4,959 works across 215 series in 17 exhibitions, all minted on the Bitmark blockchain before Feral File moved to Ethereum and Tezos. Every series' media was checked and currently resolves. Remediation — a content-addressed copy for every work, so each resolves independently of us — is targeted within 2 to 3 months. The full census of Ethereum and Tezos works is running and publishes here when it completes."
   },
   {
+    "date": "2026-08-04",
+    "title": "Every Bitmark-era series now has a verified content-addressed copy",
+    "body": "All 215 series — 398 GB, every file of every work whose only copy lived on our CDN — have been added to IPFS and verified byte-for-byte against the originals. The addresses are published in the pin manifest beside this page, so any collector, museum, or archive can hold a copy of any work with one command. The works' own references still point at our CDN; linking them to these copies is the next step."
+  },
+  {
+    "date": "2026-08-05",
+    "title": "The Feral File Archive is anchored on Ethereum",
+    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p (the 2019-2020 artist-to-artist exchange Feral File grew out of; 144 works across two generations), and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. For the archived collections, the registry on Ethereum points to their IPFS manifest with no Feral File server in the path; the works' own token references do not yet point at these copies — that reference phase is open. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
+  },
+  {
     "date": "2026-08-15",
     "title": "Tightened this page's own claims to what the probes measure",
     "body": "Two external audits of this page found summary lines claiming more than the checks prove: the machine-readable mirrors said the site reports \"whether each link answers\" when it measures the artwork-media layer only. Every summary surface (page, Markdown, llms.txt, RSS, status.json) now states the same boundary: artwork media is measured, the metadata link and rendering are not yet. The probe date now appears beside the claim, separate from the page-build time, and a build check fails if any surface drifts past this boundary again."
@@ -28,6 +28,11 @@
     "date": "2026-08-25",
     "title": "The 184 gateway-gap works now resolve; our own gateway serves everything it holds",
     "body": "Second full census, run on the production monitor this time: 35,008 works, 106,392 files — the same set as 8/3. The 184 works whose media failed on a public gateway on 8/3 were three HLS playlists whose stream files were never on IPFS; each is now a plain MP4 on IPFS, and every affected token's on-chain reference (50 on Ethereum, 142 on Tezos) points at it. Separately, ipfs.feralfile.com had failed 4,448 probes on 8/3 — 44 thumbnail files that were never pinned on it; they are pinned now and it failed 0 probes today. Works with all media content-addressed and resolving on ipfs.io: 17,563 → 17,755. Twelve works had a single gateway probe fail at census time (ipfs.io: two HTTP 410 and one timeout; dweb.link: nine connection failures on its subdomain redirect). Each was re-probed once on 2026-08-26 with the same scanner: nine passed on every gateway and their rows were replaced, so the gateway-gap bucket is 0; three still failed on dweb.link only (they resolve on ipfs.io and on our gateway) and keep their original rows. The replaced rows are listed in the commit that made the change. 21 of the works are held by a Feral File contract and were skipped by the monitor's own walk; they were probed on 2026-08-26 with the same scanner and every file resolved on all three gateways, and their rows are in the same data file."
+  },
+  {
+    "date": "2026-08-27",
+    "title": "Look up a whole wallet, and take its pin list with you",
+    "body": "Paste an Ethereum (0x…) or Tezos (tz…) address into the lookup and it returns every published work that address holds, plus a downloadable list of the unique content addresses behind them — one per line, ready for ipfs pin add. Holdings are read from the public indexers (Blockscout, TzKT) by the browser itself, so the page stays serverless and never sees the address. Works with no published content address yet are reported rather than dropped, and Bitmark-era works keep the token-ID path. Requested by collectors on launch day (feral-file/status#1)."
   },
   {
     "date": "2026-09-01",

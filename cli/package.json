@@ -1,0 +1,24 @@
+{
+  "name": "@feralfile/keep",
+  "version": "0.1.0",
+  "description": "Hold your own copies of the art you collect — pin the blockchain-native artwork a wallet holds to your own IPFS node.",
+  "type": "module",
+  "bin": {
+    "feralfile-keep": "bin/keep.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/keep.js",
+    "README.md",
+    "ARCHITECTURE.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/feral-file/status.git",
+    "directory": "cli"
+  },
+  "homepage": "https://github.com/feral-file/status/tree/main/cli#readme",
+  "license": "MIT"
+}
