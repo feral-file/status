@@ -39,7 +39,7 @@ const DEFAULT_API = "http://127.0.0.1:5001";
 const DEFAULT_RECORD = "keep-record.json";
 const SHARD_CONCURRENCY = 8;
 const RESOLVE_CONCURRENCY = 8;
-const DEFAULT_PIN_DEADLINE_MS = 15 * 60 * 1000;
+const STALL_TIMEOUT_SEC = 120; // a pin is failed this long after the last data arrived
 const LIST_PREVIEW = 20; // lines printed per tier before "… and N more"
 const LABEL_MAX = 60;
 
@@ -178,7 +178,9 @@ Options
   --limit <n>          trial run — keep at most n works per tier
   --verbose            print every work line instead of the first ${LIST_PREVIEW}
   --api <url>          kubo HTTP API (default ${DEFAULT_API})
-  --timeout <seconds>  per-pin timeout handed to the node
+  --timeout <seconds>  absolute per-pin timeout handed to the node; without it a
+                       pin runs as long as data keeps arriving and is failed
+                       after ${STALL_TIMEOUT_SEC}s of silence
   --out <file>         also write the unique CID list, one per line
   --record <file>      where to write the kept record (default ${DEFAULT_RECORD})
   --status-url <url>   published data source (default ${DEFAULT_STATUS_URL})
@@ -516,7 +518,9 @@ async function resolveCensus(unique, kind, census) {
         }
         records.push({
           id: itemId(chain, entry.contract || h.contract, h.tokenId),
-          title: entry.name ? entry.name : "token …" + h.tokenId.slice(-8),
+          // The census may have no name for an entry while the token's own
+          // metadata does — use the best name in hand before the bare number.
+          title: entry.name || metadataName(h.metadata) || "token …" + h.tokenId.slice(-8),
           collection: shard.exhibition.title || shard.exhibition.slug || "exhibition",
           provenance: { chain, contract: entry.contract || h.contract, tokenId: h.tokenId },
           evidence: EV.COMPLETE,
@@ -823,20 +827,30 @@ async function apiReachable(api) {
 }
 
 // Pinning is the one call that can legitimately run for many minutes, and it
-// is the one call that must not be cut short by something other than the
-// deadline the user asked for. `progress=true` is what makes that possible:
-// kubo then sends response headers at once and streams progress lines, so the
-// runtime's own 5-minute headers timeout never fires. Without it a cold pin of
-// anything large dies at five minutes as an opaque "fetch failed", long before
-// this tool's deadline is reached — a failure that looks like a broken file
-// rather than a broken client.
-async function pinCid(api, cid, timeoutSec) {
+// is the one call that must not be cut short while it is actually working.
+// `progress=true` is what makes that possible: kubo sends response headers at
+// once and streams a progress line per block fetched, so the runtime's own
+// 5-minute headers timeout never fires — and those same lines are the
+// liveness signal. Without an explicit --timeout, the clock re-arms on every
+// progress line: a dead CID nobody serves is failed after STALL_TIMEOUT_SEC
+// of silence, while a huge cold pin can run for hours as long as data keeps
+// arriving. With --timeout the node enforces an absolute limit and the client
+// gets a little more rope, so a node-side timeout reports as a timeout rather
+// than as a torn connection.
+async function pinCid(api, cid, timeoutSec, onProgress) {
   const t = timeoutSec ? `&timeout=${timeoutSec}s` : "";
-  // Give the client a little more rope than the node, so a node-side timeout
-  // reports as a timeout rather than as a torn connection.
-  const deadlineMs = timeoutSec ? timeoutSec * 1000 + 15000 : DEFAULT_PIN_DEADLINE_MS;
   const ac = new AbortController();
-  const timer = setTimeout(() => ac.abort(), deadlineMs);
+  let timer;
+  let stalled = false;
+  const arm = (ms, isStall) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      stalled = isStall;
+      ac.abort();
+    }, ms);
+  };
+  if (timeoutSec) arm(timeoutSec * 1000 + 15000, false);
+  else arm(STALL_TIMEOUT_SEC * 1000, true);
   try {
     const r = await fetch(
       api + `/api/v0/pin/add?arg=${encodeURIComponent(cid)}&recursive=true&progress=true${t}`,
@@ -853,9 +867,16 @@ async function pinCid(api, cid, timeoutSec) {
     let pinned = false;
     for await (const line of ndjson(r.body)) {
       if (line.Type === "error" || line.Message) throw new Error(line.Message || "pin failed");
+      if (Number.isFinite(line.Progress)) {
+        if (!timeoutSec) arm(STALL_TIMEOUT_SEC * 1000, true);
+        if (onProgress) onProgress(line.Progress);
+      }
       if (Array.isArray(line.Pins)) pinned = true;
     }
     if (!pinned) throw new Error("the node closed the connection before the pin finished");
+  } catch (e) {
+    if (stalled) throw new Error(`no data from the network for ${STALL_TIMEOUT_SEC}s — gave up`);
+    throw e;
   } finally {
     clearTimeout(timer);
   }
@@ -891,6 +912,20 @@ async function* ndjson(body) {
     try {
       yield JSON.parse(tail);
     } catch {}
+  }
+}
+
+// StorageMax is kubo's own ceiling, and a default install's 10 GB is smaller
+// than plenty of single collections. Say so before the run instead of letting
+// pins fail into it.
+async function repoStat(api) {
+  try {
+    const j = await ipfsPost(api, "/api/v0/repo/stat?size-only=true", { deadlineMs: 15000 });
+    const size = Number(j.RepoSize);
+    const max = Number(j.StorageMax);
+    return Number.isFinite(size) && Number.isFinite(max) && max > 0 ? { size, max } : null;
+  } catch {
+    return null; // the check is a courtesy, never a failure
   }
 }
 
@@ -1039,7 +1074,7 @@ function collectRecords(records, ctx, opts) {
 // evidence it was kept on and the content addresses that landed. No
 // signatures: nothing here is a claim about anyone but the person who ran it.
 
-function keepRecordDoc(records, pinnedCids) {
+function keepRecordDoc(records, pinnedCids, meta = {}) {
   const byId = new Map();
   for (const rec of records) {
     const assets = [];
@@ -1071,6 +1106,7 @@ function keepRecordDoc(records, pinnedCids) {
     byId.set(rec.id, {
       id: rec.id,
       title: rec.title,
+      ...(rec.collection ? { collection: rec.collection } : {}),
       source: rec.source || `ipfs://${assets[0].cid}`,
       provenance: {
         type: "onChain",
@@ -1092,10 +1128,10 @@ function keepRecordDoc(records, pinnedCids) {
   }
   return {
     dpVersion: "1.0.0",
-    id: randomUUID(),
+    id: meta.id || randomUUID(),
     slug: "keep-record",
     title: "Kept — feralfile-keep",
-    created: new Date().toISOString(),
+    created: meta.created || new Date().toISOString(),
     assetsVersion: "0.0.1-draft",
     items,
   };
@@ -1345,16 +1381,36 @@ async function main() {
     say();
     say(`  xargs -n1 ipfs pin add < ${file}`);
     say();
-    say("(Start a node with `ipfs daemon`, or point this at another one with --api.)");
+    say("(Start a node with `ipfs daemon`, or point this at another one with --api.");
+    say(' If the daemon itself dies with "address already in use", another program holds');
+    say(" one of its ports — change Addresses.Gateway, commonly 8080, in the IPFS config.)");
     printBoundaries(ctx.unpinnable, grandCounts, boundaryOpts);
     return;
   }
 
+  const stat = await repoStat(opts.api);
+  if (stat && stat.size >= stat.max * 0.8) {
+    const state = stat.size >= stat.max ? "already past" : "close to";
+    say(`Note: the node's datastore is ${humanBytes(stat.size)}, ${state} its ${humanBytes(stat.max)} StorageMax ceiling.`);
+    say("  Raise Datastore.StorageMax in the IPFS config before a large run, or pins may start failing.");
+    say();
+  }
+
   say(`Pinning ${cids.length} unique ${plural(cids.length, "CID")} to ${opts.api}` +
-    (opts.timeout ? ` (${opts.timeout}s per pin)` : "") + "…");
+    (opts.timeout
+      ? ` (${opts.timeout}s per pin)`
+      : ` (a pin is failed after ${STALL_TIMEOUT_SEC}s with no data)`) + "…");
   say();
 
+  // The record is rewritten after every successful pin, so an interrupted run
+  // still says exactly what landed.
   const pinnedCids = new Set();
+  const recordMeta = { id: randomUUID(), created: new Date().toISOString() };
+  const writeRecord = () => {
+    const doc = keepRecordDoc(ctx.kept, pinnedCids, recordMeta);
+    writeFileSync(opts.record, JSON.stringify(doc, null, 2) + "\n");
+    return doc;
+  };
   let pinned = 0;
   let failed = 0;
   let bytes = 0;
@@ -1362,14 +1418,19 @@ async function main() {
   for (const cid of cids) {
     n++;
     const rec = ctx.cidMap.get(cid);
-    progress(`[${n}/${cids.length}] pinning ${shortCid(cid)}…`);
+    const label = `[${n}/${cids.length}] pinning ${shortCid(cid)}`;
+    progress(label + "…");
     const started = Date.now();
     try {
-      await pinCid(opts.api, cid, opts.timeout);
+      await pinCid(opts.api, cid, opts.timeout, (blocks) => {
+        const secs = ((Date.now() - started) / 1000).toFixed(0);
+        progress(`${label} — ${blocks.toLocaleString()} ${plural(blocks, "block")}, ${secs}s…`);
+      });
       const size = await cidSize(opts.api, cid);
       if (size != null) bytes += size;
       pinned++;
       pinnedCids.add(cid);
+      writeRecord();
       progressDone();
       say(
         `  ok      ${cid}  ${size != null ? humanBytes(size) : "size unknown"}` +
@@ -1386,8 +1447,7 @@ async function main() {
   progressDone();
 
   // What actually landed, written as something a player can read back.
-  const doc = keepRecordDoc(ctx.kept, pinnedCids);
-  writeFileSync(opts.record, JSON.stringify(doc, null, 2) + "\n");
+  const doc = writeRecord();
 
   say();
   say("Summary");

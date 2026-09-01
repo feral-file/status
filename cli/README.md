@@ -13,7 +13,8 @@ token's own metadata is the evidence, and the report says so, tier by tier.
 
 ## Use
 
-With a local [kubo](https://github.com/ipfs/kubo) node running (`ipfs daemon`):
+With a local [kubo](https://github.com/ipfs/kubo) node running (`ipfs daemon` —
+on Homebrew the formula is `kubo`, and the command it installs is `ipfs`):
 
 ```sh
 npx @feralfile/keep 0xYourAddress
@@ -44,7 +45,7 @@ npx @feralfile/keep 0xYourAddress --manifest ./exports/one.assets.json
 | `--limit <n>` | trial run — keep at most `n` works per tier |
 | `--verbose` | print every work line instead of the first 20 |
 | `--api <url>` | kubo HTTP API (default `http://127.0.0.1:5001`) |
-| `--timeout <seconds>` | per-pin timeout handed to the node |
+| `--timeout <seconds>` | absolute per-pin timeout; without it a pin is failed after 120 s with no data |
 | `--out <file>` | also write the unique CID list, one per line |
 | `--record <file>` | where to write the kept record (default `keep-record.json`) |
 | `--status-url <url>` | published data source (default `https://status.feralfile.com`) |
@@ -138,8 +139,10 @@ that landed:
 ```
 
 Only CIDs that pinned successfully appear — listing an address that failed
-would claim you keep something you do not. There are no signatures: nothing in
-it is a claim about anyone but the person who ran it.
+would claim you keep something you do not. The record is rewritten after every
+successful pin, so an interrupted run still says exactly what landed. There
+are no signatures: nothing in it is a claim about anyone but the person who
+ran it.
 
 The verified tier is the command-line twin of the wallet lookup on
 status.feralfile.com (`static/wallet.js` in this repo). Same enumeration, same
@@ -166,9 +169,10 @@ a disk you control.
   verified works have not had their addresses published yet. There is nothing
   to pin for them today; they appear in the report so you know they exist.
 - **A pin is a copy, not a promise.** A whole-series archival pin can be very
-  large and can take a long time on a cold node; `--timeout` bounds it, and a
-  timeout is reported as a failure rather than quietly skipped. Re-running is
-  cheap and safe.
+  large and can take a long time on a cold node; it keeps running as long as
+  data keeps arriving, and a pin that delivers nothing for 120 seconds is
+  failed and reported rather than quietly skipped (`--timeout` sets an
+  absolute limit instead). Re-running is cheap and safe.
 - **No IPFS node?** The run degrades instead of dying: it writes
   `feralfile-pins.txt` and prints the one-liner to replay later.
 - **Your address is never sent to Feral File.** It goes to the chain indexers

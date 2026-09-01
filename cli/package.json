@@ -1,6 +1,6 @@
 {
   "name": "@feralfile/keep",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Hold your own copies of the art you collect — pin the blockchain-native artwork a wallet holds to your own IPFS node.",
   "type": "module",
   "bin": {
