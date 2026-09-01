@@ -279,7 +279,7 @@ def emit_work_shards(census, bucket3, exhibitions):
             {
                 "chain": "bitmark",
                 "contract": "",
-                "state": "dependent",
+                "state": "not_migrated",
                 "name": r["artwork_name"],
                 "files": files,
             }
@@ -349,7 +349,8 @@ def catalog_rows(exhibitions, census, bucket3):
             "works": c.get("works", 0) + bm,
             "independent": c.get("independent", 0),
             "gateway_gap": c.get("gateway_gap", 0),
-            "dependent": c.get("dependent", 0) + bm,
+            "dependent": c.get("dependent", 0),
+            "not_migrated": bm,
             "third_party": c.get("third_party", 0),
         }
         g = member_of.get(e["slug"])
@@ -366,7 +367,7 @@ def catalog_rows(exhibitions, census, bucket3):
             rows.append(merged)
         else:
             m = by_group[key]
-            for k in ("works", "independent", "gateway_gap", "dependent", "third_party"):
+            for k in ("works", "independent", "gateway_gap", "dependent", "not_migrated", "third_party"):
                 m[k] += row[k]
             m["start"] = min(m["start"], row["start"])
     return rows
@@ -391,18 +392,15 @@ def registry_paragraph(registry):
         f'{registry["version"]}, published {registry["published"]}). What '
         f'this guarantees: Ethereum records which manifest is current; the '
         f'manifest and the copies stay available only while pinned, like '
-        f'everything on this page. The works\u2019 own token references do '
-        f'not yet point at these copies \u2014 that is the open reference '
-        f'phase above.'
+        f'everything on this page. A not-yet-migrated work\u2019s own token '
+        f'references do not point at these copies until its collector '
+        f'migrates it \u2014 the swap writes them.'
     )
 
 
 def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     registry_html = registry_paragraph(registry)
     media_probe = census["date"] if census else bucket3["series_probe"]["date"]
-    dep_total = bucket3["works_on_bitmark"] + (
-        census["buckets"].get("dependent", 0) if census else 0
-    )
     if census:
         b = census["buckets"]
         tile1 = tile(
@@ -421,12 +419,12 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
             "errors, some are files not pinned anywhere public.",
         )
         tile3_note = (
-            f"{n(bucket3['works_on_bitmark'])} Bitmark-era works plus "
-            f"{n(b.get('dependent', 0))} on Ethereum and Tezos whose "
-            "published media references point only at our CDN. A further "
-            f"{n(b.get('third_party', 0))} depend on a third-party platform. "
-            "Verified archival copies exist for every Bitmark-era series "
-            "(2026-08-04); the published references are not yet updated."
+            "Works on Ethereum and Tezos whose published media references "
+            "point only at our CDN. Repointing them to content-addressed "
+            "copies is the open CDN-retirement phase "
+            "(ops/cdn-retirement-phase2.md in the repo). A further "
+            f"{n(b.get('third_party', 0))} depend on a third-party platform, "
+            "listed separately in the data."
         )
         census_note = ""
     else:
@@ -442,8 +440,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
             "did not resolve on ipfs.io. The census re-checks every work.",
         )
         tile3_note = (
-            f"Bitmark-era works, enumerated {esc(bucket3['as_of'])}. "
-            "Details and remediation below."
+            "First full census in progress. Publishes here when it completes."
         )
         census_note = (
             '<p class="dated">The Ethereum and Tezos census started '
@@ -454,9 +451,19 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
         )
 
     tile3 = tile(
-        n(dep_total) if census else n(bucket3["works_on_bitmark"]),
+        n(census["buckets"].get("dependent", 0)) if census else "&mdash;",
         "works whose published media depends entirely on Feral File",
         tile3_note,
+    )
+    tile4 = tile(
+        n(bucket3["works_on_bitmark"]),
+        "Bitmark-era works not yet migrated",
+        "Never swapped to Ethereum or Tezos, so their published references "
+        "still resolve only through our CDN. Every series has a byte-verified "
+        "archival copy on IPFS (2026-08-04), and a swap now writes "
+        "content-addressed references &mdash; the migration tooling fails "
+        "closed without them. Completing a migration moves a work to the "
+        "first tile.",
     )
 
     catalog_html = ""
@@ -469,11 +476,12 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
           <td class="num">{n(r["independent"])}</td>
           <td class="num">{n(r["gateway_gap"])}</td>
           <td class="num">{n(r["dependent"])}</td>
+          <td class="num">{n(r["not_migrated"])}</td>
           <td class="num">{n(r["third_party"])}</td>
         </tr>"""
             for r in cat_data
         )
-        cat_totals = {k: sum(r[k] for r in cat_data) for k in ("works","independent","gateway_gap","dependent","third_party")}
+        cat_totals = {k: sum(r[k] for r in cat_data) for k in ("works","independent","gateway_gap","dependent","not_migrated","third_party")}
         cat_rows += f"""
         <tr>
           <td><strong>All exhibitions</strong></td>
@@ -481,6 +489,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
           <td class="num"><strong>{n(cat_totals["independent"])}</strong></td>
           <td class="num"><strong>{n(cat_totals["gateway_gap"])}</strong></td>
           <td class="num"><strong>{n(cat_totals["dependent"])}</strong></td>
+          <td class="num"><strong>{n(cat_totals["not_migrated"])}</strong></td>
           <td class="num"><strong>{n(cat_totals["third_party"])}</strong></td>
         </tr>"""
         catalog_html = f"""
@@ -499,7 +508,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     files, all published under Data.</span></p>
     <table>
       <thead>
-        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Resolving via gateways</th><th class="num">Failing probe</th><th class="num">Depend on us</th><th class="num">Third party</th></tr>
+        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Resolving via gateways</th><th class="num">Failing probe</th><th class="num">Depend on us</th><th class="num">Not yet migrated</th><th class="num">Third party</th></tr>
       </thead>
       <tbody>
 {cat_rows}
@@ -544,9 +553,9 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     {n(ps["series"])} Bitmark-era series has a content-addressed copy &mdash;
     {ps["bytes"] / 1e9:.0f}&nbsp;GB added to IPFS and verified byte-for-byte
     against the origin files (source:
-    <a href="data/{esc(ps["file"])}">{esc(ps["file"])}</a>). The works&rsquo;
-    own published references still point at our CDN, so they remain counted
-    as depending on us until the reference phase completes.</p>"""
+    <a href="data/{esc(ps["file"])}">{esc(ps["file"])}</a>). Each
+    work&rsquo;s own published references update when its collector
+    migrates it; until then it is counted above as not yet migrated.</p>"""
 
     eth_dep_para = ""
     if census:
@@ -556,9 +565,9 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     whose media likewise lives only on our CDN, and
     {n(census["buckets"].get("third_party", 0))} whose media lives on a
     third-party platform &mdash; a different dependency with a different
-    owner, listed separately in the data. Works migrated from Bitmark
-    share their series&rsquo; files with the copies being pinned now; the
-    rest follow the same path: content-addressed copy, byte-verified,
+    owner, listed separately in the data. That set is the open
+    CDN-retirement work (phase 2), and it follows the same path the
+    Bitmark-era migration took: content-addressed copy, byte-verified,
     published here.</p>"""
 
     return f"""<!doctype html>
@@ -617,12 +626,12 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
   </section>
 
   <section class="tiles" aria-label="Summary">
-{tile1}{tile2}{tile3}
+{tile1}{tile2}{tile3}{tile4}
   </section>
   {census_note}
 {catalog_html}
   <section id="bitmark">
-    <h2>Works whose published media depends entirely on us</h2>
+    <h2>Bitmark-era works not yet migrated</h2>
     <p>Feral File&rsquo;s first {len(bucket3["exhibitions"])} exhibitions were
     minted on the Bitmark blockchain, which we built in 2014 and retired in
     2025. The chain itself was preserved as a verifiable archive &mdash; its
@@ -633,8 +642,10 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     story</a>) &mdash; so the ownership records of these works can be
     verified without us. What remained exposed was the artwork files
     themselves. Works later
-    collected on Ethereum or Tezos were migrated and carry content-addressed
-    copies; the {n(bucket3["works_on_bitmark"])} works never migrated &mdash;
+    collected on Ethereum or Tezos were migrated, and since 2026-09-01
+    every migrated token&rsquo;s published media references are
+    content-addressed (5,880 tokens repointed on-chain &mdash; see Updates);
+    the {n(bucket3["works_on_bitmark"])} works never migrated &mdash;
     across {n(bucket3["series_count"])} series, in the
     {bucket3["exhibitions_affected"]} of {len(bucket3["exhibitions"])}
     Bitmark-era exhibitions with at least one unmigrated work &mdash; have
@@ -644,12 +655,20 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     {n(probe["resolving"])} of {n(probe["total"])} series resolved (one probe
     per series; editions of a series share files).</p>{eth_dep_para}
     <p>A published reference that only our servers can answer is not what
-    we promise. Remediation runs in two phases. The archival-copy phase
-    completed 2026-08-04: every series has a byte-verified content-addressed
-    copy. The reference phase &mdash; making each work&rsquo;s own published
-    reference resolve independently of our infrastructure &mdash; is open,
-    target 2026-11-01; any exception will name the work, the reason, a
-    responsible person at Feral File, and a review date.</p>{pin_para}
+    we promise. For these works both preconditions of independence are in
+    place: the archival-copy phase completed 2026-08-04 (every series has a
+    byte-verified content-addressed copy), and a swap now writes
+    content-addressed references into the migrated token &mdash; the
+    migration tooling fails closed without them, and the 5,880 tokens
+    swapped before that guard existed were repointed on-chain 2026-09-01.
+    What remains is the migration itself, which only a collector can
+    trigger; until then a work&rsquo;s published references resolve only
+    through our CDN, and this page counts it not yet migrated rather than
+    permanently ours. The standing depends-on-us work &mdash; the
+    Ethereum/Tezos CDN class above &mdash; has its own retirement plan
+    (ops/cdn-retirement-phase2.md), target 2026-11-01; any exception will
+    name the work, the reason, a responsible person at Feral File, and a
+    review date.</p>{pin_para}
     <table>
       <thead>
         <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Not yet migrated</th><th class="num">On Ethereum</th><th class="num">On Tezos</th></tr>
@@ -739,28 +758,28 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
         b = census["buckets"]
         b1 = f"{b.get('independent', 0):,} works (every content-addressed media file answered the {census['date']} HEAD probe on ipfs.io; who holds the copies is not measured)"
         b2 = f"{b.get('gateway_gap', 0):,} works (at least one content-addressed media file failed the {census['date']} HEAD probe on ipfs.io; listed per file in the census data)"
-        b3_extra = (
-            f" Plus {b.get('dependent', 0):,} works on Ethereum and Tezos whose "
-            f"media likewise lives only on our CDN (discovered {census['date']}); "
-            "they follow the same remediation path. A further "
+        b3 = (
+            f"{b.get('dependent', 0):,} works on Ethereum and Tezos whose "
+            f"media lives only on our CDN (as of {census['date']}); the "
+            "repointing plan is ops/cdn-retirement-phase2.md in the repo, "
+            "target 2026-11-01. A further "
             f"{b.get('third_party', 0):,} works depend on a third-party "
             "platform instead of us — different dependency, different owner."
         )
         catalog_md = "\n".join(
             f"| {r['start']} | {r['title']} | {r['works']:,} | {r['independent']:,} "
-            f"| {r['gateway_gap']:,} | {r['dependent']:,} |"
+            f"| {r['gateway_gap']:,} | {r['dependent']:,} | {r['not_migrated']:,} |"
             for r in catalog_rows(exhibitions, census, bucket3)
         )
         catalog_section = f"""
 ## Every exhibition (oldest first)
 
-| Started | Exhibition | Works | Resolve without us | Failing gateways | Depend on us |
-|---|---|---:|---:|---:|---:|
+| Started | Exhibition | Works | Resolve without us | Failing gateways | Depend on us | Not yet migrated |
+|---|---|---:|---:|---:|---:|---:|
 {catalog_md}
 """
     else:
-        b1 = b2 = "census in progress (started 2026-08-03; publishes here on completion)"
-        b3_extra = ""
+        b1 = b2 = b3 = "census in progress (started 2026-08-03; publishes here on completion)"
         catalog_section = ""
     rows = "\n".join(
         f"| {e['title']} | {e['works']:,} | {e['still_bitmark'] + e['swap_initiated']:,} "
@@ -828,23 +847,25 @@ work's rendering.
 
 1. Resolve without Feral File: {b1}
 2. Should resolve without us, but currently fail on public gateways: {b2}
-3. Published media references depend entirely on Feral File:
-   {bucket3["works_on_bitmark"]:,} Bitmark-era works across
-   {bucket3["series_count"]:,} series, in the
+3. Published media references depend entirely on Feral File: {b3}
+   Exceptions to the target will name the work, reason, responsible
+   person, and review date.
+4. Not yet migrated from Bitmark: {bucket3["works_on_bitmark"]:,} works
+   across {bucket3["series_count"]:,} series, in the
    {bucket3["exhibitions_affected"]} of 18 Bitmark-era exhibitions with at
-   least one unmigrated work (as of {bucket3["as_of"]}); their published
-   references point only to cdn.feralfileassets.com. Byte-verified archival
-   copies exist for every series as of 2026-08-04 (pin manifest under
-   Data); the references themselves are not yet updated. Ownership records
-   are archived and independently anchored — data on IPFS, Merkle root on
-   Ethereum, timestamp on Bitcoin
+   least one unmigrated work (as of {bucket3["as_of"]}). Their published
+   references point only to cdn.feralfileassets.com until each collector
+   migrates; a swap now writes content-addressed references — it fails
+   closed without them, and the 5,880 previously swapped tokens were
+   repointed on-chain 2026-09-01. Byte-verified archival copies exist for
+   every series as of 2026-08-04 (pin manifest under Data). Ownership
+   records are archived and independently anchored — data on IPFS, Merkle
+   root on Ethereum, timestamp on Bitcoin
    (https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive) — though
-   the archive too stays available only while someone retains it.{b3_extra}
+   the archive too stays available only while someone retains it.
    Last reference probe {probe["date"]}: {probe["resolving"]:,} of
    {probe["total"]:,} series answered (one probe per series entry file;
-   editions share files). Reference-phase remediation target 2026-11-01;
-   exceptions will name the work, reason, responsible person, and review
-   date.{pin_md}
+   editions share files).{pin_md}
 {catalog_section}
 ## Bitmark-era exhibitions
 
@@ -913,7 +934,9 @@ def build_llms_txt(bucket3, census):
 ## Raw data
 
 - [Bitmark-era per-work enumeration]({SITE_URL}/data/{bucket3["files"][1]}):
-  one row per work whose only copy is on Feral File's CDN
+  one row per not-yet-migrated Bitmark-era work — byte-verified archival
+  copies exist for every series; a work's published references update when
+  its collector migrates it
 - [Per-series media probes]({SITE_URL}/data/{bucket3["files"][2]}): one CDN
   probe per series
 - [Per-exhibition totals]({SITE_URL}/data/{bucket3["files"][0]})
@@ -1003,9 +1026,6 @@ def main():
         ) as f_out:
             shutil.copyfileobj(f_in, f_out)
 
-    dep_total = bucket3["works_on_bitmark"] + (
-        census["buckets"].get("dependent", 0) if census else 0
-    )
     status = {
         "generated_at": now.isoformat(timespec="seconds"),
         "site": SITE_URL,
@@ -1025,16 +1045,23 @@ def main():
                 if census
                 else {"status": "census_in_progress", "started": "2026-08-03"}
             ),
-            "depend_entirely_on_feralfile": {
-                "works": dep_total,
-                "bitmark_era": {
-                    "works": bucket3["works_on_bitmark"],
-                    "series": bucket3["series_count"],
-                    "exhibitions": bucket3["exhibitions_affected"],
-                    "as_of": bucket3["as_of"],
-                    "last_probe": bucket3["series_probe"],
-                    "media_mix_by_series": bucket3["media_mix"],
-                },
+            "depend_entirely_on_feralfile": (
+                {
+                    "works": census["buckets"].get("dependent", 0),
+                    "as_of": census["date"],
+                    "host": "cdn.feralfileassets.com",
+                    "remediation": "media repointing to content-addressed copies; plan: ops/cdn-retirement-phase2.md (repo), target 2026-11-01",
+                }
+                if census
+                else {"status": "census_in_progress", "started": "2026-08-03"}
+            ),
+            "not_yet_migrated_bitmark_era": {
+                "works": bucket3["works_on_bitmark"],
+                "series": bucket3["series_count"],
+                "exhibitions": bucket3["exhibitions_affected"],
+                "as_of": bucket3["as_of"],
+                "last_probe": bucket3["series_probe"],
+                "media_mix_by_series": bucket3["media_mix"],
                 "archival_copies": (
                     {
                         "series": bucket3["pin_summary"]["series"],
@@ -1046,13 +1073,11 @@ def main():
                     if bucket3.get("pin_summary")
                     else None
                 ),
-                "eth_tezos_cdn_only": (
-                    {"works": census["buckets"].get("dependent", 0), "as_of": census["date"]}
-                    if census
-                    else None
+                "references": (
+                    "resolve via cdn.feralfileassets.com until the collector "
+                    "migrates the work; a swap writes content-addressed "
+                    "references and fails closed without them"
                 ),
-                "host": "cdn.feralfileassets.com",
-                "remediation": "content-addressed copy per work, targeted 2-3 months from 2026-08-03",
             },
         },
         "scope": measurement_scope(census, bucket3),

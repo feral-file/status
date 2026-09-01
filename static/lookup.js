@@ -5,6 +5,7 @@ const STATE_LABEL = {
   independent: "resolves without Feral File",
   gateway_gap: "content-addressed, but failing on a public gateway",
   dependent: "depends entirely on Feral File",
+  not_migrated: "is not yet migrated from Bitmark — its published references resolve through Feral File's CDN until its collector migrates it; a byte-verified archival copy exists on IPFS (address below)",
   third_party: "depends on a third-party platform",
 };
 
