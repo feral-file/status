@@ -1,15 +1,5 @@
 [
   {
-    "date": "2026-08-05",
-    "title": "The Feral File Archive is anchored on Ethereum",
-    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p (the 2019-2020 artist-to-artist exchange Feral File grew out of; 144 works across two generations), and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. For the archived collections, the registry on Ethereum points to their IPFS manifest with no Feral File server in the path; the works' own token references do not yet point at these copies — that reference phase is open. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
-  },
-  {
-    "date": "2026-08-04",
-    "title": "Every Bitmark-era series now has a verified content-addressed copy",
-    "body": "All 215 series — 398 GB, every file of every work whose only copy lived on our CDN — have been added to IPFS and verified byte-for-byte against the originals. The addresses are published in the pin manifest beside this page, so any collector, museum, or archive can hold a copy of any work with one command. The works' own references still point at our CDN; linking them to these copies is the next step."
-  },
-  {
     "date": "2026-08-03",
     "title": "First full census of Ethereum and Tezos works",
     "body": "Every file of every edition — 35,008 works, 106,392 files — was fetched through the public gateways wallets and browsers use. 17,563 works have all media content-addressed and resolving on ipfs.io. 184 works have content-addressed media that currently fails on a public gateway. 17,255 works' media was reachable only from our CDN, and 6 works depended on a third-party platform (figures corrected 2026-08-05 from the first published 17,261); they join the Bitmark-era works on the remediation path. These checks measure the artwork files; the metadata link and rendering are not yet measured."
@@ -18,6 +8,16 @@
     "date": "2026-08-03",
     "title": "Works that depend entirely on us, enumerated",
     "body": "Published the complete list of works whose only copy sits behind Feral File's own servers: 4,959 works across 215 series in 17 exhibitions, all minted on the Bitmark blockchain before Feral File moved to Ethereum and Tezos. Every series' media was checked and currently resolves. Remediation — a content-addressed copy for every work, so each resolves independently of us — is targeted within 2 to 3 months. The full census of Ethereum and Tezos works is running and publishes here when it completes."
+  },
+  {
+    "date": "2026-08-04",
+    "title": "Every Bitmark-era series now has a verified content-addressed copy",
+    "body": "All 215 series — 398 GB, every file of every work whose only copy lived on our CDN — have been added to IPFS and verified byte-for-byte against the originals. The addresses are published in the pin manifest beside this page, so any collector, museum, or archive can hold a copy of any work with one command. The works' own references still point at our CDN; linking them to these copies is the next step."
+  },
+  {
+    "date": "2026-08-05",
+    "title": "The Feral File Archive is anchored on Ethereum",
+    "body": "The Archive's manifest — every archival copy's address, for all 215 Bitmark-era series, a2p (the 2019-2020 artist-to-artist exchange Feral File grew out of; 144 works across two generations), and the Bitmark blockchain itself — is now recorded on Ethereum in the FeralFileArchiveRegistry at 0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e, owned by Feral File's 2-of-3 custody Safe. For the archived collections, the registry on Ethereum points to their IPFS manifest with no Feral File server in the path; the works' own token references do not yet point at these copies — that reference phase is open. The registry keeps its full version history in contract storage, following the pattern set when the Bitmark blockchain was retired: root on Ethereum, data on IPFS."
   },
   {
     "date": "2026-08-15",
@@ -33,5 +33,15 @@
     "date": "2026-08-27",
     "title": "Look up a whole wallet, and take its pin list with you",
     "body": "Paste an Ethereum (0x…) or Tezos (tz…) address into the lookup and it returns every published work that address holds, plus a downloadable list of the unique content addresses behind them — one per line, ready for ipfs pin add. Holdings are read from the public indexers (Blockscout, TzKT) by the browser itself, so the page stays serverless and never sees the address. Works with no published content address yet are reported rather than dropped, and Bitmark-era works keep the token-ID path. Requested by collectors on launch day (feral-file/status#1)."
+  },
+  {
+    "date": "2026-09-01",
+    "title": "The Bitmark-era repointing lands: works dependent on our CDN 17,247 → 11,389",
+    "body": "Third full census (35,008 works, 106,392 files), the first since the 5,880 migrated Bitmark-era tokens were repointed on-chain to ipfs://. Works with all media content-addressed and resolving on ipfs.io: 17,755 → 23,619; works whose media depend on our CDN: 17,247 → 11,389 — the remainder is the phase-2 population (ops/cdn-retirement-phase2.md), all Ethereum, led by crystalline work (9,048). The raw run recorded 748 ipfs.io and 890 dweb.link failures: 747 and 721 of them HTTP 429 — the repointing moved ~11,000 files onto the IPFS probe path in one run and the public gateways rate-limited it (429 is deliberately never retried in-run); the rest were 167 dweb.link 504s, two 301s, and one ipfs.io 410 that served 200 on re-probe. Every one of the 699 affected tokens was re-probed with the census's own scanner, paced 2–5 s apart (tools/census-rescan, resumable variant): all 699 passed on every gateway and their rows were replaced, so the gateway-gap bucket is 0. The 21 works held by a Feral File contract were again missing from the monitor's own walk — its recover-by-refetch counter recorded 0, a bug to chase in the monitor — and were probed and appended exactly as on 8/25; every file resolved on all three gateways. Two real changes since 8/25, both server-side: the 878 imagedelivery.net thumbnail files now serve from our IPFS gateway, and the six works previously counted third-party-only now have a content-addressed image as well (their animations still run on aesthetic.computer), so no work is classified third-party-only this census."
+  },
+  {
+    "date": "2026-09-02",
+    "title": "Bitmark-era works reclassified: not yet migrated, no longer counted as depending on us",
+    "body": "The depends-on-us tile bundled two different situations: 11,389 Ethereum/Tezos works whose media we must repoint (the CDN-retirement phase-2 population), and 4,959 Bitmark-era works never swapped to a collector chain. The second set now has its own class — not yet migrated — because both preconditions of independence are already in place: every series has a byte-verified archival copy on IPFS (2026-08-04), and a swap writes content-addressed references into the migrated token (it fails closed without them; the 5,880 tokens swapped before that guard existed were repointed on-chain 2026-09-01). Their published references still resolve only through our CDN until each collector migrates — the page and the per-work lookup say exactly that. status.json changed shape: bitmark_era moved out of depend_entirely_on_feralfile into a top-level not_yet_migrated_bitmark_era class."
   }
 ]

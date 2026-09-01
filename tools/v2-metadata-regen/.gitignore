@@ -1,0 +1,9 @@
+src/
+runs/
+dirs/
+updates/
+*.log
+*.csv
+*.sql
+*.json
+!package.json

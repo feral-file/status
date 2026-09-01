@@ -14,14 +14,14 @@
 //
 // Commands (see README.md for the runbook):
 //   node update-token-uri.mjs preflight                    → on-chain + gateway checks for every row; prints a TODO list
-//   node update-token-uri.mjs tx        <edition>          → dry-run, then vault eth-tx sign request (stdout)
-//   node update-token-uri.mjs broadcast <edition> <vault-tx.json> → verify signed_tx, dry-run, relay, wait 2 confs
+//   node update-token-uri.mjs tx        <token_id|edition> → dry-run, then vault eth-tx sign request (stdout)
+//   node update-token-uri.mjs broadcast <token_id|edition> <vault-tx.json> → verify signed_tx, dry-run, relay, wait 2 confs
 //   node update-token-uri.mjs check                        → tokenURI()/ipfsCID per row vs expected
 //   node update-token-uri.mjs base-uri-tx                  → setTokenBaseURI(config.tokenBaseURI): dry-run, vault eth-tx sign request (stdout)
 //   node update-token-uri.mjs base-uri-broadcast <vault-tx.json> → verify signed_tx, dry-run, relay, re-read tokenURI
 //
 // Config: ./config.json next to this script, or $UPDATE_CONFIG.
-// Env:    RPC_URL (read + relay only, no keys).
+// Env:    RPC_URL (read + relay only, no keys); MAX_GAS_GWEI (default 1, or config.maxGasPriceGwei); GAS_POLL_SECONDS (60).
 
 import { ethers } from 'ethers';
 import fs from 'node:fs';
@@ -43,6 +43,15 @@ const SENDER = cfg.senderAddress;      // trustee (or owner) address — tx send
 const SENDER_ACCOUNT = cfg.senderAccount; // vault account identifier for that key
 const GATEWAY = (cfg.metadataGateway ?? 'https://ipfs.bitmark.com/ipfs/').replace(/\/?$/, '/');
 const NEW_BASE = cfg.tokenBaseURI; // optional: target for setTokenBaseURI (e.g. https://ipfs.feralfile.com/ipfs/)
+// Gas price ceiling in gwei (config.maxGasPriceGwei, or $MAX_GAS_GWEI; default 1).
+// Before every sign request the current base fee + tip must be at or below it,
+// otherwise the tool waits (polling every $GAS_POLL_SECONDS, default 60) for as
+// long as it takes. The signed tx's maxFeePerGas is set to the ceiling, so a
+// transaction can never pay more than ceiling × gasLimit.
+const MAX_GAS_GWEI = Number(process.env.MAX_GAS_GWEI ?? cfg.maxGasPriceGwei ?? 1);
+const GAS_POLL_S = Number(process.env.GAS_POLL_SECONDS ?? 60);
+if (!(MAX_GAS_GWEI > 0)) fail('maxGasPriceGwei must be > 0');
+const MAX_FEE_WEI = ethers.parseUnits(String(MAX_GAS_GWEI), 'gwei');
 if (NEW_BASE !== undefined && !/^https:\/\/[a-z0-9.-]+\/ipfs\/$/.test(NEW_BASE))
   fail('config: tokenBaseURI must look like https://<gateway>/ipfs/ (trailing slash — the contract appends <cid>/metadata.json directly)');
 
@@ -68,10 +77,17 @@ if (new Set(UPDATES.map((u) => u.tokenId)).size !== UPDATES.length) fail('update
 if (new Set(UPDATES.map((u) => u.newCid)).size !== UPDATES.length) fail('updates csv: duplicate new_metadata_cid — the contract rejects a CID registered twice');
 
 const [cmd, arg1, txRespFile] = process.argv.slice(2);
-const byEdition = (ed) => {
-  const u = UPDATES.find((x) => x.edition === String(ed));
-  if (!u) fail(`edition ${ed} not in ${path.basename(updatesPath)}`);
-  return u;
+// Rows are addressed by token_id (unique). An edition number is still accepted
+// when it is unique in the csv (single-series contracts); with several series
+// per contract many rows share edition 1, so token_id is the key run-all uses.
+const byEdition = (key) => {
+  const k = String(key);
+  const byTok = UPDATES.filter((x) => x.tokenId === k);
+  if (byTok.length === 1) return byTok[0];
+  const byEd = UPDATES.filter((x) => x.edition === k);
+  if (byEd.length === 1) return byEd[0];
+  if (byEd.length > 1) fail(`edition ${k} matches ${byEd.length} rows in ${path.basename(updatesPath)} — address the row by token_id`);
+  fail(`${k} (token_id or edition) not in ${path.basename(updatesPath)}`);
 };
 
 // Paced provider (same reasoning as withdraw-v4.mjs): space every JSON-RPC
@@ -86,7 +102,30 @@ class PacedProvider extends ethers.JsonRpcProvider {
       rpcNextSlot = slot + RPC_GAP_MS;
       if (slot > now) await new Promise((res) => setTimeout(res, slot - now));
     }
-    return super.send(method, params);
+    // Transient RPC failures (Infura "Internal error" -32603, 5xx, timeouts,
+    // rate limits) are retried: 3/6/9/12/15 s, then every 12 s, indefinitely.
+    // Contract reverts (-32000 "execution reverted") are NOT retried — those are
+    // real answers. eth_sendRawTransaction is not retried here either: relaySigned
+    // handles it explicitly (a resend of the same raw tx is idempotent, but we
+    // want that decision visible in the log).
+    for (let attempt = 1; ; attempt++) {
+      try { return await super.send(method, params); }
+      catch (e) {
+        const code = e?.error?.code ?? e?.code;
+        const underlying = e?.info?.error?.code;           // ethers wraps RPC errors: a -32603 during eth_call surfaces as CALL_EXCEPTION "missing revert data" with the real code in info.error
+        const msg = String(e?.error?.message ?? e?.shortMessage ?? e?.message ?? '') + ' ' + String(e?.info?.error?.message ?? '');
+        const genuineRevert = code === 'CALL_EXCEPTION' && (e?.data != null || e?.revert != null || /execution reverted/i.test(msg));
+        const transient = method !== 'eth_sendRawTransaction' && !genuineRevert && (
+          [-32603, -32005, 429].includes(code) || [-32603, -32005, 429].includes(underlying)
+          || code === 'SERVER_ERROR' || code === 'TIMEOUT' || code === 'NETWORK_ERROR' || code === 'UNKNOWN_ERROR'
+          || (code === 'CALL_EXCEPTION' && e?.data == null && e?.revert == null && underlying != null)
+          || /internal error|timeout|rate limit|too many|bad gateway|gateway time-out|unavailable|ECONNRESET|socket hang up/i.test(msg));
+        if (!transient) throw e;
+        const delay = attempt < 5 ? 3 * attempt : 12;
+        console.error(`· rpc ${method} failed (attempt ${attempt}: ${msg.slice(0, 80)}) — retrying in ${delay}s`);
+        await new Promise((res) => setTimeout(res, delay * 1000));
+      }
+    }
   }
 }
 const rpc = () => new PacedProvider(process.env.RPC_URL ?? 'https://ethereum-rpc.publicnode.com', CHAIN_ID,
@@ -114,20 +153,40 @@ async function currentBaseURI(c, u) {
 }
 
 // Shared "sign this calldata in the vault" request builder (eth-tx scheme).
-async function vaultTxRequest(provider, data, label) {
+async function vaultTxRequest(provider, data, label, nonceOverride) {
   await provider.call({ from: SENDER, to: CONTRACT, data, value: 0 });
   ok(`eth_call dry-run passed: ${label}`);
-  const nonce = await provider.getTransactionCount(SENDER, 'pending');
+  const nonce = nonceOverride !== undefined ? nonceOverride : await provider.getTransactionCount(SENDER, 'pending');
   const gas = await provider.estimateGas({ from: SENDER, to: CONTRACT, data });
   const gasLimit = gas * 120n / 100n;
-  let fees;
+  // Gas ceiling: wait (indefinitely) until baseFee + tip ≤ MAX_GAS_GWEI, then
+  // sign with maxFeePerGas = ceiling and tip = min(suggested tip, ceiling).
+  let fees, baseFee, tip, waited = 0;
   for (let attempt = 1; ; attempt++) {
-    try { fees = await provider.getFeeData(); if (fees.maxFeePerGas && fees.maxPriorityFeePerGas) break; } catch { /* retry */ }
-    if (attempt >= 5) fail('RPC returned no EIP-1559 fee data after 5 attempts');
-    console.error(`· fee data unavailable (attempt ${attempt}) — retrying in ${3 * attempt}s`);
-    await new Promise((res) => setTimeout(res, 3000 * attempt));
+    let why = '';
+    try {
+      const [fd, blk] = await Promise.all([provider.getFeeData().catch((e) => { why += `getFeeData: ${e.shortMessage ?? e.message}; `; return null; }), provider.getBlock('latest')]);
+      // both pieces are required: the block's baseFeePerGas and the RPC's priority fee — no fallbacks
+      if (blk?.baseFeePerGas == null) why += 'latest block has no baseFeePerGas; ';
+      if (!fd?.maxPriorityFeePerGas) why += 'no maxPriorityFeePerGas from RPC; ';
+      if (blk?.baseFeePerGas != null && fd?.maxPriorityFeePerGas) { baseFee = blk.baseFeePerGas; fees = fd; }
+    } catch (e) { why += e.shortMessage ?? e.message; }
+    if (!fees) {
+      // never give up: keep polling every second until the RPC answers
+      if (attempt === 1 || attempt % 30 === 0) console.error(`· fee data unavailable (attempt ${attempt}${why ? `: ${why}` : ''}) — retrying every 1s`);
+      await new Promise((res) => setTimeout(res, 1000)); continue;
+    }
+    const TIP_BOOST = ethers.parseUnits('0.0002', 'gwei'); // flat boost over the suggested tip, for faster inclusion
+    tip = fees.maxPriorityFeePerGas + TIP_BOOST;
+    if (tip > MAX_FEE_WEI) tip = MAX_FEE_WEI;
+    const need = baseFee + tip;
+    if (need <= MAX_FEE_WEI) break;
+    waited += GAS_POLL_S;
+    console.error(`· gas too high: baseFee ${ethers.formatUnits(baseFee, 'gwei')} + tip ${ethers.formatUnits(tip, 'gwei')} = ${ethers.formatUnits(need, 'gwei')} gwei > ceiling ${MAX_GAS_GWEI} gwei — waiting ${GAS_POLL_S}s (${Math.round(waited / 60)} min so far)`);
+    fees = undefined; await new Promise((res) => setTimeout(res, GAS_POLL_S * 1000));
   }
-  ok(`nonce=${nonce} gasEstimate=${gas} gasLimit=${gasLimit} maxFee=${ethers.formatUnits(fees.maxFeePerGas, 'gwei')} gwei tip=${ethers.formatUnits(fees.maxPriorityFeePerGas, 'gwei')} gwei`);
+  fees = { maxFeePerGas: MAX_FEE_WEI, maxPriorityFeePerGas: tip };
+  ok(`nonce=${nonce} gasEstimate=${gas} gasLimit=${gasLimit} baseFee=${ethers.formatUnits(baseFee, 'gwei')} gwei → maxFee=${MAX_GAS_GWEI} gwei (ceiling) tip=${ethers.formatUnits(tip, 'gwei')} gwei`);
   return {
     account_number: SENDER_ACCOUNT,
     chain: 'ethereum',
@@ -144,7 +203,7 @@ async function vaultTxRequest(provider, data, label) {
 
 // Shared verify-and-relay for a vault-signed tx. Hard-fails unless the vault
 // signed exactly `expectedData` from SENDER to CONTRACT with zero value.
-async function relaySigned(provider, txRespPath, expectedData, label) {
+async function relaySigned(provider, txRespPath, expectedData, label, waitConfs = 2) {
   const txResp = JSON.parse(fs.readFileSync(txRespPath, 'utf8'));
   if (!txResp.signed_tx) fail(`no 'signed_tx' in ${txRespPath}`);
   const tx = ethers.Transaction.from(txResp.signed_tx);
@@ -159,21 +218,24 @@ async function relaySigned(provider, txRespPath, expectedData, label) {
   console.log('tx hash (pre-relay):', tx.hash);
   const sleep = (ms) => new Promise((res) => setTimeout(res, ms));
   let relayed = false;
-  for (let attempt = 1; attempt <= 3 && !relayed; attempt++) {
+  const RELAY_RETRIES = Number(process.env.RELAY_RETRIES ?? 20);
+  for (let attempt = 1; attempt <= RELAY_RETRIES && !relayed; attempt++) {
     try { await provider.broadcastTransaction(txResp.signed_tx); relayed = true; }
     catch (e) {
       const msg = (e.error?.message ?? e.shortMessage ?? e.message ?? '').toLowerCase();
       if (msg.includes('already known') || msg.includes('known transaction') || msg.includes('nonce too low')) { relayed = true; break; }
-      console.error(`· relay attempt ${attempt} errored (${msg}) — checking whether the tx landed anyway`);
-      for (let i = 0; i < 4 && !relayed; i++) { await sleep(5000); try { if (await provider.getTransaction(tx.hash)) relayed = true; } catch { /* poll */ } }
-      if (!relayed && attempt === 3) fail(`relay failed 3× and ${tx.hash} is not in the network — nonce still free; re-run broadcast to retry`);
+      console.error(`· relay attempt ${attempt}/${RELAY_RETRIES} errored (${msg}) — checking whether the tx landed anyway`);
+      for (let i = 0; i < 2 && !relayed; i++) { await sleep(3000); try { if (await provider.getTransaction(tx.hash)) relayed = true; } catch { /* poll */ } }
+      if (!relayed && attempt === RELAY_RETRIES) fail(`relay failed ${RELAY_RETRIES}× and ${tx.hash} is not in the network — nonce still free; re-run broadcast to retry`);
     }
   }
   console.log('tx sent:', tx.hash);
-  const rcpt = await provider.waitForTransaction(tx.hash, 2);
+  if (waitConfs === 0) return tx.hash;
+  const rcpt = await provider.waitForTransaction(tx.hash, waitConfs);
   if (!rcpt) fail(`no receipt for ${tx.hash} — check manually`);
   if (rcpt.status !== 1) fail(`tx ${tx.hash} REVERTED in block ${rcpt.blockNumber} — nothing changed`);
   ok(`mined in block ${rcpt.blockNumber}, status SUCCESS, gasUsed ${rcpt.gasUsed}`);
+  return tx.hash;
 }
 
 async function assertAuthorized(c) {
@@ -195,11 +257,17 @@ async function gatewayCheck(u) {
   if (!res.ok) return { okay: false, why: `HTTP ${res.status}` };
   let m;
   try { m = await res.json(); } catch { return { okay: false, why: 'not JSON' }; }
-  if (typeof m.animation_url !== 'string' || !m.animation_url.startsWith('ipfs://'))
-    return { okay: false, why: `animation_url is ${JSON.stringify(m.animation_url)}` };
-  if (String(m.edition_index) !== u.edition)
-    return { okay: false, why: `edition_index ${m.edition_index} ≠ ${u.edition} — wrong metadata for this token` };
-  return { okay: true, why: `animation_url=${m.animation_url.slice(0, 24)}… edition_index=${m.edition_index}` };
+  // Media rule (= server GenerateArtworkSwappingMetadata): image is always present;
+  // animation_url only for video/audio/software/gif/3d. Both must be ipfs://.
+  const isIpfs = (v) => typeof v === 'string' && v.startsWith('ipfs://') && v.length > 7 && !v.startsWith('ipfs://?');
+  if (!isIpfs(m.image)) return { okay: false, why: `image is ${JSON.stringify(m.image)}` };
+  if (m.animation_url !== undefined && !isIpfs(m.animation_url)) return { okay: false, why: `animation_url is ${JSON.stringify(m.animation_url)}` };
+  // Edition: edition_index, or for 2021 legacy metadata the trailing "#N" of name.
+  const ed = m.edition_index !== undefined && m.edition_index !== '' ? String(m.edition_index) : (String(m.name ?? '').match(/#(\d+)\s*$/) ?? [])[1];
+  if (ed !== u.edition)
+    return { okay: false, why: `metadata edition ${ed} ≠ ${u.edition} — wrong metadata for this token` };
+  const media = m.animation_url ? `animation_url=${m.animation_url.slice(0, 24)}…` : `image=${m.image.slice(0, 24)}… (no animation_url: image medium)`;
+  return { okay: true, why: `${media} edition=${ed}${m.edition_index === undefined ? ' (from name, legacy)' : ''}` };
 }
 
 // ---------------------------------------------------------------------------
@@ -212,18 +280,18 @@ if (cmd === 'preflight') {
   let todo = 0, done = 0, blocked = 0;
   for (const u of UPDATES) {
     const [{ ipfsCID }, uri] = await Promise.all([c.artworkEditions(u.tokenId), c.tokenURI(u.tokenId)]);
-    if (ipfsCID === u.newCid) { done++; console.log(`ed ${u.edition.padStart(3)}  DONE     on-chain already ${u.newCid}`); continue; }
-    if (ipfsCID !== u.oldCid) { blocked++; console.log(`ed ${u.edition.padStart(3)}  BLOCKED  on-chain ipfsCID ${ipfsCID} ≠ csv old ${u.oldCid} — csv is stale, regenerate`); continue; }
-    if (!uri.includes(ipfsCID)) { blocked++; console.log(`ed ${u.edition.padStart(3)}  BLOCKED  tokenURI ${uri} does not embed ipfsCID — unexpected contract shape`); continue; }
+    if (ipfsCID === u.newCid) { done++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  DONE     on-chain already ${u.newCid}`); continue; }
+    if (ipfsCID !== u.oldCid) { blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  on-chain ipfsCID ${ipfsCID} ≠ csv old ${u.oldCid} — csv is stale, regenerate`); continue; }
+    if (!uri.includes(ipfsCID)) { blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  tokenURI ${uri} does not embed ipfsCID — unexpected contract shape`); continue; }
     const gw = await gatewayCheck(u);
-    if (!gw.okay) { blocked++; console.log(`ed ${u.edition.padStart(3)}  BLOCKED  new metadata not servable: ${gw.why} (${GATEWAY}${u.newCid}/metadata.json)`); continue; }
+    if (!gw.okay) { blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  new metadata not servable: ${gw.why} (${GATEWAY}${u.newCid}/metadata.json)`); continue; }
     // Dry-run the exact call as the sender — catches "ipfs id has registered" etc.
     try {
       await provider.call({ from: SENDER, to: CONTRACT, data: calldataFor(u), value: 0 });
     } catch (e) {
-      blocked++; console.log(`ed ${u.edition.padStart(3)}  BLOCKED  dry-run reverted: ${e.reason ?? e.shortMessage ?? e.message}`); continue;
+      blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  dry-run reverted: ${e.reason ?? e.shortMessage ?? e.message}`); continue;
     }
-    todo++; console.log(`ed ${u.edition.padStart(3)}  TODO     ${ipfsCID} → ${u.newCid}  (${gw.why})`);
+    todo++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  TODO     ${ipfsCID} → ${u.newCid}  (${gw.why})`);
   }
   console.error(`\n${todo} to do · ${done} already done · ${blocked} blocked`);
   if (blocked) process.exit(2);
@@ -234,22 +302,27 @@ if (cmd === 'preflight') {
   const c = new ethers.Contract(CONTRACT, ABI, provider);
   await assertAuthorized(c);
   const { ipfsCID } = await c.artworkEditions(u.tokenId);
-  if (ipfsCID === u.newCid) fail(`edition ${u.edition}: on-chain ipfsCID is already ${u.newCid} — nothing to do`);
+  if (ipfsCID === u.newCid) { console.error(`✓ …${u.tokenId.slice(-6)}: on-chain ipfsCID is already ${u.newCid}`); process.exit(3); } // exit 3 = already done
   if (ipfsCID !== u.oldCid) fail(`edition ${u.edition}: on-chain ipfsCID ${ipfsCID} ≠ csv old ${u.oldCid} — csv is stale`);
   const gw = await gatewayCheck(u);
   if (!gw.okay) fail(`edition ${u.edition}: new metadata not servable from ${GATEWAY}: ${gw.why}`);
-  const req = await vaultTxRequest(provider, calldataFor(u), `updateArtworkEditionIPFSCid(…${u.tokenId.slice(-6)}, ${u.newCid})`);
+  const nonceOverride = txRespFile !== undefined ? Number(txRespFile) : undefined; // tx <token> [nonce]
+  if (nonceOverride !== undefined && !Number.isInteger(nonceOverride)) fail(`bad nonce ${txRespFile}`);
+  const req = await vaultTxRequest(provider, calldataFor(u), `updateArtworkEditionIPFSCid(…${u.tokenId.slice(-6)}, ${u.newCid})`, nonceOverride);
   console.log(JSON.stringify(req, null, 2));
 
 } else if (cmd === 'broadcast') {
-  if (!txRespFile) fail('usage: broadcast <edition> <vault-tx.json>');
+  if (!txRespFile) fail('usage: broadcast <token> <vault-tx.json> [--no-wait]');
   const u = byEdition(arg1);
   const provider = rpc();
-  await relaySigned(provider, txRespFile, calldataFor(u), `edition=${u.edition} newCid=${u.newCid}`);
-  const c = new ethers.Contract(CONTRACT, ABI, provider);
-  const { ipfsCID } = await c.artworkEditions(u.tokenId);
-  if (ipfsCID !== u.newCid) fail(`post-check: on-chain ipfsCID is ${ipfsCID}, expected ${u.newCid}`);
-  ok(`post-check: tokenURI now ${await c.tokenURI(u.tokenId)}`);
+  const noWait = process.argv.includes('--no-wait');
+  await relaySigned(provider, txRespFile, calldataFor(u), `edition=${u.edition} newCid=${u.newCid}`, noWait ? 0 : 2);
+  if (!noWait) { // with --no-wait the driver runs `confirm` later; the tx is not mined yet
+    const c = new ethers.Contract(CONTRACT, ABI, provider);
+    const { ipfsCID } = await c.artworkEditions(u.tokenId);
+    if (ipfsCID !== u.newCid) fail(`post-check: on-chain ipfsCID is ${ipfsCID}, expected ${u.newCid}`);
+    ok(`post-check: tokenURI now ${await c.tokenURI(u.tokenId)}`);
+  }
 
 } else if (cmd === 'base-uri-tx') {
   if (!NEW_BASE) fail('config: tokenBaseURI is not set');
@@ -277,6 +350,19 @@ if (cmd === 'preflight') {
   if (cur !== NEW_BASE) fail(`post-check: tokenBaseURI is ${cur}, expected ${NEW_BASE}`);
   ok(`post-check: tokenURI(…${UPDATES[0].tokenId.slice(-6)}) = ${await c.tokenURI(UPDATES[0].tokenId)}`);
 
+} else if (cmd === 'confirm') {
+  // confirm <token_id> <txhash> — wait 2 confs, require SUCCESS, re-read the on-chain ipfsCID
+  const u = byEdition(arg1);
+  if (!/^0x[0-9a-fA-F]{64}$/.test(txRespFile ?? '')) fail('usage: confirm <token_id> <txhash>');
+  const provider = rpc();
+  const rcpt = await provider.waitForTransaction(txRespFile, 2, 600_000);
+  if (!rcpt) fail(`no receipt for ${txRespFile}`);
+  if (rcpt.status !== 1) fail(`tx ${txRespFile} REVERTED in block ${rcpt.blockNumber}`);
+  const c = new ethers.Contract(CONTRACT, ABI, provider);
+  const { ipfsCID } = await c.artworkEditions(u.tokenId);
+  if (ipfsCID !== u.newCid) fail(`…${u.tokenId.slice(-6)}: on-chain ipfsCID ${ipfsCID} ≠ ${u.newCid} after ${txRespFile}`);
+  ok(`…${u.tokenId.slice(-6)} confirmed in block ${rcpt.blockNumber}, gasUsed ${rcpt.gasUsed}, ipfsCID = ${u.newCid}`);
+
 } else if (cmd === 'check') {
   const c = new ethers.Contract(CONTRACT, ABI, rpc());
   const cur = await currentBaseURI(c, UPDATES[0]);
@@ -289,7 +375,8 @@ if (cmd === 'preflight') {
     console.log(`ed ${u.edition.padStart(3)}  …${u.tokenId.slice(-6)}  ${ipfsCID}  ${mark}`);
   }
   console.error(`${good}/${UPDATES.length} updated`);
+  if (good !== UPDATES.length) process.exit(3);
 
 } else {
-  fail('usage: update-token-uri.mjs preflight | tx <edition> | broadcast <edition> <vault-tx.json> | check | base-uri-tx | base-uri-broadcast <vault-tx.json>');
+  fail('usage: update-token-uri.mjs preflight | tx <token> [nonce] | broadcast <token> <vault-tx.json> [--no-wait] | confirm <token> <txhash> | check | base-uri-tx | base-uri-broadcast <vault-tx.json>');
 }
