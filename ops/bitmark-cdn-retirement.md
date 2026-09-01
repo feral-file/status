@@ -89,7 +89,7 @@ Decisions taken 2026-08-28: the DB export (step 0) is **not** run yet — next a
 
 ## Out of scope (recorded so it is not lost)
 
-- The 17,247 CDN-dependent Ethereum works in **non-Bitmark** exhibitions (crystalline work 9,048, Unsupervised's native V2 editions are inside the 5,903 above, I KNOW 669, …): different cause (no `ipfs_reference` rows at all; V3+/V4 API-served metadata). Separate plan.
+- ➜ now planned: `ops/cdn-retirement-phase2.md` (2026-09-01). The CDN-dependent Ethereum works in **non-Bitmark** exhibitions — **11,517** (census 8/25; the 17,247 previously written here mislabeled the ALL-ETH fully-CDN total of ~17.25k, which double-counts this plan's own ~5.9k migrated Bitmark-era tokens; reconciliation in the phase-2 doc) — crystalline work 9,048, I KNOW 669, …: different cause (no `ipfs_reference` rows at all; V3+/V4 API-served metadata). Separate plan.
 - Site / FF1 / DP-1 routing through the CDN.
 - `imagedelivery.net` thumbnails as a dependency beyond what goal 1 needs.
 - ff-pin-1 kubo upgrade (tracked in #3435).
