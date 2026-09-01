@@ -172,7 +172,8 @@ a disk you control.
   large and can take a long time on a cold node; it keeps running as long as
   data keeps arriving, and a pin that delivers nothing for 120 seconds is
   failed and reported rather than quietly skipped (`--timeout` sets an
-  absolute limit instead). Re-running is cheap and safe.
+  absolute limit instead). Pins run six at a time, so one slow pin does not
+  set the pace of the run. Re-running is cheap and safe.
 - **No IPFS node?** The run degrades instead of dying: it writes
   `feralfile-pins.txt` and prints the one-liner to replay later.
 - **Your address is never sent to Feral File.** It goes to the chain indexers

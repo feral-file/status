@@ -40,6 +40,7 @@ const DEFAULT_RECORD = "keep-record.json";
 const SHARD_CONCURRENCY = 8;
 const RESOLVE_CONCURRENCY = 8;
 const STALL_TIMEOUT_SEC = 120; // a pin is failed this long after the last data arrived
+const PIN_CONCURRENCY = 6; // a slow pin drips in one slot while the rest proceed
 const LIST_PREVIEW = 20; // lines printed per tier before "… and N more"
 const LABEL_MAX = 60;
 
@@ -1396,14 +1397,17 @@ async function main() {
     say();
   }
 
+  const lanes = Math.min(PIN_CONCURRENCY, cids.length);
   say(`Pinning ${cids.length} unique ${plural(cids.length, "CID")} to ${opts.api}` +
+    ` (${lanes} at a time` +
     (opts.timeout
-      ? ` (${opts.timeout}s per pin)`
-      : ` (a pin is failed after ${STALL_TIMEOUT_SEC}s with no data)`) + "…");
+      ? `, ${opts.timeout}s per pin)`
+      : `; a pin is failed after ${STALL_TIMEOUT_SEC}s with no data)`) + "…");
   say();
 
   // The record is rewritten after every successful pin, so an interrupted run
-  // still says exactly what landed.
+  // still says exactly what landed. Pins run PIN_CONCURRENCY at a time: the
+  // network decides each pin's pace, and a slow one must not decide the run's.
   const pinnedCids = new Set();
   const recordMeta = { id: randomUUID(), created: new Date().toISOString() };
   const writeRecord = () => {
@@ -1414,36 +1418,58 @@ async function main() {
   let pinned = 0;
   let failed = 0;
   let bytes = 0;
-  let n = 0;
-  for (const cid of cids) {
-    n++;
-    const rec = ctx.cidMap.get(cid);
-    const label = `[${n}/${cids.length}] pinning ${shortCid(cid)}`;
-    progress(label + "…");
-    const started = Date.now();
-    try {
-      await pinCid(opts.api, cid, opts.timeout, (blocks) => {
-        const secs = ((Date.now() - started) / 1000).toFixed(0);
-        progress(`${label} — ${blocks.toLocaleString()} ${plural(blocks, "block")}, ${secs}s…`);
+  let nextIdx = 0;
+  const inflight = new Map(); // cid -> { blocks, started }
+  const renderProgress = () => {
+    const busiest = [...inflight.entries()]
+      .sort((a, b) => b[1].blocks - a[1].blocks)
+      .slice(0, 2)
+      .map(([c, s]) => {
+        const secs = ((Date.now() - s.started) / 1000).toFixed(0);
+        return `${shortCid(c)} ${s.blocks.toLocaleString()}b ${secs}s`;
       });
-      const size = await cidSize(opts.api, cid);
-      if (size != null) bytes += size;
-      pinned++;
-      pinnedCids.add(cid);
-      writeRecord();
-      progressDone();
-      say(
-        `  ok      ${cid}  ${size != null ? humanBytes(size) : "size unknown"}` +
-          (rec.wholeSeries ? "  (whole series)" : "")
-      );
-    } catch (e) {
-      failed++;
-      progressDone();
-      const secs = ((Date.now() - started) / 1000).toFixed(0);
-      const why = isTimeout(e) ? `timeout after ${secs}s` : e.message;
-      say(`  FAIL    ${cid}  ${why}` + (rec.wholeSeries ? "  (whole series)" : ""));
+    progress(
+      `[${pinned + failed}/${cids.length} done, ${inflight.size} in flight] ${busiest.join(" · ")}…`
+    );
+  };
+  async function pinWorker() {
+    for (;;) {
+      const i = nextIdx++;
+      if (i >= cids.length) return;
+      const cid = cids[i];
+      const rec = ctx.cidMap.get(cid);
+      const started = Date.now();
+      inflight.set(cid, { blocks: 0, started });
+      renderProgress();
+      try {
+        await pinCid(opts.api, cid, opts.timeout, (blocks) => {
+          const st = inflight.get(cid);
+          if (st) st.blocks = blocks;
+          renderProgress();
+        });
+        const size = await cidSize(opts.api, cid);
+        if (size != null) bytes += size;
+        pinned++;
+        pinnedCids.add(cid);
+        writeRecord();
+        inflight.delete(cid);
+        progressDone();
+        say(
+          `  ok      ${cid}  ${size != null ? humanBytes(size) : "size unknown"}` +
+            (rec.wholeSeries ? "  (whole series)" : "")
+        );
+      } catch (e) {
+        failed++;
+        inflight.delete(cid);
+        progressDone();
+        const secs = ((Date.now() - started) / 1000).toFixed(0);
+        const why = isTimeout(e) ? `timeout after ${secs}s` : e.message;
+        say(`  FAIL    ${cid}  ${why}` + (rec.wholeSeries ? "  (whole series)" : ""));
+      }
+      renderProgress();
     }
   }
+  await Promise.all(Array.from({ length: lanes }, pinWorker));
   progressDone();
 
   // What actually landed, written as something a player can read back.
