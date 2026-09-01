@@ -95,6 +95,7 @@ cp config.example.json config.json  # fill in senderAccount
 | `senderAccount` | the vault account identifier holding that key |
 | `metadataGateway` | `https://ipfs.bitmark.com/ipfs/` (what `_tokenBaseURI` is set to) |
 | `updates` | path to the csv: `edition,token_id,old_metadata_cid,new_metadata_cid` (output of `rewilded-metadata-fix/pin.sh`) |
+| `maxGasPriceGwei` | gas price ceiling (default `1`; env `MAX_GAS_GWEI` overrides). Before each sign request the tool waits — indefinitely, polling every `GAS_POLL_SECONDS` (60) — until `baseFee + tip ≤ ceiling`; the tx is signed with `maxFeePerGas = ceiling`, so it can never pay more than ceiling × gasLimit |
 | `tokenBaseURI` | optional — target for `base-uri-tx`, e.g. `https://ipfs.feralfile.com/ipfs/` (trailing slash; the contract appends `<cid>/metadata.json`) |
 
 Env: `RPC_URL` (any mainnet RPC; read + relay only), `VAULT_URL` /

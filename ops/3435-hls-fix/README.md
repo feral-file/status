@@ -41,7 +41,7 @@ Replacement media (all pinned on prod-02, resolving on ipfs.io):
 - [ ] optional: `setTokenBaseURI` → `https://ipfs.feralfile.com/ipfs/` (`tools/update-token-uri base-uri-tx`)
 - [ ] unpin superseded HLS metadata (50 ETH dirs, 142 Tezos JSONs, 3 playlists) once nothing references it
 - [ ] ff-pin-1 kubo 0.32 → 0.39 (sweep provider), then `Reprovider.Strategy=all` and retire the provide loop
-- [ ] next phase: retire the Bitmark-era CDN links — see `ops/bitmark-cdn-retirement.md`
+- [x] next phase: retire the Bitmark-era CDN links — done 2026-09-01, see `ops/bitmark-cdn-retirement/SUMMARY.md`
 
 Order of operations: `gen.py` → `pin.sh` (IPFS tunnel) → chain update tool
 (`tools/update-token-uri`, `tools/update-tezos-metadata`) → DB

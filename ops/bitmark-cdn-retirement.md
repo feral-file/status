@@ -51,7 +51,7 @@ So goal 1 reduces to: **every still-Bitmark work must have both reference rows b
 - Thumbnail: **checked 2026-08-28** (`ops/3435-hls-fix/db/check-bitmark-thumbnail-refs.sql`): works 4,959, missing preview refs 0, missing thumbnail refs 0. Nothing to push.
 - Acceptance: the first swap after this check is inspected on Etherscan/tzkt — `animation_url` and `image` are `ipfs://`; the census then classifies it `independent`.
 
-## Goal 2 — the 5,903 already-swapped tokens
+## Goal 2 — the 5,903 already-swapped tokens — **DONE 2026-09-01** (5,880 tokens after chain-side audit; execution record: `ops/bitmark-cdn-retirement/SUMMARY.md`)
 
 Same procedure as `ops/3435-hls-fix/rewilded-metadata-fix` + `tools/update-token-uri`, generalised to 17 contracts.
 
@@ -59,7 +59,7 @@ Same procedure as `ops/3435-hls-fix/rewilded-metadata-fix` + `tools/update-token
 
 `ops/3435-hls-fix/db/export-v2-cdn-tokens.sql`: per token — contract, token id, artwork id, edition index, current `swaps.ipfs_cid`, `preview_uri` → its `ipfs_reference.ipfs_uri`, `thumbnail_uri` → its `ipfs_reference.ipfs_uri`. Rows where either reference is missing are listed separately: they need `EnsureIPFSReferenceByURI` first (goal 1's check, same fix).
 
-### Step 1 — generate (local, `tools/v2-metadata-regen`, to be written from `rewilded-metadata-fix/gen.py`)
+### Step 1 — generate (local, `tools/v2-metadata-regen` — written 2026-08-28, see its README; `audit.py` there is the chain-side verification above)
 
 For each token: fetch `https://ipfs.bitmark.com/ipfs/<old cid>/metadata.json`, replace **only** `animation_url` (→ preview reference) and `image` (→ thumbnail reference; for image-medium series the server puts the preview in `image`, mirror that), byte-preserve everything else, write `dirs/<contract>/<tokenId>/metadata.json`, emit `plan.csv`. Diff a sample against the originals: exactly two lines change.
 
@@ -85,7 +85,7 @@ Census on prod-02; the 5,903 move from `dependent` to `independent`; status.fera
 
 Exit for goal 2: census `dependent` = 0 for every Bitmark-era exhibition's migrated tokens.
 
-Decisions taken 2026-08-28: the DB export (step 0) is **not** run yet — next agent starts there. `image` rule: use the thumbnail's `ipfs_reference` CID (the On Screen Presence procedure); if a series' thumbnail reference is missing, run `EnsureIPFSReferenceByURI` first — never leave a CDN or `imagedelivery.net` URL in regenerated metadata.
+Decisions taken 2026-08-28: the DB export (step 0) is **not** run yet — next agent starts there. Tooling for steps 1–4 exists in `tools/v2-metadata-regen/`; **audit + generate + media verification ran 2026-08-28: the chain-built fix list is 5,880 tokens (not 5,903), 0 blocked, all 436 media CIDs publicly fetchable — see the run record in that README; pin/chain/DB not started** (audit → gen → verify-media → pin → per-contract update-token-uri configs → SQL); `run-all.mjs` now takes a per-config `workDir` so 17 contracts never share `progress.json`. The contract holds only the directory CID (verified from source): `?edition_number=…` parameters are plain metadata values, and `gen.py` refuses any rewrite that drops or changes them. `image` rule: use the thumbnail's `ipfs_reference` CID (the On Screen Presence procedure); if a series' thumbnail reference is missing, run `EnsureIPFSReferenceByURI` first — never leave a CDN or `imagedelivery.net` URL in regenerated metadata.
 
 ## Out of scope (recorded so it is not lost)
 
