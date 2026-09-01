@@ -4,7 +4,7 @@
   "description": "Hold your own copies of the art you collect — pin the blockchain-native artwork a wallet holds to your own IPFS node.",
   "type": "module",
   "bin": {
-    "feralfile-keep": "./bin/keep.js"
+    "feralfile-keep": "bin/keep.js"
   },
   "engines": {
     "node": ">=18"
