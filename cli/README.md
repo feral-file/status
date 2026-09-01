@@ -11,9 +11,6 @@ of it. For those, the census at status.feralfile.com says exactly which files
 make the work, so the pin is complete and probed. For everything else the
 token's own metadata is the evidence, and the report says so, tier by tier.
 
-> **Name is TBD.** `@feralfile/keep` / `feralfile-keep` is a placeholder while
-> the tool is being shaped. Nothing is published to npm yet.
-
 ## Use
 
 With a local [kubo](https://github.com/ipfs/kubo) node running (`ipfs daemon`):
