@@ -154,12 +154,11 @@ while IFS=, read -r -u3 unit _rest; do
   [[ -n "$cid" ]] || { echo "  ERROR: add returned no CID for $unit" >&2; exit 1; }
   echo "  cid: $cid"
 
+  # public-gateway probing removed from the hot path (announce lag made it
+  # cost minutes per unit); rows are marked public_pending and re-verified in
+  # one batch after the run / the next reprovide cycle.
   gw_ff=fail; gw_pub=public_pending
   fetch_ok "https://ipfs.feralfile.com/ipfs/$cid$sample_path" "$sample_local" && gw_ff=ok
-  for attempt in 1 2 3; do
-    fetch_ok "https://ipfs.io/ipfs/$cid$sample_path" "$sample_local" && { gw_pub=ok; break; }
-    sleep $((attempt * 20))
-  done
   verified=$([[ "$gw_ff" == ok ]] && echo yes || echo NO)
   echo "$unit,$key,$cid,$n_files,$bytes,$gw_ff,$gw_pub,$verified" >> "$RECORD"
   [[ "$unit" == */ ]] && mfs_clean "$key"
