@@ -28,7 +28,7 @@ pin-docs.py turns plan.csv into per-contract updates CSVs with new CIDs.
       --src ops/cdn-retirement-phase2/step3/v3-src \
       --out-dir ops/cdn-retirement-phase2/step3/v3-docs
 """
-import argparse, csv, json, os, sys, threading, time, urllib.request
+import argparse, csv, json, os, re, sys, threading, time, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 CDN_HOSTS = ('cdn.feralfileassets.com', 'imagedelivery.net')
@@ -65,7 +65,19 @@ def is_cdn(v):
     return v and (any(h in v for h in CDN_HOSTS)
                   or v.startswith(('previews/', 'thumbnails/')))
 
+
+# CDN URL-rewrite fold (measured 2026-09-03): the CDN serves
+# generated_images/<name>?variant=<v> from the real key
+# generated_images/<v>/<name> (no variant -> 308 to medium). IPFS has no
+# such router, so the variant is folded into the path BEFORE prefix
+# mapping — the exact byte-verified equivalent of what the CDN serves.
+VARIANT_RE = re.compile(r'^(?P<pre>.*/generated_images/)(?P<name>[^/?]+)\?variant=(?P<v>\w+)$')
+def fold_variant(v):
+    m = VARIANT_RE.match(v)
+    return f"{m.group('pre')}{m.group('v')}/{m.group('name')}" if m else v
+
 def map_value(v):
+    v = fold_variant(v)
     base = v.split('?', 1)[0]
     for unit, pref in dir_map.items():
         if v.startswith(unit):

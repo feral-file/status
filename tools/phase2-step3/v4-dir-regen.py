@@ -32,7 +32,7 @@ Then (operator, tunnel open):
   -> align artworks.metadata.ipfs_cid to the new per-token doc CIDs
      (`ipfs add -r` without -Q lists them; same WHERE-pinned SQL as Truth)
 """
-import argparse, csv, json, os, sys, threading, time, urllib.request
+import argparse, csv, json, os, re, sys, threading, time, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 
 CDN_HOSTS = ('cdn.feralfileassets.com', 'imagedelivery.net')
@@ -60,10 +60,22 @@ for r in csv.DictReader(open(a.dir_cids)):
     else:
         file_map[r['dir_or_file']] = f"ipfs://{r['cid']}"
 
+
+# CDN URL-rewrite fold (measured 2026-09-03): the CDN serves
+# generated_images/<name>?variant=<v> from the real key
+# generated_images/<v>/<name> (no variant -> 308 to medium). IPFS has no
+# such router, so the variant is folded into the path BEFORE prefix
+# mapping — the exact byte-verified equivalent of what the CDN serves.
+VARIANT_RE = re.compile(r'^(?P<pre>.*/generated_images/)(?P<name>[^/?]+)\?variant=(?P<v>\w+)$')
+def fold_variant(v):
+    m = VARIANT_RE.match(v)
+    return f"{m.group('pre')}{m.group('v')}/{m.group('name')}" if m else v
+
 def map_value(v):
     """CDN URL -> ipfs:// replacement, or None if no unit covers it."""
     if not any(h in v for h in CDN_HOSTS):
         return v  # not a CDN value: unchanged
+    v = fold_variant(v)
     base = v.split('?', 1)[0]
     for unit, pref in dir_map.items():
         if v.startswith(unit):
