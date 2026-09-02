@@ -153,10 +153,15 @@ assumed. Facts:
 - **Truth needs NO metadata fix and NO tx**: all 896 on-chain docs' media are `ipfs://`
   (audit: `v4_audit_truth.csv`, chain_needs_fix 0). The census's 128 CDN-class Truth tokens
   are pure **API/DB drift**: the API serves docs from `artworks.metadata.ipfs_cid`, which
-  points at OLDER doc versions than the chain. Remedy is DB bookkeeping only — align
+  points at OLDER doc versions than the chain. Verified live 2026-09-02 on filum #1: chain
+  doc `animation_url` = `ipfs://Qma2VZ…`, the API serves `https://cdn.feralfileassets.com/
+  previews/71e2bed5…/index.html` for the same token, and the series has NO
+  `alternativePreviewURI` — so this is not an overlay artifact (the Ten Whistlegraphs case);
+  the DB CID really points at an old doc. Remedy is DB bookkeeping only — align
   `artworks.metadata.ipfs_cid` to the on-chain doc CIDs (the audit CSV carries them),
   WHERE-pinned to the old value, then OpenSea/census re-verify.
-- **crystalline is the real V4 fix** (audit confirms CDN media inside the on-chain docs).
+- **crystalline is the real V4 fix**: audit `v4_audit_crystalline.csv` — 9,048/9,048 on-chain
+  docs carry CDN media (image + animation_url), full population coverage, none missing.
   Pipeline: fetch all 9,048 docs from the on-chain dir (authoritative source — not the DB) →
   byte-preserving media-key rewrite → build ONE new directory with entries named by full
   decimal tokenId → pin on prod-02 → **one `setTokenBaseURI("ipfs://<newDir>/")` tx**
