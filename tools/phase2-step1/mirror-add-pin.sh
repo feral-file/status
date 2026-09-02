@@ -1,22 +1,25 @@
 #!/usr/bin/env bash
 # Phase-2 Step 1b: mirror each CDN pin unit from the origin bucket and add it
-# to prod-02 (pinned), recording unit -> dirCID for step 2's reference rows.
+# to prod-02 (pinned), recording unit -> CID for step 2's reference rows.
+#
+# curl-only against the kubo HTTP API through the tunnel (same convention as
+# tools/bitmark-pin/pin-on-prod02.sh) — no local ipfs binary needed.
+# Directory units are uploaded with one multipart POST to /api/v0/add
+# (slashed filenames build the tree, exactly what the ipfs CLI sends); a
+# built-in self-test adds a tiny 2-file dir and byte-compares it through the
+# gateway BEFORE any real unit, so a wrong multipart shape fails in seconds,
+# not 30 GB into crystalline.
 #
 # Per unit (a row of step 0's cdn_dirs.csv):
-#   1. aws s3 sync (dir) / aws s3 cp (bare file) from the origin bucket to a
-#      local work dir
-#   2. ipfs add -r --hidden --cid-version 0 -Q through the prod-02 tunnel —
-#      the add pins by default; --cid-version 0 per the phase-2 doc (same as
-#      the phase-1 metadata dirs), --hidden per pin_works.sh's rule
+#   1. aws s3 sync (dir) / aws s3 cp (bare file) from the origin bucket
+#   2. POST /api/v0/add?cid-version=0&hidden=true — pins by default
+#      (required under prod-02's Gateway.NoFetch, ff-deploy#28);
+#      dir unit -> dir CID, bare file -> its own file CID (phase-1 HLS style)
 #   3. verify: fetch ONE sampled file via https://ipfs.feralfile.com AND
-#      https://ipfs.io, byte-compare (cmp) against the local mirror.
-#      ipfs.io may lag the reprovide cycle: retried, then recorded as
-#      public_pending rather than failing the run (step 5's census is the
-#      final acceptance).
+#      https://ipfs.io, byte-compare against the local mirror. ipfs.io may
+#      lag the reprovide cycle: retried, then recorded public_pending (step
+#      5's census is the final acceptance).
 #   4. append to the record CSV; delete the local mirror (KEEP=1 retains)
-#
-# prod-02 runs Gateway.NoFetch=true: everything referenced must be pinned
-# (ff-deploy#28) — the add's default pin satisfies that for these dirs.
 #
 # Run from a machine with the IPFS tunnel open:
 #   make ipfs-port-forward ENV=prod HOST=prod-02     (in ff-deploy)
@@ -25,44 +28,95 @@
 #       ops/cdn-retirement-phase2/step1/dir_cids.csv
 #
 # Env: BUCKET (required)   origin bucket name
-#      API   (default /ip4/127.0.0.1/tcp/5001)  kubo API multiaddr (tunnel)
-#      WORK  (default ./phase2-mirror)          local mirror scratch
-#      KEEP=1                                    keep local mirrors
-#      HEADROOM_STOP (default 90)                stop when repo% of StorageMax exceeds this
+#      A     (default http://127.0.0.1:5001/api/v0)  kubo API base (tunnel)
+#      WORK  (default ./phase2-mirror)               local mirror scratch
+#      KEEP=1                                        keep local mirrors
+#      HEADROOM_STOP (default 90)   stop when repo% of StorageMax exceeds this
 # Idempotent / resumable: units already in the record CSV are skipped.
 set -euo pipefail
 DIRS_CSV=${1:?cdn_dirs.csv from step 0}
 RECORD=${2:?output record csv (dir_cids.csv)}
 : "${BUCKET:?BUCKET env required}"
-API=${API:-/ip4/127.0.0.1/tcp/5001}
+A=${A:-http://127.0.0.1:5001/api/v0}
 WORK=${WORK:-./phase2-mirror}
 CDN_PREFIX='https://cdn.feralfileassets.com/'
 HEADROOM_STOP=${HEADROOM_STOP:-90}
 
-command -v ipfs >/dev/null || { echo "ipfs CLI not installed — brew install ipfs (any recent kubo works; it only drives the remote API)" >&2; exit 1; }
-command -v aws  >/dev/null || { echo "aws CLI not installed" >&2; exit 1; }
-ipfs --api "$API" id -f '<id>' >/dev/null || { echo "no kubo API at $API — open the tunnel first (make ipfs-port-forward ENV=prod HOST=prod-02)" >&2; exit 1; }
+command -v aws >/dev/null || { echo "aws CLI not installed" >&2; exit 1; }
+curl -sf -X POST "$A/id" >/dev/null || { echo "no kubo API at $A — open the tunnel first (make ipfs-port-forward ENV=prod HOST=prod-02)" >&2; exit 1; }
 mkdir -p "$WORK" "$(dirname "$RECORD")"
 [[ -f "$RECORD" ]] || echo "dir_or_file,s3_prefix,cid,n_files,bytes,gw_ff,gw_public,verified" > "$RECORD"
 
 headroom_check() {
-  ipfs --api "$API" repo stat | awk -v stop="$HEADROOM_STOP" '
-    /^RepoSize/   {size=$2}
-    /^StorageMax/ {max=$2}
-    END {
-      pct = 100 * size / max
-      printf "repo %.0f GB / %.0f GB (%.0f%%)\n", size/1e9, max/1e9, pct
-      exit (pct > stop) ? 1 : 0
-    }'
+  curl -s -X POST "$A/repo/stat" | python3 -c "
+import json, sys
+s = json.load(sys.stdin)
+pct = 100 * s['RepoSize'] / s['StorageMax']
+print(f\"repo {s['RepoSize']/1e9:.0f} GB / {s['StorageMax']/1e9:.0f} GB ({pct:.0f}%)\")
+sys.exit(1 if pct > $HEADROOM_STOP else 0)"
 }
 
 in_record() { awk -F, -v u="$1" 'NR>1 && $1==u {f=1} END {exit !f}' "$RECORD"; }
+
+# add_dir <local-dir> [pin] -> prints root dir CID
+# One multipart POST, every file as a part named root%2F<url-encoded relpath>
+# (kubo builds the directory tree from slashed filenames; the response's
+# Name=="root" line carries the directory CID). Config file avoids ARG_MAX.
+add_dir() {
+  local dst=$1 pin=${2:-true} cfg out
+  cfg=$(mktemp); out=$(mktemp)
+  python3 - "$dst" > "$cfg" <<'PYEOF'
+import os, sys, urllib.parse
+root = sys.argv[1]
+rels = []
+for base, _dirs, files in os.walk(root):
+    for f in files:
+        rels.append(os.path.relpath(os.path.join(base, f), root))
+for rel in sorted(rels):
+    enc = urllib.parse.quote('root/' + rel, safe='')
+    local = os.path.join(root, rel).replace('\\', '\\\\').replace('"', '\\"')
+    print(f'form = "file=@\\"{local}\\";filename=\\"{enc}\\""')
+PYEOF
+  curl -sS -X POST -K "$cfg" "$A/add?cid-version=0&hidden=true&progress=false&pin=$pin" > "$out" \
+    || { rm -f "$cfg" "$out"; return 1; }
+  python3 -c "
+import json, sys
+cid = None
+for line in open(sys.argv[1]):
+    line = line.strip()
+    if not line: continue
+    d = json.loads(line)
+    if d.get('Name') == 'root': cid = d.get('Hash')
+print(cid or '')" "$out"
+  rm -f "$cfg" "$out"
+}
+
+# add_file <local-file> -> prints file CID
+add_file() {
+  curl -sS -X POST -F "file=@\"$1\"" "$A/add?cid-version=0&hidden=true&progress=false&quieter=true" \
+    | python3 -c "import json,sys; print(json.load(sys.stdin)['Hash'])"
+}
 
 fetch_ok() { # url localfile -> 0 if bytes match
   local tmp; tmp=$(mktemp)
   if curl -sfL --max-time 300 "$1" -o "$tmp" && cmp -s "$tmp" "$2"; then rm -f "$tmp"; return 0; fi
   rm -f "$tmp"; return 1
 }
+
+# --- self-test: prove the multipart dir shape end-to-end before real units --
+selftest() {
+  local d="$WORK/.selftest"
+  rm -rf "$d"; mkdir -p "$d/sub"
+  echo "phase2 selftest a" > "$d/a.txt"
+  echo "phase2 selftest b" > "$d/sub/b.txt"
+  local cid; cid=$(add_dir "$d" false)   # pin=false: cache only, tiny
+  [[ -n "$cid" ]] || { echo "self-test: add returned no root CID" >&2; return 1; }
+  fetch_ok "https://ipfs.feralfile.com/ipfs/$cid/sub/b.txt" "$d/sub/b.txt" \
+    || { echo "self-test: gateway fetch/byte-compare failed for $cid/sub/b.txt" >&2; return 1; }
+  echo "self-test ok (dir CID $cid, nested file verified via gateway)"
+  rm -rf "$d"
+}
+selftest || exit 1
 
 total=$(( $(wc -l < "$DIRS_CSV") - 1 )); i=0
 tail -n +2 "$DIRS_CSV" | while IFS=, read -r unit _rest; do
@@ -86,18 +140,17 @@ tail -n +2 "$DIRS_CSV" | while IFS=, read -r unit _rest; do
   [[ "$n_files" -gt 0 ]] || { echo "  EMPTY at origin — recorded, investigate" >&2; echo "$unit,$key,,0,0,,,empty_at_origin" >> "$RECORD"; continue; }
 
   if [[ "$unit" == */ ]]; then
-    # directory unit: dir CID, references become ipfs://<cid>/<path>
-    echo "  add -r --cid-version 0 ($n_files files, $bytes bytes)"
-    cid=$(ipfs --api "$API" add -r --hidden --cid-version 0 -Q "$dst")
-    sample=$(cd "$dst" && find . -type f | sed 's|^\./||' | sort | head -1)
+    echo "  add dir ($n_files files, $bytes bytes)"
+    cid=$(add_dir "$dst")
+    sample=$(cd "$dst" && find . -type f | sed 's|^\./||' | LC_ALL=C sort | head -1)
     sample_local="$dst/$sample"; sample_path="/$sample"
   else
-    # bare-file unit (shared thumbnail): the file's own CID, phase-1 HLS style
-    echo "  add --cid-version 0 (1 file, $bytes bytes)"
+    echo "  add file ($bytes bytes)"
     sample_local="$dst/$(basename "$key")"
-    cid=$(ipfs --api "$API" add --hidden --cid-version 0 -Q "$sample_local")
+    cid=$(add_file "$sample_local")
     sample_path=""
   fi
+  [[ -n "$cid" ]] || { echo "  ERROR: add returned no CID for $unit" >&2; exit 1; }
   echo "  cid: $cid"
 
   gw_ff=fail; gw_pub=public_pending
@@ -109,7 +162,7 @@ tail -n +2 "$DIRS_CSV" | while IFS=, read -r unit _rest; do
   verified=$([[ "$gw_ff" == ok ]] && echo yes || echo NO)
   echo "$unit,$key,$cid,$n_files,$bytes,$gw_ff,$gw_pub,$verified" >> "$RECORD"
   echo "  ff-gateway: $gw_ff, public: $gw_pub"
-  [[ "$gw_ff" == ok ]] || echo "  WARNING: ipfs.feralfile.com failed for $cid/$sample — investigate before step 2" >&2
+  [[ "$gw_ff" == ok ]] || echo "  WARNING: ipfs.feralfile.com failed for $cid$sample_path — investigate before step 2" >&2
   [[ -n "${KEEP:-}" ]] || rm -rf "$dst"
 done
 echo "DONE — record: $RECORD (public_pending entries: re-verify after the next reprovide cycle)"
