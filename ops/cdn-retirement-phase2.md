@@ -162,7 +162,9 @@ assumed. Facts:
   (`FIXME temporary solution to support broken art on OpenSea`); relative values get the
   CDN host via `thumbnail.GetPreviewURL`. Evidence: filum #1's API animation ts
   (1706081014) matches neither the chain doc (ipfs) nor `preview_uri` (1695225066).
-  Confirm with `step2/export-v4-overlay.sql` (read-only). That puts Truth's 128 in the
+  CONFIRMED by `step2/export-v4-overlay.sql` (run 2026-09-02): exactly 128 overlay rows,
+  all filum, all `previews/71e2bed5…/1706081014/index.html?…`; **crystalline has ZERO
+  overlays** (its post-rebuild API path is unobstructed). That puts Truth's 128 in the
   SAME class as Ten Whistlegraphs — an overlay/product decision, explicitly out of this
   phase's hard boundary ("no overlay decisions") — the chain path a wallet follows is
   already clean. Status-page classification is where it surfaces, not this pipeline.
