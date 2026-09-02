@@ -170,6 +170,11 @@ assumed. Facts:
   manual review.
 - **crystalline is the real V4 fix**: audit `v4_audit_crystalline.csv` — 9,048/9,048 on-chain
   docs carry CDN media (image + animation_url), full population coverage, none missing.
+  Per-token API-vs-chain media URLs compared 2026-09-02: 9,048/9,048 identical — no
+  Truth-style drift signal. Still owed before its DB-align SQL: the CID-level check
+  (`artworks.metadata.ipfs_cid` vs the dir entry's doc CID, from a DB export — same
+  discipline as Truth; the UPDATE's WHERE pins the DB's own value either way, and any
+  CID mismatch found gets the old-vs-chain doc diff before inclusion).
   Pipeline: fetch all 9,048 docs from the on-chain dir (authoritative source — not the DB) →
   byte-preserving media-key rewrite → build ONE new directory with entries named by full
   decimal tokenId → pin on prod-02 → **one `setTokenBaseURI("ipfs://<newDir>/")` tx**
