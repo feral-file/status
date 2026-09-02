@@ -157,9 +157,17 @@ assumed. Facts:
   doc `animation_url` = `ipfs://Qma2VZ…`, the API serves `https://cdn.feralfileassets.com/
   previews/71e2bed5…/index.html` for the same token, and the series has NO
   `alternativePreviewURI` — so this is not an overlay artifact (the Ten Whistlegraphs case);
-  the DB CID really points at an old doc. Remedy is DB bookkeeping only — align
-  `artworks.metadata.ipfs_cid` to the on-chain doc CIDs (the audit CSV carries them),
-  WHERE-pinned to the old value, then OpenSea/census re-verify.
+  the DB CID really points at an old doc. The rebuild this implies ALREADY HAPPENED — the
+  clean docs are the ones in the on-chain dir; regenerating would reproduce them
+  byte-identically (chain_needs_fix 0 = nothing to change). What was never finished is the
+  bookkeeping: align `artworks.metadata.ipfs_cid` to the on-chain doc CIDs (the audit CSV
+  carries them), WHERE-pinned to the old value, then OpenSea/census re-verify.
+  **Precondition for that SQL (sanity diff, per-token):** fetch each DB-CID (old) doc and
+  diff against the on-chain doc — expect the same token's legitimate successor (name and
+  non-media fields equal; differences confined to media keys/format). Only one token
+  (filum #1) has been spot-diffed so far; run the full diff off the DB export before any
+  UPDATE. Any token whose two docs differ beyond media keys drops out of the batch for
+  manual review.
 - **crystalline is the real V4 fix**: audit `v4_audit_crystalline.csv` — 9,048/9,048 on-chain
   docs carry CDN media (image + animation_url), full population coverage, none missing.
   Pipeline: fetch all 9,048 docs from the on-chain dir (authoritative source — not the DB) →
