@@ -72,37 +72,11 @@ enc() { python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1
 
 add_dir() {
   local dst=$1 keypfx=$2 pin=${3:-true}
-  local mfs="$MFS_ROOT/${keypfx%/}" manifest n=0 total_f
-  manifest=$(mktemp)
-  python3 - "$dst" "$mfs" > "$manifest" <<'PYEOF'
-import os, sys, urllib.parse
-root, mfs = sys.argv[1], sys.argv[2]
-rels = []
-for base, _dirs, files in os.walk(root):
-    for f in files:
-        rels.append(os.path.relpath(os.path.join(base, f), root))
-parents = sorted({os.path.dirname(r) for r in rels if os.path.dirname(r)})
-for d in [''] + parents:   # '' = the unit dir itself
-    print('D\t' + urllib.parse.quote(f'{mfs}/{d}'.rstrip('/'), safe=''))
-for r in sorted(rels):
-    print(f'F\t{os.path.join(root, r)}\t' + urllib.parse.quote(f'{mfs}/{r}', safe=''))
-PYEOF
-  total_f=$(grep -c '^F' "$manifest")
-  while IFS=$'\t' read -r typ p1 p2; do
-    if [[ "$typ" == D ]]; then
-      curl -sf -X POST "$A/files/mkdir?arg=$p1&parents=true&cid-version=0" >/dev/null 2>&1 || true
-    else
-      if curl -sf -X POST "$A/files/stat?arg=$p2" >/dev/null 2>&1; then n=$((n+1)); continue; fi
-      curl -sSf -X POST -F "file=@\"$p1\"" \
-        "$A/add?quieter=true&cid-version=0&hidden=true&pin=false&to-files=$p2" >/dev/null \
-        || { echo "  add failed at file $((n+1))/$total_f ($p1) — rerun to resume" >&2; rm -f "$manifest"; return 1; }
-      n=$((n+1))
-      (( n % 500 == 0 )) && echo "    $n/$total_f files uploaded" >&2
-    fi
-  done < "$manifest"
-  rm -f "$manifest"
-  local cid
-  cid=$(curl -sf -X POST "$A/files/stat?arg=$(enc "$mfs")" | python3 -c 'import json,sys; print(json.load(sys.stdin)["Hash"])') || return 1
+  local mfs="$MFS_ROOT/${keypfx%/}" cid
+  # batched upload (mfs-batch-add.py): ~200 files per POST — the per-file
+  # loop was latency-bound (2 round-trips × ~0.3 s × 45k files ≈ 8 h).
+  cid=$(python3 "$(cd "$(dirname "$0")" && pwd)/mfs-batch-add.py" "$dst" "$mfs" --api "${A%/api/v0}") || return 1
+  [[ -n "$cid" ]] || return 1
   [[ "$pin" == true ]] && { curl -sf -X POST "$A/pin/add?arg=$cid" >/dev/null || { echo "  pin/add failed for $cid" >&2; return 1; }; }
   curl -sf -X POST "$A/files/rm?arg=$(enc "$mfs")&recursive=true" >/dev/null 2>&1 || true
   echo "$cid"
