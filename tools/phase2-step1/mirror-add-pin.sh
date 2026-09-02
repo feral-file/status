@@ -78,9 +78,13 @@ add_dir() {
   cid=$(python3 "$(cd "$(dirname "$0")" && pwd)/mfs-batch-add.py" "$dst" "$mfs" --api "${A%/api/v0}") || return 1
   [[ -n "$cid" ]] || return 1
   [[ "$pin" == true ]] && { curl -sf -X POST "$A/pin/add?arg=$cid" >/dev/null || { echo "  pin/add failed for $cid" >&2; return 1; }; }
-  curl -sf -X POST "$A/files/rm?arg=$(enc "$mfs")&recursive=true" >/dev/null 2>&1 || true
+  # staging is NOT removed here: the caller cleans it only after the record
+  # row is written, so a death in the verify window leaves the CID findable
+  # in MFS (2026-09-03 incident: pin done, record lost, CID unrecoverable).
   echo "$cid"
 }
+
+mfs_clean() { curl -sf -X POST "$A/files/rm?arg=$(enc "$MFS_ROOT/${1%/}")&recursive=true" >/dev/null 2>&1 || true; }
 
 # add_file <local-file> -> prints file CID
 add_file() {
@@ -105,7 +109,7 @@ selftest() {
   fetch_ok "https://ipfs.feralfile.com/ipfs/$cid/sub/b.txt" "$d/sub/b.txt" \
     || { echo "self-test: gateway fetch/byte-compare failed for $cid/sub/b.txt" >&2; return 1; }
   echo "self-test ok (dir CID $cid, nested file verified via gateway)"
-  rm -rf "$d"
+  mfs_clean ".selftest"; rm -rf "$d"
 }
 selftest || exit 1
 
@@ -153,6 +157,7 @@ while IFS=, read -r -u3 unit _rest; do
   done
   verified=$([[ "$gw_ff" == ok ]] && echo yes || echo NO)
   echo "$unit,$key,$cid,$n_files,$bytes,$gw_ff,$gw_pub,$verified" >> "$RECORD"
+  [[ "$unit" == */ ]] && mfs_clean "$key"
   echo "  ff-gateway: $gw_ff, public: $gw_pub"
   [[ "$gw_ff" == ok ]] || echo "  WARNING: ipfs.feralfile.com failed for $cid$sample_path — investigate before step 2" >&2
   [[ -n "${KEEP:-}" ]] || rm -rf "$dst"
