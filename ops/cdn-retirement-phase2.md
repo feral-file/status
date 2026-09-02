@@ -150,24 +150,28 @@ assumed. Facts:
   - crystalline `0xBE0A4E26…` → `ipfs://QmY67Gq1514Zj1yWtHxoHeoVj8FpFLM5ZNSNQejjirxKTo/` (9,048 entries)
   The phase-3 `setTokenBaseURI` switch already happened for these contracts at some point —
   the V4 **link layer is FF-free today**; what can still be dirty is the doc contents.
-- **Truth needs NO metadata fix and NO tx**: all 896 on-chain docs' media are `ipfs://`
-  (audit: `v4_audit_truth.csv`, chain_needs_fix 0). The census's 128 CDN-class Truth tokens
-  are pure **API/DB drift**: the API serves docs from `artworks.metadata.ipfs_cid`, which
-  points at OLDER doc versions than the chain. Verified live 2026-09-02 on filum #1: chain
-  doc `animation_url` = `ipfs://Qma2VZ…`, the API serves `https://cdn.feralfileassets.com/
-  previews/71e2bed5…/index.html` for the same token, and the series has NO
-  `alternativePreviewURI` — so this is not an overlay artifact (the Ten Whistlegraphs case);
-  the DB CID really points at an old doc. The rebuild this implies ALREADY HAPPENED — the
-  clean docs are the ones in the on-chain dir; regenerating would reproduce them
-  byte-identically (chain_needs_fix 0 = nothing to change). What was never finished is the
-  bookkeeping: align `artworks.metadata.ipfs_cid` to the on-chain doc CIDs (the audit CSV
-  carries them), WHERE-pinned to the old value, then OpenSea/census re-verify.
-  **Precondition for that SQL (sanity diff, per-token):** fetch each DB-CID (old) doc and
-  diff against the on-chain doc — expect the same token's legitimate successor (name and
-  non-media fields equal; differences confined to media keys/format). Only one token
-  (filum #1) has been spot-diffed so far; run the full diff off the DB export before any
-  UPDATE. Any token whose two docs differ beyond media keys drops out of the batch for
-  manual review.
+- **Truth needs NO metadata fix, NO tx — and (corrected 2026-09-02, after the DB export)
+  NO DB align either.** All 896 on-chain docs' media are `ipfs://` (audit:
+  `v4_audit_truth.csv`, chain_needs_fix 0), and the export showed
+  `artworks.metadata.ipfs_cid` = `<dirCID>/<tokenId>` for every token — the DB points INTO
+  the same on-chain directory; there is no stale doc pointer. (The earlier "DB drift"
+  reading was wrong: it checked `alternativePreviewURI` at the SERIES level, which is null.)
+  The census's 128 CDN-class Truth rows come from the **per-ARTWORK
+  `alternativePreviewURI` overlay**: api/swap.go's V3+/V4 branch captures
+  `art.Metadata.AlternativePreviewURI` and overwrites `animation_url` after the doc fetch
+  (`FIXME temporary solution to support broken art on OpenSea`); relative values get the
+  CDN host via `thumbnail.GetPreviewURL`. Evidence: filum #1's API animation ts
+  (1706081014) matches neither the chain doc (ipfs) nor `preview_uri` (1695225066).
+  Confirm with `step2/export-v4-overlay.sql` (read-only). That puts Truth's 128 in the
+  SAME class as Ten Whistlegraphs — an overlay/product decision, explicitly out of this
+  phase's hard boundary ("no overlay decisions") — the chain path a wallet follows is
+  already clean. Status-page classification is where it surfaces, not this pipeline.
+- **DB convention learned from the export (matters for crystalline's SQL):**
+  `artworks.metadata.ipfs_cid` on V4 contracts holds a PATH `<dirCID>/<tokenId>`, not a
+  bare doc CID (`IpfsGatewayGet` fetches it as-is). So crystalline's post-rebuild
+  bookkeeping is: set `ipfs_cid = '<newDirCID>/<tokenId>'` WHERE it still equals
+  `'<oldDirCID>/<tokenId>'` — the same single dir root across all 9,048 rows, WHERE-pinned
+  per token.
 - **crystalline is the real V4 fix**: audit `v4_audit_crystalline.csv` — 9,048/9,048 on-chain
   docs carry CDN media (image + animation_url), full population coverage, none missing.
   Per-token API-vs-chain media URLs compared 2026-09-02: 9,048/9,048 identical — no
