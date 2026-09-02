@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Chain-side audit of FeralfileExhibitionV2 token metadata.
+"""Chain-side audit of FeralfileExhibitionV2/V3 token metadata.
 
 For every (contract, token_id) in the input csv: read tokenURI() on-chain
-(JSON-RPC batch eth_call), fetch <cid>/metadata.json (cached in src/), and
-classify `animation_url` and `image`. The chain is authoritative — the
-feralfile.com API overlays alternativePreviewURI and rewrites ipfs:// URIs, so
-census/API output must not be used to build a fix list.
+(JSON-RPC batch eth_call), fetch the metadata doc (cached in src/), and
+classify `animation_url` and `image`. Both on-chain shapes are handled:
+V2 tokenURI = <base><dirCID>/metadata.json; V3 tokenURI = <base><docCID>
+(bare file CID, no suffix — phase-2 step 0, 2026-09-02). The chain is
+authoritative — the feralfile.com API overlays alternativePreviewURI and
+rewrites ipfs:// URIs, so census/API output must not be used to build a fix
+list.
 
   RPC_URL=https://… python3 audit.py tokens.csv [--db-export export.csv] [--out audit.csv] [--workers 16]
 
@@ -77,10 +80,18 @@ def abi_string(hexdata):
     b = bytes.fromhex(hexdata[2:]); off = int.from_bytes(b[:32], 'big'); ln = int.from_bytes(b[off:off+32], 'big')
     return b[off+32:off+32+ln].decode('utf-8', 'replace')
 
+CID_RE = re.compile(r'^(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[a-z0-9]{20,})$')
+
 def cid_from_uri(uri):
-    # <base><cid>/metadata.json  or  ipfs://<cid>/metadata.json
+    """Returns (cid, doc_suffix). V2: <base><cid>/metadata.json (dir CID, doc
+    at /metadata.json). V3: <base><cid> — the bare doc CID, no suffix
+    (verified on chain 2026-09-02, all six V3 contracts)."""
     p = uri.rstrip('/').split('/')
-    return p[-2] if p[-1] == 'metadata.json' and len(p) >= 2 else None
+    if p[-1] == 'metadata.json' and len(p) >= 2:
+        return p[-2], '/metadata.json'
+    if CID_RE.match(p[-1]):
+        return p[-1], ''
+    return None, None
 
 def classify(u):
     if u in (None, ''): return 'none'
@@ -90,13 +101,13 @@ def classify(u):
     if h == 'imagedelivery.net': return 'imagedelivery'
     return 'other'
 
-def fetch_metadata(base, cid):
+def fetch_metadata(base, cid, suffix='/metadata.json'):
     p = os.path.join(here, 'src', cid + '.json')
     if os.path.exists(p): return json.load(open(p)), None
     last = None
     for g in ([base] if base else []) + GATEWAY_FALLBACKS:
         try:
-            raw = urllib.request.urlopen(urllib.request.Request(f'{g}{cid}/metadata.json', headers={'User-Agent': 'v2-metadata-regen/audit'}), timeout=120).read()
+            raw = urllib.request.urlopen(urllib.request.Request(f'{g}{cid}{suffix}', headers={'User-Agent': 'v2-metadata-regen/audit'}), timeout=120).read()
             m = json.loads(raw); open(p, 'wb').write(raw); return m, None
         except Exception as e: last = e
     return None, f'fetch failed: {last}'
@@ -145,10 +156,10 @@ print(file=sys.stderr)
 def work(key):
     c, t = key; raw = uris[key]
     if raw is None or raw.startswith('ERR'): return dict(contract=c, token_id=t, token_id_db=dbform[key], error=raw or 'no result')
-    uri = abi_string(raw); cid = cid_from_uri(uri or '')
+    uri = abi_string(raw); cid, suffix = cid_from_uri(uri or '')
     if not cid: return dict(contract=c, token_id=t, error=f'unexpected tokenURI {uri!r}')
     base = uri[:uri.index(cid)]
-    m, err = fetch_metadata(base if base.startswith('http') else None, cid)
+    m, err = fetch_metadata(base if base.startswith('http') else None, cid, suffix)
     row = dict(contract=c, token_id=t, token_id_db=dbform[key], onchain_cid=cid, token_base_uri=base, error=err or '')
     if m:
         an, im = m.get('animation_url'), m.get('image')
