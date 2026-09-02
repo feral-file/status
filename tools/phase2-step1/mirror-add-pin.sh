@@ -4,11 +4,11 @@
 #
 # curl-only against the kubo HTTP API through the tunnel (same convention as
 # tools/bitmark-pin/pin-on-prod02.sh) — no local ipfs binary needed.
-# Directory units are uploaded with one multipart POST to /api/v0/add
-# (slashed filenames build the tree, exactly what the ipfs CLI sends); a
-# built-in self-test adds a tiny 2-file dir and byte-compares it through the
-# gateway BEFORE any real unit, so a wrong multipart shape fails in seconds,
-# not 30 GB into crystalline.
+# Directory units are built file-by-file in MFS (each file its own small
+# POST /add?to-files=…, resumable — a dropped connection costs one file, not
+# the unit; see add_dir below). A built-in self-test exercises the exact
+# same path on a tiny nested dir and byte-compares it through the gateway
+# BEFORE any real unit.
 #
 # Per unit (a row of step 0's cdn_dirs.csv):
 #   1. aws s3 sync (dir) / aws s3 cp (bare file) from the origin bucket
@@ -58,37 +58,54 @@ sys.exit(1 if pct > $HEADROOM_STOP else 0)"
 
 in_record() { awk -F, -v u="$1" 'NR>1 && $1==u {f=1} END {exit !f}' "$RECORD"; }
 
-# add_dir <local-dir> [pin] -> prints root dir CID
-# One multipart POST, every file as a part named root%2F<url-encoded relpath>
-# (kubo builds the directory tree from slashed filenames; the response's
-# Name=="root" line carries the directory CID). Config file avoids ARG_MAX.
+# add_dir <local-dir> <s3-key-prefix> [pin] -> prints root dir CID
+#
+# Resumable per-file MFS build — NOT one giant multipart POST (the first
+# crystalline attempt died silently ~30 GB into a single 45k-part POST; a
+# dropped tunnel connection loses everything and can't resume). Instead:
+# each file is its own small POST /add?to-files=<MFS path>&pin=false, the
+# finished MFS directory's stat Hash is the dir CID, one pin/add pins it
+# recursively, and the MFS path is removed. Rerunning skips files already
+# in MFS (files/stat), so an interruption costs at most one file.
+MFS_ROOT=/phase2-mirror
+enc() { python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe=""))' "$1"; }
+
 add_dir() {
-  local dst=$1 pin=${2:-true} cfg out
-  cfg=$(mktemp); out=$(mktemp)
-  python3 - "$dst" > "$cfg" <<'PYEOF'
+  local dst=$1 keypfx=$2 pin=${3:-true}
+  local mfs="$MFS_ROOT/${keypfx%/}" manifest n=0 total_f
+  manifest=$(mktemp)
+  python3 - "$dst" "$mfs" > "$manifest" <<'PYEOF'
 import os, sys, urllib.parse
-root = sys.argv[1]
+root, mfs = sys.argv[1], sys.argv[2]
 rels = []
 for base, _dirs, files in os.walk(root):
     for f in files:
         rels.append(os.path.relpath(os.path.join(base, f), root))
-for rel in sorted(rels):
-    enc = urllib.parse.quote('root/' + rel, safe='')
-    local = os.path.join(root, rel).replace('\\', '\\\\').replace('"', '\\"')
-    print(f'form = "file=@\\"{local}\\";filename=\\"{enc}\\""')
+parents = sorted({os.path.dirname(r) for r in rels if os.path.dirname(r)})
+for d in [''] + parents:   # '' = the unit dir itself
+    print('D\t' + urllib.parse.quote(f'{mfs}/{d}'.rstrip('/'), safe=''))
+for r in sorted(rels):
+    print(f'F\t{os.path.join(root, r)}\t' + urllib.parse.quote(f'{mfs}/{r}', safe=''))
 PYEOF
-  curl -sS -X POST -K "$cfg" "$A/add?cid-version=0&hidden=true&progress=false&pin=$pin" > "$out" \
-    || { rm -f "$cfg" "$out"; return 1; }
-  python3 -c "
-import json, sys
-cid = None
-for line in open(sys.argv[1]):
-    line = line.strip()
-    if not line: continue
-    d = json.loads(line)
-    if d.get('Name') == 'root': cid = d.get('Hash')
-print(cid or '')" "$out"
-  rm -f "$cfg" "$out"
+  total_f=$(grep -c '^F' "$manifest")
+  while IFS=$'\t' read -r typ p1 p2; do
+    if [[ "$typ" == D ]]; then
+      curl -sf -X POST "$A/files/mkdir?arg=$p1&parents=true&cid-version=0" >/dev/null 2>&1 || true
+    else
+      if curl -sf -X POST "$A/files/stat?arg=$p2" >/dev/null 2>&1; then n=$((n+1)); continue; fi
+      curl -sSf -X POST -F "file=@\"$p1\"" \
+        "$A/add?quieter=true&cid-version=0&hidden=true&pin=false&to-files=$p2" >/dev/null \
+        || { echo "  add failed at file $((n+1))/$total_f ($p1) — rerun to resume" >&2; rm -f "$manifest"; return 1; }
+      n=$((n+1))
+      (( n % 500 == 0 )) && echo "    $n/$total_f files uploaded" >&2
+    fi
+  done < "$manifest"
+  rm -f "$manifest"
+  local cid
+  cid=$(curl -sf -X POST "$A/files/stat?arg=$(enc "$mfs")" | python3 -c 'import json,sys; print(json.load(sys.stdin)["Hash"])') || return 1
+  [[ "$pin" == true ]] && { curl -sf -X POST "$A/pin/add?arg=$cid" >/dev/null || { echo "  pin/add failed for $cid" >&2; return 1; }; }
+  curl -sf -X POST "$A/files/rm?arg=$(enc "$mfs")&recursive=true" >/dev/null 2>&1 || true
+  echo "$cid"
 }
 
 # add_file <local-file> -> prints file CID
@@ -109,7 +126,7 @@ selftest() {
   rm -rf "$d"; mkdir -p "$d/sub"
   echo "phase2 selftest a" > "$d/a.txt"
   echo "phase2 selftest b" > "$d/sub/b.txt"
-  local cid; cid=$(add_dir "$d" false)   # pin=false: cache only, tiny
+  local cid; cid=$(add_dir "$d" ".selftest" false)   # pin=false: cache only, tiny
   [[ -n "$cid" ]] || { echo "self-test: add returned no root CID" >&2; return 1; }
   fetch_ok "https://ipfs.feralfile.com/ipfs/$cid/sub/b.txt" "$d/sub/b.txt" \
     || { echo "self-test: gateway fetch/byte-compare failed for $cid/sub/b.txt" >&2; return 1; }
@@ -119,7 +136,8 @@ selftest() {
 selftest || exit 1
 
 total=$(( $(wc -l < "$DIRS_CSV") - 1 )); i=0
-tail -n +2 "$DIRS_CSV" | while IFS=, read -r unit _rest; do
+# read the unit list on fd 3 so nothing inside the loop can eat the list's stdin
+while IFS=, read -r -u3 unit _rest; do
   i=$((i+1))
   in_record "$unit" && { echo "[$i/$total] done, skip: $unit"; continue; }
   headroom_check || { echo "STOP: repo above ${HEADROOM_STOP}% of StorageMax — settle capacity first" >&2; exit 1; }
@@ -141,13 +159,13 @@ tail -n +2 "$DIRS_CSV" | while IFS=, read -r unit _rest; do
 
   if [[ "$unit" == */ ]]; then
     echo "  add dir ($n_files files, $bytes bytes)"
-    cid=$(add_dir "$dst")
+    cid=$(add_dir "$dst" "$key") || { echo "ERROR: add_dir failed on $unit — rerun the same command to resume" >&2; exit 1; }
     sample=$(cd "$dst" && find . -type f | sed 's|^\./||' | LC_ALL=C sort | head -1)
     sample_local="$dst/$sample"; sample_path="/$sample"
   else
     echo "  add file ($bytes bytes)"
     sample_local="$dst/$(basename "$key")"
-    cid=$(add_file "$sample_local")
+    cid=$(add_file "$sample_local") || { echo "ERROR: add_file failed on $unit — rerun to resume" >&2; exit 1; }
     sample_path=""
   fi
   [[ -n "$cid" ]] || { echo "  ERROR: add returned no CID for $unit" >&2; exit 1; }
@@ -164,5 +182,5 @@ tail -n +2 "$DIRS_CSV" | while IFS=, read -r unit _rest; do
   echo "  ff-gateway: $gw_ff, public: $gw_pub"
   [[ "$gw_ff" == ok ]] || echo "  WARNING: ipfs.feralfile.com failed for $cid$sample_path — investigate before step 2" >&2
   [[ -n "${KEEP:-}" ]] || rm -rf "$dst"
-done
+done 3< <(tail -n +2 "$DIRS_CSV")
 echo "DONE — record: $RECORD (public_pending entries: re-verify after the next reprovide cycle)"
