@@ -29,7 +29,16 @@ Split across two phases (decision 2026-09-01):
   accepts: gateway-URL media links normalized to `ipfs://`, and the per-contract base-URI
   switch so `tokenURI` itself is FF-free. Design notes captured below so nothing is re-derived.
 
-## Where things stand (2026-09-01)
+## Where things stand (updated 2026-09-02)
+
+- **Node-upgrade verification complete (2026-09-02, Brandon)**: the post-0.43 pending
+  item from 9/1 (first 22h reprovide cycle → archive-probe / browser-dialability check)
+  passed. Both preconditions for this phase — node upgrades and fresh census — are met.
+- **nonipfs-scan (2026-09-02)**: new tool live-probes every non-IPFS media URL the census
+  references (`tools/nonipfs-scan`); first run 20,016 URLs → 5 broken, all The Art of
+  Survival (`6ed56114`, I KNOW) `_unique-thumbnails` absent since mint. Fixed same day at
+  the origin bucket (option A), verified 200 ×5. Full non-IPFS population healthy —
+  phase 2 mirrors known-good bytes.
 
 - **Phase 1 (Bitmark-era) is done.** Goal 1: swap code fails closed, all 4,959 still-Bitmark
   works have preview+thumbnail `ipfs_reference` rows. Goal 2: 5,880 migrated V2 tokens on 17

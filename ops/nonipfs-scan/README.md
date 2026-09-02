@@ -33,3 +33,8 @@ the natural replacement bytes.
 The census had recorded these five 403s each time; nothing surfaced them —
 that gap is what this tool closes (found by hand 2026-09-02,
 feral-file/feral-file#3435).
+
+**Fixed 2026-09-02 (option A, Brandon):** thumbnail files restored at the
+origin-bucket keys. Verified live: all five URLs return 200 `image/jpeg`
+(48–176 KB, distinct files per edition). With that, the full first-run
+population reads 20,016/20,016 healthy.
