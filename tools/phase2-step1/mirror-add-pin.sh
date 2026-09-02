@@ -39,7 +39,9 @@ WORK=${WORK:-./phase2-mirror}
 CDN_PREFIX='https://cdn.feralfileassets.com/'
 HEADROOM_STOP=${HEADROOM_STOP:-90}
 
-ipfs --api "$API" id -f '<id>' >/dev/null || { echo "no kubo API at $API — open the tunnel first" >&2; exit 1; }
+command -v ipfs >/dev/null || { echo "ipfs CLI not installed — brew install ipfs (any recent kubo works; it only drives the remote API)" >&2; exit 1; }
+command -v aws  >/dev/null || { echo "aws CLI not installed" >&2; exit 1; }
+ipfs --api "$API" id -f '<id>' >/dev/null || { echo "no kubo API at $API — open the tunnel first (make ipfs-port-forward ENV=prod HOST=prod-02)" >&2; exit 1; }
 mkdir -p "$WORK" "$(dirname "$RECORD")"
 [[ -f "$RECORD" ]] || echo "dir_or_file,s3_prefix,cid,n_files,bytes,gw_ff,gw_public,verified" > "$RECORD"
 
