@@ -116,13 +116,13 @@ selftest() {
   mfs_clean ".selftest"; rm -rf "$d"
 }
 selftest || exit 1
+headroom_check || { echo "STOP: repo above ${HEADROOM_STOP}% of StorageMax — settle capacity first" >&2; exit 1; }
 
 total=$(( $(wc -l < "$DIRS_CSV") - 1 )); i=0
 # read the unit list on fd 3 so nothing inside the loop can eat the list's stdin
 while IFS=, read -r -u3 unit _rest; do
   i=$((i+1))
   in_record "$unit" && { echo "[$i/$total] done, skip: $unit"; continue; }
-  headroom_check || { echo "STOP: repo above ${HEADROOM_STOP}% of StorageMax — settle capacity first" >&2; exit 1; }
 
   key=${unit#"$CDN_PREFIX"}
   [[ "$key" != "$unit" ]] || { echo "[$i/$total] non-CDN host, manual: $unit" >&2; continue; }
@@ -166,4 +166,5 @@ while IFS=, read -r -u3 unit _rest; do
   [[ "$gw_ff" == ok ]] || echo "  WARNING: ipfs.feralfile.com failed for $cid$sample_path — investigate before step 2" >&2
   [[ -n "${KEEP:-}" ]] || rm -rf "$dst"
 done 3< <(tail -n +2 "$DIRS_CSV")
+headroom_check || true
 echo "DONE — record: $RECORD (public_pending entries: re-verify after the next reprovide cycle)"
