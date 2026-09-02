@@ -181,9 +181,30 @@ assumed. Facts:
   replaced by `v4-dir-audit.py` (chain-dir-driven); `gen.py` consumes the audit CSV;
   `gen-sql.py`'s V4 variant now aligns DB → chain (Truth) or DB → new dir (crystalline).
 - V3 mechanism unchanged (verified same run: all six V3 contracts answer
-  `https://ipfs.bitmark.com/ipfs/<bare CID>`; per-token `updateArtworkEditionIPFSCid` stands,
-  ~2,441 txs — note the V3 gateway host is ipfs.bitmark.com, not ipfs.feralfile.com as the
+  `https://ipfs.bitmark.com/ipfs/<bare CID>`; per-token `updateArtworkEditionIPFSCid` stands
+  — note the V3 gateway host is ipfs.bitmark.com, not ipfs.feralfile.com as the
   acceptance bullet above guessed).
+- **V3 full-contract chain audit (2026-09-02, `v3_audit.csv`, 2,476 tokens): needs_fix
+  2,341 — EXACTLY the census set, zero drift in either direction.** Single base URI across
+  all six contracts; trustee/owner per contract in `v3_audit.contracts.csv`; no legacy-format
+  tokens. Two findings beyond the counts:
+  - **135 Peer to Peer tokens have `data:application/json;base64` tokenURI** (fully inline
+    on-chain metadata): `animation_url` is inline `data:text/html` (FF-free), `image` is an
+    FF-gateway URL — no CDN anywhere, so out of phase-2 scope; the gateway-named image is
+    phase-3's normalization class.
+  - **590 of the 2,341 carry RELATIVE image paths on chain**
+    (`previews/<uuid>/<ts>/_unique-thumbnails/N-large.jpg`, no scheme/host) — the API
+    prefixes the CDN host when serving, so the census showed full URLs; on chain these are
+    unresolvable for any wallet. All 590 fall inside `_unique-thumbnails/` subtrees of
+    preview dirs already in the 104-unit mirror list (13 dirs). The gen rewrite rule must
+    treat a relative `previews/…`/`thumbnails/…` value as a CDN link (implied host) and
+    rewrite it to `ipfs://<unitCID>/<subpath>`. Related: the server's own IPFS uploads
+    historically EXCLUDED `_unique-thumbnails` (`internal/infra/ipfs/ipfs.go` exclusion
+    regex) — the phase-2 mirror deliberately includes them.
+  With crystalline (9,048, all needs_fix) and Truth (896, none) audited on 9/02 as well,
+  every phase-2 contract now has a chain-authoritative fix list; the 104-unit mirror list is
+  final (chain CDN URL coverage: 100%; only crystalline's own dir and Truth's drift dir are
+  not referenced by V3 docs, both accounted for).
 
 ## The plan
 
