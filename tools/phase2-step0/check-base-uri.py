@@ -11,11 +11,13 @@ the link layer actually points:
   ipfs        ipfs://…                            (FF-free already)
   other       anything else                       (investigate)
 
-Why this matters: the plan's "V4 needs no chain txs this phase" rests on the
-V4 base URI pointing at the feralfile.com API (metadata served from
-`artworks.metadata.ipfs_cid`). If any V4 contract's live base URI is NOT the
-API, that claim must be re-checked for that contract — this script makes the
-assumption a measured fact. Exits 1 on any expectation mismatch.
+History: the plan assumed V4 base URIs point at the feralfile.com API; the
+first run (2026-09-02) measured `ipfs` for both V4-family contracts — the
+base URI is already an IPFS directory of tokenId-named docs, so the V4 fix
+is one setTokenBaseURI (onlyOwner) per contract and the authoritative fix
+list comes from that directory (see v4-dir-audit.py). Expectations below
+encode the measured reality; owner() is recorded for the V4 contracts.
+Exits 1 on any expectation mismatch.
 
 For V3 it also parses the trailing bare CID (no /metadata.json suffix) and
 records it, confirming the audit tool's parsing assumption.
@@ -55,6 +57,23 @@ def token_uri(contract, token_id):
             time.sleep(3 * (attempt + 1))
 
 CID_RE = re.compile(r'/(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[a-z0-9]{20,})/?$')
+DIR_RE = re.compile(r'^ipfs://(Qm[1-9A-HJ-NP-Za-km-z]{44}|baf[a-z0-9]{20,})/')
+
+def eth_call(contract, data):
+    payload = {'jsonrpc': '2.0', 'id': 1, 'method': 'eth_call',
+               'params': [{'to': contract, 'data': data}, 'latest']}
+    req = urllib.request.Request(RPC, json.dumps(payload).encode(),
+                                 {'Content-Type': 'application/json'})
+    r = json.load(urllib.request.urlopen(req, timeout=a.timeout))
+    if 'error' in r:
+        raise RuntimeError(r['error'])
+    return r['result']
+
+def owner_of(contract):
+    try:
+        return '0x' + eth_call(contract, '0x8da5cb5b')[-40:]  # owner()
+    except Exception as e:
+        return 'ERROR: ' + str(e)[:80]
 
 def classify(uri):
     if uri.startswith('ipfs://'):
@@ -65,7 +84,11 @@ def classify(uri):
         return 'ff_gateway'
     return 'other'
 
-EXPECT = {'V2': 'ff_gateway', 'V3': 'ff_gateway', 'V4': 'ff_api', 'V4_2': 'ff_api'}
+# Measured 2026-09-02: both V4-family contracts' live base URI is already an
+# IPFS directory (ipfs://<dirCID>/<tokenId>) — NOT the feralfile.com API the
+# plan doc assumed. The expectation now encodes that measured reality; a V4
+# contract answering ff_api again would be a regression worth stopping on.
+EXPECT = {'V2': 'ff_gateway', 'V3': 'ff_gateway', 'V4': 'ipfs', 'V4_2': 'ipfs'}
 
 rows, mismatches = [], []
 with open(a.contracts) as f:
@@ -81,12 +104,24 @@ with open(a.contracts) as f:
             note = ''
             if v in ('V3', 'V2') and cls == 'ff_gateway' and not cid:
                 ok, note = False, 'gateway URI but no trailing CID parsed'
+            owner = ''
+            if v in ('V4', 'V4_2'):
+                # the V4 fix is one setTokenBaseURI (onlyOwner) per contract —
+                # record who owns it so the vault-key question is settled here
+                owner = owner_of(c)
+                dirm = DIR_RE.match(uri)
+                cid = dirm.group(1) if dirm else cid
+                if not dirm and cls == 'ipfs':
+                    ok, note = False, 'ipfs URI but no dir CID parsed'
         except Exception as e:
-            uri, cls, cid, exp, ok, depends_ff, note = '', 'ERROR', '', EXPECT.get(v, '?'), False, '', str(e)[:120]
+            uri, cls, cid, exp, ok, depends_ff, note, owner = \
+                '', 'ERROR', '', EXPECT.get(v, '?'), False, '', str(e)[:120], ''
         rows.append([c, v, r['series_hint'], r['sample_token_id'], uri, cls, exp,
-                     ok, depends_ff, cid, note])
+                     ok, depends_ff, cid, owner, note])
         flag = 'ok' if ok else 'MISMATCH'
-        print(f'{c}  {v:5s} -> {cls:10s} (expect {exp}) {flag}  {uri[:80]}')
+        print(f'{c}  {v:5s} -> {cls:10s} (expect {exp}) {flag}'
+              + (f'  owner={owner}' if owner else ''))
+        print(f'    {uri}')
         if not ok:
             mismatches.append(c)
 
@@ -95,7 +130,7 @@ with open(a.out, 'w', newline='') as f:
     w = csv.writer(f)
     w.writerow(['contract', 'version', 'series_hint', 'sample_token_id', 'token_uri',
                 'classification', 'expected', 'matches_expectation', 'depends_on_ff_server',
-                'trailing_cid', 'note'])
+                'cid', 'owner', 'note'])
     w.writerows(rows)
 print(f'\nwrote {a.out}: {len(rows)} contracts, {len(mismatches)} mismatches')
 if mismatches:

@@ -14,8 +14,8 @@ Split across two phases (decision 2026-09-01):
   the `ipfs://` references — **byte-preserving everything else, query params carried over**,
   provable per token the way phase 1 proved it (`check-dirs.py`: diff = only the media keys).
   **Accepted for now, both deferred to phase 3**: (a) the token base URI in `tokenURI` still
-  routes through an FF host (`ipfs.bitmark.com` / `ipfs.feralfile.com` gateway on V2/V3, the
-  feralfile.com API on V4/V4_2); (b) metadata documents whose media links are FF **gateway**
+  routes through an FF host (`ipfs.bitmark.com` gateway on V2/V3 — V4/V4_2 turned out to be
+  FF-free already, see Revision 2026-09-02); (b) metadata documents whose media links are FF **gateway**
   URLs (`https://ipfs.feralfile.com/ipfs/<cid>…`) — content-addressed but FF-named — are left
   untouched this phase.
   **Hard boundary (Brandon, 2026-09-01): we do NOT touch how feralfile.com displays artwork.**
@@ -107,14 +107,12 @@ How metadata is served (`GET /api/contracts/<addr>/tokens/<id>`, `api/swap.go ge
   (no `/metadata.json` suffix, unlike V2) and the SAME `updateArtworkEditionIPFSCid(tokenId, cid)`
   guarded by trustee/owner (Sourcify-verified on I KNOW's contract). → fixing V3 media requires
   one on-chain tx per token (~2,441 tokens ≈ 0.14 Ggas ≈ 0.03 ETH at 0.2 gwei).
-- **V4/V4_2**: `tokenURI = _baseURI() + tokenId` (OZ-style; VERIFY the live `tokenBaseURI`
-  value with a real RPC — expected: the feralfile.com API). With the base URI accepted as-is
-  this phase, **fixing V4 media needs no chain transactions**: regenerate the per-token
-  metadata documents (media keys only) → pin → record the new CIDs in
-  `artworks.metadata.ipfs_cid` (pure CID bookkeeping, phase-1 style — the API picking up the
-  new documents is a consequence, not the objective; server display behavior is out of scope). (Phase 3 fact, Sourcify-verified: both contracts have
-  `setTokenBaseURI(string) external onlyOwner`, so the eventual switch is one owner tx per
-  contract to `ipfs://<tokenId-named-dir>/` — see Phase 3 notes.)
+- **V4/V4_2**: `tokenURI = _baseURI() + tokenId` (OZ-style). **SUPERSEDED 2026-09-02 — the
+  RPC check this bullet asked for was run and falsified the assumption; see "Revision
+  2026-09-02" below.** The live base URI is NOT the feralfile.com API: both contracts
+  already point at an IPFS directory of tokenId-named docs, so the V4 fix is a new
+  directory + ONE `setTokenBaseURI` owner tx per contract, and the authoritative fix list
+  comes from the on-chain directory, not a DB export.
 
 **Approach decision (Brandon, 2026-09-01): do this with clean, reusable LOCAL tools, phase-1
 style** — fetch → byte-preserving rewrite → check → pin → vault-signed txs with
@@ -140,6 +138,39 @@ Server-side pieces still used, deliberately small:
 | `check-dirs.py`, `verify-media.py`, `pin.sh` | as-is |
 | `tools/update-token-uri` | V3 support only this phase: gateway-check for suffix-less tokenURI; per-contract configs unchanged (base-URI extensions belong to phase 3) |
 | `tools/v2-metadata-regen/gen-sql.py` | add the V4/V3 variant: `artworks.metadata.ipfs_cid` UPDATE keyed on the old value (phase-1 WHERE discipline) |
+
+## Revision 2026-09-02 — measured V4 reality (step 0 run; supersedes the V4 mechanism above)
+
+`check-base-uri.py` (RPC, Brandon) + `v4-dir-audit.py` (gateway) measured what the plan had
+assumed. Facts:
+
+- **Both V4-family base URIs are ALREADY IPFS directories** (`ipfs://<dirCID>/<tokenId>`,
+  entries named by full decimal tokenId):
+  - Truth `0xBb12686c…` → `ipfs://QmQjzvrvZjzNGiqQhTGsiHeTpb9FmEcjCVWxVySf5FANC1/` (896 entries)
+  - crystalline `0xBE0A4E26…` → `ipfs://QmY67Gq1514Zj1yWtHxoHeoVj8FpFLM5ZNSNQejjirxKTo/` (9,048 entries)
+  The phase-3 `setTokenBaseURI` switch already happened for these contracts at some point —
+  the V4 **link layer is FF-free today**; what can still be dirty is the doc contents.
+- **Truth needs NO metadata fix and NO tx**: all 896 on-chain docs' media are `ipfs://`
+  (audit: `v4_audit_truth.csv`, chain_needs_fix 0). The census's 128 CDN-class Truth tokens
+  are pure **API/DB drift**: the API serves docs from `artworks.metadata.ipfs_cid`, which
+  points at OLDER doc versions than the chain. Remedy is DB bookkeeping only — align
+  `artworks.metadata.ipfs_cid` to the on-chain doc CIDs (the audit CSV carries them),
+  WHERE-pinned to the old value, then OpenSea/census re-verify.
+- **crystalline is the real V4 fix** (audit confirms CDN media inside the on-chain docs).
+  Pipeline: fetch all 9,048 docs from the on-chain dir (authoritative source — not the DB) →
+  byte-preserving media-key rewrite → build ONE new directory with entries named by full
+  decimal tokenId → pin on prod-02 → **one `setTokenBaseURI("ipfs://<newDir>/")` tx**
+  (onlyOwner — owner() recorded by check-base-uri.py; confirm the vault holds that key) →
+  align `artworks.metadata.ipfs_cid` to the new doc CIDs (bookkeeping) → OpenSea refresh.
+  Compatibility check before the tx: render one token from the new dir path on
+  OpenSea/indexer staging the way phase 3 planned it.
+- Consequences for the tools table: `audit.py`'s planned "V4 mode reading the DB export" is
+  replaced by `v4-dir-audit.py` (chain-dir-driven); `gen.py` consumes the audit CSV;
+  `gen-sql.py`'s V4 variant now aligns DB → chain (Truth) or DB → new dir (crystalline).
+- V3 mechanism unchanged (verified same run: all six V3 contracts answer
+  `https://ipfs.bitmark.com/ipfs/<bare CID>`; per-token `updateArtworkEditionIPFSCid` stands,
+  ~2,441 txs — note the V3 gateway host is ipfs.bitmark.com, not ipfs.feralfile.com as the
+  acceptance bullet above guessed).
 
 ## The plan
 

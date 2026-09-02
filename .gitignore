@@ -9,3 +9,4 @@ package-lock.json
 ops/*/*-metadata-fix/src/
 # local media scratch (the MP4s live on the CDN and on IPFS by CID)
 hls/
+ops/cdn-retirement-phase2/step0/*.state.jsonl
