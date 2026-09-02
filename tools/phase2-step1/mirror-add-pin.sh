@@ -143,7 +143,8 @@ while IFS=, read -r -u3 unit _rest; do
     echo "  add dir ($n_files files, $bytes bytes)"
     cid=$(add_dir "$dst" "$key") || { echo "ERROR: add_dir failed on $unit — rerun the same command to resume" >&2; exit 1; }
     sample=$(cd "$dst" && find . -type f | sed 's|^\./||' | LC_ALL=C sort | head -1)
-    sample_local="$dst/$sample"; sample_path="/$sample"
+    sample_local="$dst/$sample"
+    sample_path="/$(python3 -c 'import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1], safe="/"))' "$sample")"
   else
     echo "  add file ($bytes bytes)"
     sample_local="$dst/$(basename "$key")"
