@@ -9,3 +9,5 @@ package-lock.json
 ops/*/*-metadata-fix/src/
 # local media scratch (the MP4s live on the CDN and on IPFS by CID)
 hls/
+# nonipfs-scan resume state — run data, results CSV is the record
+ops/nonipfs-scan/state_*.jsonl
