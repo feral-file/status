@@ -34,6 +34,10 @@
 #      HEADROOM_STOP (default 90)   stop when repo% of StorageMax exceeds this
 # Idempotent / resumable: units already in the record CSV are skipped.
 set -euo pipefail
+# forensic traps: two silent deaths at the same spot (after a long add, during
+# pin/verify) with no message — record WHAT terminated us and the last command.
+trap 'rc=$?; [[ $rc -ne 0 ]] && echo "[trap] EXIT code=$rc last-command: $BASH_COMMAND" >&2' EXIT
+for sig in HUP INT TERM PIPE; do trap "echo \"[trap] received SIG$sig — last-command: \$BASH_COMMAND\" >&2; exit 1" $sig; done
 DIRS_CSV=${1:?cdn_dirs.csv from step 0}
 RECORD=${2:?output record csv (dir_cids.csv)}
 : "${BUCKET:?BUCKET env required}"
