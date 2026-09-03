@@ -14,6 +14,7 @@ import argparse, csv, json, os, sys
 ap = argparse.ArgumentParser()
 ap.add_argument('--contracts', default='audit.contracts.csv'); ap.add_argument('--sender-account', required=True)
 ap.add_argument('--expect-trustee'); ap.add_argument('--gateway', default='https://ipfs.bitmark.com/ipfs/')
+ap.add_argument('--doc-suffix', default=None, help="write docSuffix into each config; V3 contracts need '' (bare doc CID in tokenURI)")
 ap.add_argument('--max-gas-gwei', type=float, default=1.0, help='gas price ceiling written to each config (maxGasPriceGwei); update-token-uri waits until baseFee+tip is at or below it')
 a = ap.parse_args()
 here = os.path.dirname(os.path.abspath(__file__)); os.chdir(here)
@@ -26,6 +27,8 @@ for r in csv.DictReader(open(a.contracts)):
     d = f'runs/{c}'; os.makedirs(d, exist_ok=True)
     cfg = {'chainId': 1, 'contract': c, 'senderAddress': r['trustee'], 'senderAccount': a.sender_account,
            'metadataGateway': a.gateway, 'updates': os.path.abspath(upd), 'workDir': os.path.abspath(d), 'maxGasPriceGwei': a.max_gas_gwei}
+    if a.doc_suffix is not None:
+        cfg['docSuffix'] = a.doc_suffix
     json.dump(cfg, open(f'{d}/config.json', 'w'), indent=2); n += 1
     print(f'{d}/config.json  ({sum(1 for _ in open(upd)) - 1} rows)')
 print(f'{n} configs. Run each with UPDATE_CONFIG=$PWD/runs/<contract>/config.json from tools/update-token-uri.')
