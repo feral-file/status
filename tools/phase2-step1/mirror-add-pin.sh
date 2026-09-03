@@ -81,7 +81,10 @@ add_dir() {
   # loop was latency-bound (2 round-trips × ~0.3 s × 45k files ≈ 8 h).
   cid=$(python3 "$(cd "$(dirname "$0")" && pwd)/mfs-batch-add.py" "$dst" "$mfs" --api "${A%/api/v0}") || return 1
   [[ -n "$cid" ]] || return 1
-  [[ "$pin" == true ]] && { curl -sf -X POST "$A/pin/add?arg=$cid" >/dev/null || { echo "  pin/add failed for $cid" >&2; return 1; }; }
+  if [[ "$pin" == true ]]; then
+    local pres; pres=$(curl -sS -X POST "$A/pin/add?arg=$cid")
+    case "$pres" in *'"Pins"'*) ;; *) echo "  pin/add did not confirm for $cid: ${pres:0:160}" >&2; return 1;; esac
+  fi
   # staging is NOT removed here: the caller cleans it only after the record
   # row is written, so a death in the verify window leaves the CID findable
   # in MFS (2026-09-03 incident: pin done, record lost, CID unrecoverable).
@@ -159,11 +162,14 @@ while IFS=, read -r -u3 unit _rest; do
   # one batch after the run / the next reprovide cycle.
   gw_ff=fail; gw_pub=public_pending
   fetch_ok "https://ipfs.feralfile.com/ipfs/$cid$sample_path" "$sample_local" && gw_ff=ok
-  verified=$([[ "$gw_ff" == ok ]] && echo yes || echo NO)
+  if [[ "$gw_ff" != ok ]]; then
+    echo "ERROR: ipfs.feralfile.com cannot serve $cid$sample_path — bytes not actually on the node; staging and local mirror kept, NOT recorded. Investigate, then rerun." >&2
+    exit 1
+  fi
+  verified=yes
   echo "$unit,$key,$cid,$n_files,$bytes,$gw_ff,$gw_pub,$verified" >> "$RECORD"
   [[ "$unit" == */ ]] && mfs_clean "$key"
   echo "  ff-gateway: $gw_ff, public: $gw_pub"
-  [[ "$gw_ff" == ok ]] || echo "  WARNING: ipfs.feralfile.com failed for $cid$sample_path — investigate before step 2" >&2
   [[ -n "${KEEP:-}" ]] || rm -rf "$dst"
 done 3< <(tail -n +2 "$DIRS_CSV")
 headroom_check || true
