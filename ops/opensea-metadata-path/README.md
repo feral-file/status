@@ -25,7 +25,7 @@ The derivation was confirmed against the live API for every scanned Ethereum ser
 
 ## Method
 
-`tools/opensea-collection-metadata-scan.py` — for each of the 560 series: derive the
+`tools/opensea/collection-metadata-scan.py` — for each of the 560 series: derive the
 two fields, pick a settled Ethereum token, fetch its OpenSea item page
 (`opensea.io/item/ethereum/<contract>/<tokenID>`, no auth). The server-rendered page
 embeds the item record OpenSea actually uses, including **`tokenUri`** (the metadata
@@ -64,7 +64,7 @@ Oddities (not for OpenSea, for us): `Bridges by HP` sits in an unverified `FFV3 
 collection (owner FFDev); the two Da Nang Review series sit in `TestExhibition001`;
 `Inaugural SuperBridge Summit` collection is unverified.
 
-## FF API readiness spot-check (`tools/opensea-ff-api-spotcheck.py`, 10 tokens/series)
+## FF API readiness spot-check (`tools/opensea/ff-api-spotcheck.py`, 10 tokens/series)
 
 | | |
 |---|---|
@@ -96,6 +96,6 @@ displays). Re-check after the fix: 30/30 tokens return the expected `collection_
 - `fix_unsupervised_collection_name.sql` — the applied DB fix for the 3 empty-name series
 - `scan_state.jsonl`, `scan.log`, `spotcheck.log` — raw state / logs (resumable)
 
-Re-run: `python3 tools/opensea-collection-metadata-scan.py --state … --out … --md … --refresh`
+Re-run: `python3 tools/opensea/collection-metadata-scan.py --state … --out … --md … --refresh`
 (≈25 min at 1 OpenSea page/s); use `--series <id>` for a single collection as a canary
 after OpenSea re-points it.

@@ -1,5 +1,6 @@
 public/
 __pycache__/
+.DS_Store
 
 # ops tooling
 **/.omc/
@@ -7,10 +8,6 @@ node_modules/
 package-lock.json
 # downloaded originals — re-fetched by each gen.py
 ops/*/*-metadata-fix/src/
-# local media scratch (the MP4s live on the CDN and on IPFS by CID)
-hls/
-ops/cdn-retirement-phase2/step0/*.state.jsonl
-ops/cdn-retirement-phase2/step3/src/
-ops/cdn-retirement-phase2/step3/v3-src/
-ops/cdn-retirement-phase2/step3/crystalline-newdir/
-ops/cdn-retirement-phase2/step3/v3-docs/0x*/
+# resumable scanner/run state — deleted when a run completes
+ops/**/*.state.jsonl
+tools/**/progress.json

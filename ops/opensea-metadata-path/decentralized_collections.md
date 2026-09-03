@@ -1,6 +1,6 @@
 # Feral File collections whose OpenSea metadata does NOT come through the Feral File API
 
-Generated 2026-09-03 by `tools/opensea-collection-metadata-scan.py`. 560 series scanned; 290 Centralized (FF API), 121 Decentralized (tokenURI direct), 22 Delisted (no data on OpenSea), 0 NotIndexed, 127 without Ethereum tokens.
+Generated 2026-09-03 by `tools/opensea/collection-metadata-scan.py`. 560 series scanned; 290 Centralized (FF API), 121 Decentralized (tokenURI direct), 22 Delisted (no data on OpenSea), 0 NotIndexed, 127 without Ethereum tokens.
 
 Expected metadata URL for every token: `https://feralfile.com/api/contracts/<contract>/tokens/<tokenID>` (returns `collection_name` + `collection_uuid`, which OpenSea uses for series-level grouping).
 

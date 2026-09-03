@@ -45,7 +45,7 @@ Replacement media (all pinned on prod-02, resolving on ipfs.io):
 
 Order of operations: `gen.py` → `pin.sh` (IPFS tunnel) → chain update tool
 (`tools/update-token-uri`, `tools/update-tezos-metadata`) → DB
-(`tools/db-sql/hls-fix.sql`) → re-run census → rebuild the page.
+(regenerable via `tools/db-align-sql/gen-token-sql.py`) → re-run census → rebuild the page.
 
 `src/` (the fetched originals) is gitignored — `gen.py` re-fetches it, and the
 regenerated `dirs/` / `files/` are byte-identical to what is committed (verified
