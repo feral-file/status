@@ -86,7 +86,10 @@ def fetch(name):
         try:
             r = urllib.request.urlopen(f'{a.gateway}/ipfs/{a.dir_cid}/{name}', timeout=a.timeout)
             body = r.read()
-            rec['doc_cid'] = (r.headers.get('Etag') or '').strip('"W/')
+            et = r.headers.get('Etag') or ''
+            if et.startswith('W/'):
+                et = et[2:]
+            rec['doc_cid'] = et.strip('"')
             d = json.loads(body)
             for k in MEDIA_KEYS:
                 rec[k] = d.get(k, '')
