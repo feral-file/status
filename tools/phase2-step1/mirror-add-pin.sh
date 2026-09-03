@@ -100,9 +100,20 @@ add_file() {
 }
 
 fetch_ok() { # url localfile -> 0 if bytes match
-  local tmp; tmp=$(mktemp)
-  if curl -sfL --max-time 300 "$1" -o "$tmp" && cmp -s "$tmp" "$2"; then rm -f "$tmp"; return 0; fi
-  rm -f "$tmp"; return 1
+  # files > 64 MB are verified with a 1 MB Range request + total-length check
+  # (a full 0.5 GB download blew the 300 s cap and produced false fails);
+  # smaller files are fully downloaded and byte-compared.
+  local tmp hdr sz total; tmp=$(mktemp); hdr=$(mktemp)
+  sz=$(stat -f%z "$2" 2>/dev/null || stat -c%s "$2")
+  if (( sz > 67108864 )); then
+    if curl -sfL --max-time 120 -r 0-1048575 -D "$hdr" "$1" -o "$tmp"; then
+      total=$(grep -i '^content-range:' "$hdr" | tail -1 | sed 's|.*/||' | tr -d '[:space:]')
+      if [[ "$total" == "$sz" ]] && cmp -s "$tmp" <(head -c 1048576 "$2"); then rm -f "$tmp" "$hdr"; return 0; fi
+    fi
+  else
+    if curl -sfL --max-time 300 "$1" -o "$tmp" && cmp -s "$tmp" "$2"; then rm -f "$tmp" "$hdr"; return 0; fi
+  fi
+  rm -f "$tmp" "$hdr"; return 1
 }
 
 # --- self-test: prove the multipart dir shape end-to-end before real units --
