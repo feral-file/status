@@ -11,3 +11,8 @@ ops/*/*-metadata-fix/src/
 # resumable scanner/run state — deleted when a run completes
 ops/**/*.state.jsonl
 tools/**/progress.json
+# live tx configs (vault account ids) — only the *.example.json templates are tracked
+tools/update-token-uri/config.json
+tools/update-token-uri/config.v3.json
+tools/update-token-uri/v4-base-uri.config.json
+tools/update-tezos-metadata/config.json
