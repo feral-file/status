@@ -244,11 +244,20 @@ async function relaySigned(provider, txRespPath, expectedData, label, waitConfs 
 }
 
 async function assertAuthorized(c) {
-  const [owner, trustee] = await Promise.all([c.owner(), c.trustee()]);
   const s = SENDER.toLowerCase();
-  if (s !== owner.toLowerCase() && s !== trustee.toLowerCase())
-    fail(`senderAddress ${SENDER} is neither owner (${owner}) nor trustee (${trustee}) — updateArtworkEditionIPFSCid would revert`);
-  ok(`sender ${SENDER} is authorized (${s === trustee.toLowerCase() ? 'trustee' : 'owner'})`);
+  const owner = await c.owner();
+  let trustee = null;
+  try { trustee = await c.trustee(); }
+  catch { console.error('· trustee() not readable on this contract (V3 has no getter) — authorization is proven by the per-token eth_call dry-runs instead'); }
+  if (trustee !== null) {
+    if (s !== owner.toLowerCase() && s !== trustee.toLowerCase())
+      fail(`senderAddress ${SENDER} is neither owner (${owner}) nor trustee (${trustee}) — updateArtworkEditionIPFSCid would revert`);
+    ok(`sender ${SENDER} is authorized (${s === trustee.toLowerCase() ? 'trustee' : 'owner'})`);
+  } else if (s === owner.toLowerCase()) {
+    ok(`sender ${SENDER} is the owner`);
+  } else {
+    ok(`sender ${SENDER}: authorization deferred to dry-runs (owner is ${owner})`);
+  }
 }
 
 // Fetch the replacement metadata through the gateway the tokenURI actually

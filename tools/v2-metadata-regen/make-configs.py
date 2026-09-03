@@ -14,6 +14,7 @@ import argparse, csv, json, os, sys
 ap = argparse.ArgumentParser()
 ap.add_argument('--contracts', default='audit.contracts.csv'); ap.add_argument('--sender-account', required=True)
 ap.add_argument('--expect-trustee'); ap.add_argument('--gateway', default='https://ipfs.bitmark.com/ipfs/')
+ap.add_argument('--sender-address', help='explicit senderAddress when the audit could not read trustee() (e.g. V3 contracts without the getter); the per-token dry-run in preflight is the real authorization check')
 ap.add_argument('--doc-suffix', default=None, help="write docSuffix into each config; V3 contracts need '' (bare doc CID in tokenURI)")
 ap.add_argument('--max-gas-gwei', type=float, default=1.0, help='gas price ceiling written to each config (maxGasPriceGwei); update-token-uri waits until baseFee+tip is at or below it')
 a = ap.parse_args()
@@ -22,10 +23,11 @@ n = 0
 for r in csv.DictReader(open(a.contracts)):
     c = r['contract'].lower(); upd = f'updates/{c}.csv'
     if not os.path.exists(upd): print(f'skip {c}: no {upd} (nothing pinned for it)'); continue
-    if a.expect_trustee and r['trustee'].lower() != a.expect_trustee.lower(): sys.exit(f'{c}: trustee {r["trustee"]} ≠ expected {a.expect_trustee}')
-    if not r['trustee']: sys.exit(f'{c}: trustee unknown — rerun audit.py')
+    sender = r['trustee'] or a.sender_address
+    if not sender: sys.exit(f'{c}: trustee unknown and no --sender-address given')
+    if a.expect_trustee and sender.lower() != a.expect_trustee.lower(): sys.exit(f'{c}: sender {sender} ≠ expected {a.expect_trustee}')
     d = f'runs/{c}'; os.makedirs(d, exist_ok=True)
-    cfg = {'chainId': 1, 'contract': c, 'senderAddress': r['trustee'], 'senderAccount': a.sender_account,
+    cfg = {'chainId': 1, 'contract': c, 'senderAddress': sender, 'senderAccount': a.sender_account,
            'metadataGateway': a.gateway, 'updates': os.path.abspath(upd), 'workDir': os.path.abspath(d), 'maxGasPriceGwei': a.max_gas_gwei}
     if a.doc_suffix is not None:
         cfg['docSuffix'] = a.doc_suffix
