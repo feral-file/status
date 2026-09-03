@@ -1,0 +1,7 @@
+contract,trustee,owner,token_base_uri,tokens,needs_fix,errors
+0x2a86c5466f088caebf94e071a77669bae371cd87,,0x1d05cf6c6beb0c869851bfdb9510d4e44e855ad6,https://ipfs.bitmark.com/ipfs/,746,611,135
+0x6003994adeca13407e8dbee808280cc3ef2ab820,,0x1d05cf6c6beb0c869851bfdb9510d4e44e855ad6,https://ipfs.bitmark.com/ipfs/,182,182,0
+0x6e82e4b398ca4137007ba69ddd6ff699334d13b5,,0x1d05cf6c6beb0c869851bfdb9510d4e44e855ad6,https://ipfs.bitmark.com/ipfs/,171,171,0
+0x8f30722dd16bd63cf2665c383c1aef5e307b0046,,0x1d05cf6c6beb0c869851bfdb9510d4e44e855ad6,https://ipfs.bitmark.com/ipfs/,108,108,0
+0xc4f0ee96676d3de800b9725eb628de1c5a0cbea1,,0x1d05cf6c6beb0c869851bfdb9510d4e44e855ad6,https://ipfs.bitmark.com/ipfs/,600,600,0
+0xe46a41b840176b62983fc71162dc9faeac4d9bcb,,0x1d05cf6c6beb0c869851bfdb9510d4e44e855ad6,https://ipfs.bitmark.com/ipfs/,669,669,0

@@ -59,7 +59,7 @@ Same procedure as `ops/3435-hls-fix/rewilded-metadata-fix` + `tools/update-token
 
 `ops/3435-hls-fix/db/export-v2-cdn-tokens.sql`: per token — contract, token id, artwork id, edition index, current `swaps.ipfs_cid`, `preview_uri` → its `ipfs_reference.ipfs_uri`, `thumbnail_uri` → its `ipfs_reference.ipfs_uri`. Rows where either reference is missing are listed separately: they need `EnsureIPFSReferenceByURI` first (goal 1's check, same fix).
 
-### Step 1 — generate (local, `tools/v2-metadata-regen` — written 2026-08-28, see its README; `audit.py` there is the chain-side verification above)
+### Step 1 — generate (local, `tools/metadata-regen` — written 2026-08-28, see its README; `audit.py` there is the chain-side verification above)
 
 For each token: fetch `https://ipfs.bitmark.com/ipfs/<old cid>/metadata.json`, replace **only** `animation_url` (→ preview reference) and `image` (→ thumbnail reference; for image-medium series the server puts the preview in `image`, mirror that), byte-preserve everything else, write `dirs/<contract>/<tokenId>/metadata.json`, emit `plan.csv`. Diff a sample against the originals: exactly two lines change.
 
@@ -77,7 +77,7 @@ For each token: fetch `https://ipfs.bitmark.com/ipfs/<old cid>/metadata.json`, r
 
 ### Step 4 — DB
 
-`UPDATE swaps SET ipfs_cid = <new> WHERE contract_address = … AND token = … AND ipfs_cid = <old>` (generated like `tools/db-sql/gen-token-sql.py`). The API serves `<ipfs_cid>/metadata.json` on the next request; trigger the OpenSea refresh task per contract.
+`UPDATE swaps SET ipfs_cid = <new> WHERE contract_address = … AND token = … AND ipfs_cid = <old>` (generated like `tools/db-align-sql/gen-token-sql.py`). The API serves `<ipfs_cid>/metadata.json` on the next request; trigger the OpenSea refresh task per contract.
 
 ### Step 5 — measure
 
@@ -85,7 +85,7 @@ Census on prod-02; the 5,903 move from `dependent` to `independent`; status.fera
 
 Exit for goal 2: census `dependent` = 0 for every Bitmark-era exhibition's migrated tokens.
 
-Decisions taken 2026-08-28: the DB export (step 0) is **not** run yet — next agent starts there. Tooling for steps 1–4 exists in `tools/v2-metadata-regen/`; **audit + generate + media verification ran 2026-08-28: the chain-built fix list is 5,880 tokens (not 5,903), 0 blocked, all 436 media CIDs publicly fetchable — see the run record in that README; pin/chain/DB not started** (audit → gen → verify-media → pin → per-contract update-token-uri configs → SQL); `run-all.mjs` now takes a per-config `workDir` so 17 contracts never share `progress.json`. The contract holds only the directory CID (verified from source): `?edition_number=…` parameters are plain metadata values, and `gen.py` refuses any rewrite that drops or changes them. `image` rule: use the thumbnail's `ipfs_reference` CID (the On Screen Presence procedure); if a series' thumbnail reference is missing, run `EnsureIPFSReferenceByURI` first — never leave a CDN or `imagedelivery.net` URL in regenerated metadata.
+Decisions taken 2026-08-28: the DB export (step 0) is **not** run yet — next agent starts there. Tooling for steps 1–4 exists in `tools/metadata-regen/`; **audit + generate + media verification ran 2026-08-28: the chain-built fix list is 5,880 tokens (not 5,903), 0 blocked, all 436 media CIDs publicly fetchable — see the run record in that README; pin/chain/DB not started** (audit → gen → verify-media → pin → per-contract update-token-uri configs → SQL); `run-all.mjs` now takes a per-config `workDir` so 17 contracts never share `progress.json`. The contract holds only the directory CID (verified from source): `?edition_number=…` parameters are plain metadata values, and `gen.py` refuses any rewrite that drops or changes them. `image` rule: use the thumbnail's `ipfs_reference` CID (the On Screen Presence procedure); if a series' thumbnail reference is missing, run `EnsureIPFSReferenceByURI` first — never leave a CDN or `imagedelivery.net` URL in regenerated metadata.
 
 ## Out of scope (recorded so it is not lost)
 
@@ -107,7 +107,7 @@ existing tools + procedure ────┘
 Thread: feral-file/feral-file#3435. Everything below is on `feral-file/status` branch `tools/step2-archive-mirror` (PR #4, pending merge) unless noted.
 
 **Done, verified**
-- 184 "gateway-gap" works (3 HLS playlists): MP4s pinned; 50 ETH editions re-pointed via `updateArtworkEditionIPFSCid`, 142 Tezos via `update_edition_metadata`; DB updated. Census 8/25: gateway-gap 184 → 0. Tools: `tools/update-token-uri` (ETH V2, vault-signed), `tools/update-tezos-metadata` (FA2, vault-signed), `tools/db-sql/gen-token-sql.py`; records in `ops/3435-hls-fix/`.
+- 184 "gateway-gap" works (3 HLS playlists): MP4s pinned; 50 ETH editions re-pointed via `updateArtworkEditionIPFSCid`, 142 Tezos via `update_edition_metadata`; DB updated. Census 8/25: gateway-gap 184 → 0. Tools: `tools/update-token-uri` (ETH V2, vault-signed), `tools/update-tezos-metadata` (FA2, vault-signed), `tools/db-align-sql/gen-token-sql.py`; records in `ops/3435-hls-fix/`.
 - prod-02 (`ipfs.feralfile.com` = `ipfs.bitmark.com`, kubo 0.39): volume 1000 GB / StorageMax 900 GB (ff-deploy#27 merged); all 215 Bitmark-era series mirrored from ff-pin-1 (verify 215/215); every DB-referenced (73,385) and chain-referenced (198) CID pinned — they had been unpinned cache, alive only because the container runs without `--enable-gc` (ff-deploy#28, docs, pending merge). 74,311 recursive pins. Sweep provider announces everything.
 - ff-pin-1 (custody node, Sean's box, Brandon co-operator via DO console; Canon `ops/archival-node.md` is the contract and the change log): kubo 0.32.1, `Reprovider.Strategy=roots`, ConnMgr 100/250, `/root/provide-roots.sh` (retry ×3) on cron 03:00 UTC announces the ~230 roots because 0.32's reprovider never completes. Archive probe: ipfs.io 228/230. Planned: upgrade to kubo 0.39, then `Strategy=all`, retire the loop. Not scheduled.
 - `ipfs_reference` cleanup: 157 rows rebuilt, 9 truncated orphans deleted (`ops/3435-hls-fix/db/`).

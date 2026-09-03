@@ -14,8 +14,8 @@ Split across two phases (decision 2026-09-01):
   the `ipfs://` references — **byte-preserving everything else, query params carried over**,
   provable per token the way phase 1 proved it (`check-dirs.py`: diff = only the media keys).
   **Accepted for now, both deferred to phase 3**: (a) the token base URI in `tokenURI` still
-  routes through an FF host (`ipfs.bitmark.com` / `ipfs.feralfile.com` gateway on V2/V3, the
-  feralfile.com API on V4/V4_2); (b) metadata documents whose media links are FF **gateway**
+  routes through an FF host (`ipfs.bitmark.com` gateway on V2/V3 — V4/V4_2 turned out to be
+  FF-free already, see Revision 2026-09-02); (b) metadata documents whose media links are FF **gateway**
   URLs (`https://ipfs.feralfile.com/ipfs/<cid>…`) — content-addressed but FF-named — are left
   untouched this phase.
   **Hard boundary (Brandon, 2026-09-01): we do NOT touch how feralfile.com displays artwork.**
@@ -28,6 +28,98 @@ Split across two phases (decision 2026-09-01):
 - **Phase 3 (deferred)**: one comprehensive raw-document scan + fix for everything this phase
   accepts: gateway-URL media links normalized to `ipfs://`, and the per-contract base-URI
   switch so `tokenURI` itself is FF-free. Design notes captured below so nothing is re-derived.
+
+## Where things stand (2026-09-02, end of day — supersedes the 9/01 status below)
+
+Preconditions all met: 0.43 post-upgrade verification passed; census fresh; `nonipfs-scan`
+(new tool, 2026-09-02) live-probed all 20,016 non-IPFS media URLs and found the only broken
+CDN bytes — The Art of Survival ×5 thumbnails, restored at origin same day, 20,016/20,016
+healthy. Since then, in one day:
+
+**Step 0 — COMPLETE, every contract chain-audited:**
+- V3 (6 contracts, 2,476 tokens): needs_fix **2,341**, exactly the census set, zero drift.
+  135 Peer to Peer data-URI tokens out of scope (inline HTML anim; gateway image → phase 3).
+  590 of the 2,341 carry relative image paths on chain (census can't see it; gen rule added).
+- crystalline (V4_2, 9,048): all 9,048 need the fix; API==chain per token (9,048/9,048 +
+  12-token live sample); ZERO overlays.
+- Truth (V4, 896): chain clean, DB aligned (`<dirCID>/<tokenId>` path form), zero in-phase
+  work — its 128 census-CDN rows are the filum overlay (see Pending decisions).
+- Both V4 base URIs are already IPFS dirs; the V4 fix is a new dir + ONE setTokenBaseURI
+  (crystalline only). Records: `step0/` base_uri_check / v4_audit_* / v3_audit CSVs.
+
+**Step 1**: 1a sizing done — 104 units, 74,143 objects, **40.2 GB**, prod-02 projection
+694/900 GB (77%), no empty prefixes. **1b mirror RUNNING** (mirror-add-pin.sh, curl-only,
+self-tested) → `step1/dir_cids.csv`.
+
+**Step 2**: DB exports done (9,944 rows, both V4 contracts). Conclusions folded into step 0;
+the only align SQL remaining is crystalline's, path form, after its dir rebuild.
+
+**Step 3**: `v4-dir-regen.py` ready + smoke-tested (byte-preserving, media keys only, query
+params carried). Waiting on dir_cids. V3 gen next (audit.py already V3-capable).
+
+**The in-pipeline fix population is exactly 11,389** (V3 2,341 + crystalline 9,048) — the
+same number as the status page's "depend entirely on us" ETH class; the other 128
+(Truth/filum) moved to the overlay class in Pending decisions.
+
+**Remaining sequence**: mirror finishes → crystalline regen + V3 gen (agent) → trial series
+(V3: Material Wonderland 108; crystalline is the only V4) → V3 rollout smallest-first,
+~2,341 vault txs → crystalline `ipfs add -r` + 1 owner tx + path-form SQL → OpenSea refresh
+→ pin-referenced rerun → census → status page rebuild.
+
+## Pending decisions (out of phase scope — packaged 2026-09-02 for product/ops)
+
+**The class: `alternativePreviewURI` display overlays.** Artwork-level field
+(`artworks.metadata`), read by `api/swap.go`, overwrites `animation_url` AFTER the doc
+fetch. Added 2024-01-22 (`08f7f0eae` "add alternative preview url to fix broken art",
+extended 2024-01-29 for full URLs). It reintroduces a dependency at the display layer on
+top of clean on-chain metadata — wallets following tokenURI see the clean chain path; the
+API/census/status page see the overlay. Two live cases, 167 tokens:
+
+1. **filum (Truth `0xBb12686c…`, 128 tokens) → FF CDN.** Byte-level comparison of the two
+   versions (2026-09-02): all 11 files identical EXCEPT index.html, where the CDN copy adds
+   `crossorigin="anonymous"` to 7 `<img>` tags (168 bytes). That attribute is load-bearing:
+   `js/base.js` uses WebGL `texImage2D` + `readPixels`, and a cross-origin image without it
+   taints the context → SecurityError → black screen. So in 2024-01 the artwork broke in a
+   cross-origin embed, the 168-byte patch was made — and instead of repinning to IPFS and
+   updating the chain pointer, the patched copy went to the CDN behind a new API field.
+2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) → aesthetic.computer.** On-chain metadata
+   is all-`ipfs://` (phase-1 verified); the overlay points the display layer at the
+   artist's live third-party site. Third-party dependence by (presumed) product choice.
+
+**The question both cases reduce to: does Feral File modify an artist's source files and
+pin THAT as the permanent IPFS version?** filum's fix is a 7-attribute HTML patch —
+technically trivial, but it changes the artist's shipped bytes; archival integrity
+(byte-canonical vs. functioning) and artist consent/credit are product calls, not pipeline
+calls. The question generalizes: whenever a permanence fix requires touching the work
+(crossorigin here, the 8/25 HLS→MP4 repackaging before it), who authorizes it and how is
+it recorded?
+
+Options per case:
+- **filum**: (a) patch the 168 bytes into a new IPFS dir, rebuild Truth's tokenId dir, one
+  `setTokenBaseURI`, drop the overlay — permanent and FF-free, rides crystalline's
+  identical pipeline (the cheapest moment is now); needs artist sign-off on the patched
+  bytes. (b) drop the overlay as-is — same-origin gateway serving works today, but the
+  2024 failure mode (cross-origin embeds) can recur. (c) keep + reclassify on the status
+  page (CDN dependency stays, honestly labeled).
+- **Ten Whistlegraphs**: (a) keep the overlay, reclassify as third-party-by-choice.
+  (b) drop it — the ipfs:// versions need a render test first.
+- Either way the status page should stop counting overlay-only tokens the same as
+  doc-level CDN tokens — different failure mode, different owner.
+
+Owner: Sean/Hieu + (for source-file changes) the artists. The HLS precedent replaced
+playlists with MP4s under operator authority — a written rule for when touching the work
+is OK would close this class permanently.
+
+## Where things stand — see STATUS.md (2026-09-04)
+
+Current state, remaining work, and all close-out numbers live in
+`ops/cdn-retirement-phase2/STATUS.md` (updated 2026-09-04): the V3 arc is
+CLOSED end-to-end (2,341/2,341 chain txs + DB align + reference rows +
+explicit pins), crystalline's DB align is applied ahead of its pending owner
+tx, and what remains is census close-out, the #3435 checkpoint, and the unpin
+backlog. The section below is the 2026-09-01 snapshot, kept as history.
+Side-track closed along the way: nonipfs-scan (status PR #10) — the 5 Art of
+Survival thumbnail 403s were fixed at origin 2026-09-02 and verified.
 
 ## Where things stand (2026-09-01)
 
@@ -107,14 +199,12 @@ How metadata is served (`GET /api/contracts/<addr>/tokens/<id>`, `api/swap.go ge
   (no `/metadata.json` suffix, unlike V2) and the SAME `updateArtworkEditionIPFSCid(tokenId, cid)`
   guarded by trustee/owner (Sourcify-verified on I KNOW's contract). → fixing V3 media requires
   one on-chain tx per token (~2,441 tokens ≈ 0.14 Ggas ≈ 0.03 ETH at 0.2 gwei).
-- **V4/V4_2**: `tokenURI = _baseURI() + tokenId` (OZ-style; VERIFY the live `tokenBaseURI`
-  value with a real RPC — expected: the feralfile.com API). With the base URI accepted as-is
-  this phase, **fixing V4 media needs no chain transactions**: regenerate the per-token
-  metadata documents (media keys only) → pin → record the new CIDs in
-  `artworks.metadata.ipfs_cid` (pure CID bookkeeping, phase-1 style — the API picking up the
-  new documents is a consequence, not the objective; server display behavior is out of scope). (Phase 3 fact, Sourcify-verified: both contracts have
-  `setTokenBaseURI(string) external onlyOwner`, so the eventual switch is one owner tx per
-  contract to `ipfs://<tokenId-named-dir>/` — see Phase 3 notes.)
+- **V4/V4_2**: `tokenURI = _baseURI() + tokenId` (OZ-style). **SUPERSEDED 2026-09-02 — the
+  RPC check this bullet asked for was run and falsified the assumption; see "Revision
+  2026-09-02" below.** The live base URI is NOT the feralfile.com API: both contracts
+  already point at an IPFS directory of tokenId-named docs, so the V4 fix is a new
+  directory + ONE `setTokenBaseURI` owner tx per contract, and the authoritative fix list
+  comes from the on-chain directory, not a DB export.
 
 **Approach decision (Brandon, 2026-09-01): do this with clean, reusable LOCAL tools, phase-1
 style** — fetch → byte-preserving rewrite → check → pin → vault-signed txs with
@@ -135,11 +225,89 @@ Server-side pieces still used, deliberately small:
 
 | tool | change |
 |---|---|
-| `tools/v2-metadata-regen/audit.py` | V3: works as-is (same `tokenURI`/`artworkEditions` ABI; note V3 tokenURI has NO `/metadata.json` suffix — the cid parser needs that case). V4: new mode — the "current metadata" comes from `artworks.metadata.ipfs_cid` (DB export) fetched via gateway, not from the chain; chain read only confirms `tokenBaseURI` |
-| `tools/v2-metadata-regen/gen.py` | works as-is once the export supplies (token, current doc CID, refs, medium); keys confirmed `animation_url`/`image` for V3/V4 too (server `GenerateEthereumArtworkMintingMetadata` emits the same map; still diff one live doc per series before running). Rewrite rule = phase 1 exactly: replace a media value iff it is a CDN link (`cdn.feralfileassets.com`/`imagedelivery.net`), preserve query params (`--allow-param-diff` only with code evidence), leave every other value — including FF-gateway URLs — byte-identical |
+| `tools/metadata-regen/audit.py` | V3: works as-is (same `tokenURI`/`artworkEditions` ABI; note V3 tokenURI has NO `/metadata.json` suffix — the cid parser needs that case). V4: new mode — the "current metadata" comes from `artworks.metadata.ipfs_cid` (DB export) fetched via gateway, not from the chain; chain read only confirms `tokenBaseURI` |
+| `tools/metadata-regen/gen.py` | works as-is once the export supplies (token, current doc CID, refs, medium); keys confirmed `animation_url`/`image` for V3/V4 too (server `GenerateEthereumArtworkMintingMetadata` emits the same map; still diff one live doc per series before running). Rewrite rule = phase 1 exactly: replace a media value iff it is a CDN link (`cdn.feralfileassets.com`/`imagedelivery.net`), preserve query params (`--allow-param-diff` only with code evidence), leave every other value — including FF-gateway URLs — byte-identical |
 | `check-dirs.py`, `verify-media.py`, `pin.sh` | as-is |
 | `tools/update-token-uri` | V3 support only this phase: gateway-check for suffix-less tokenURI; per-contract configs unchanged (base-URI extensions belong to phase 3) |
-| `tools/v2-metadata-regen/gen-sql.py` | add the V4/V3 variant: `artworks.metadata.ipfs_cid` UPDATE keyed on the old value (phase-1 WHERE discipline) |
+| `tools/metadata-regen/gen-sql.py` | add the V4/V3 variant: `artworks.metadata.ipfs_cid` UPDATE keyed on the old value (phase-1 WHERE discipline) |
+
+## Revision 2026-09-02 — measured V4 reality (step 0 run; supersedes the V4 mechanism above)
+
+`check-base-uri.py` (RPC, Brandon) + `v4-dir-audit.py` (gateway) measured what the plan had
+assumed. Facts:
+
+- **Both V4-family base URIs are ALREADY IPFS directories** (`ipfs://<dirCID>/<tokenId>`,
+  entries named by full decimal tokenId):
+  - Truth `0xBb12686c…` → `ipfs://QmQjzvrvZjzNGiqQhTGsiHeTpb9FmEcjCVWxVySf5FANC1/` (896 entries)
+  - crystalline `0xBE0A4E26…` → `ipfs://QmY67Gq1514Zj1yWtHxoHeoVj8FpFLM5ZNSNQejjirxKTo/` (9,048 entries)
+  The phase-3 `setTokenBaseURI` switch already happened for these contracts at some point —
+  the V4 **link layer is FF-free today**; what can still be dirty is the doc contents.
+- **Truth needs NO metadata fix, NO tx — and (corrected 2026-09-02, after the DB export)
+  NO DB align either.** All 896 on-chain docs' media are `ipfs://` (audit:
+  `v4_audit_truth.csv`, chain_needs_fix 0), and the export showed
+  `artworks.metadata.ipfs_cid` = `<dirCID>/<tokenId>` for every token — the DB points INTO
+  the same on-chain directory; there is no stale doc pointer. (The earlier "DB drift"
+  reading was wrong: it checked `alternativePreviewURI` at the SERIES level, which is null.)
+  The census's 128 CDN-class Truth rows come from the **per-ARTWORK
+  `alternativePreviewURI` overlay**: api/swap.go's V3+/V4 branch captures
+  `art.Metadata.AlternativePreviewURI` and overwrites `animation_url` after the doc fetch
+  (`FIXME temporary solution to support broken art on OpenSea`); relative values get the
+  CDN host via `thumbnail.GetPreviewURL`. Evidence: filum #1's API animation ts
+  (1706081014) matches neither the chain doc (ipfs) nor `preview_uri` (1695225066).
+  CONFIRMED by `step2/export-v4-overlay.sql` (run 2026-09-02): exactly 128 overlay rows,
+  all filum, all `previews/71e2bed5…/1706081014/index.html?…`; **crystalline has ZERO
+  overlays** (its post-rebuild API path is unobstructed). That puts Truth's 128 in the
+  SAME class as Ten Whistlegraphs — an overlay/product decision, explicitly out of this
+  phase's hard boundary ("no overlay decisions") — the chain path a wallet follows is
+  already clean. Status-page classification is where it surfaces, not this pipeline.
+- **DB convention learned from the export (matters for crystalline's SQL):**
+  `artworks.metadata.ipfs_cid` on V4 contracts holds a PATH `<dirCID>/<tokenId>`, not a
+  bare doc CID (`IpfsGatewayGet` fetches it as-is). So crystalline's post-rebuild
+  bookkeeping is: set `ipfs_cid = '<newDirCID>/<tokenId>'` WHERE it still equals
+  `'<oldDirCID>/<tokenId>'` — the same single dir root across all 9,048 rows, WHERE-pinned
+  per token.
+- **crystalline is the real V4 fix**: audit `v4_audit_crystalline.csv` — 9,048/9,048 on-chain
+  docs carry CDN media (image + animation_url), full population coverage, none missing.
+  Per-token API-vs-chain media URLs compared 2026-09-02: 9,048/9,048 identical — no
+  Truth-style drift signal. Still owed before its DB-align SQL: the CID-level check
+  (`artworks.metadata.ipfs_cid` vs the dir entry's doc CID, from a DB export — same
+  discipline as Truth; the UPDATE's WHERE pins the DB's own value either way, and any
+  CID mismatch found gets the old-vs-chain doc diff before inclusion).
+  Pipeline: fetch all 9,048 docs from the on-chain dir (authoritative source — not the DB) →
+  byte-preserving media-key rewrite → build ONE new directory with entries named by full
+  decimal tokenId → pin on prod-02 → **one `setTokenBaseURI("ipfs://<newDir>/")` tx**
+  (onlyOwner — owner() recorded by check-base-uri.py; confirm the vault holds that key) →
+  align `artworks.metadata.ipfs_cid` to the new doc CIDs (bookkeeping) → OpenSea refresh.
+  Compatibility check before the tx: render one token from the new dir path on
+  OpenSea/indexer staging the way phase 3 planned it.
+- Consequences for the tools table: `audit.py`'s planned "V4 mode reading the DB export" is
+  replaced by `v4-dir-audit.py` (chain-dir-driven); `gen.py` consumes the audit CSV;
+  `gen-sql.py`'s V4 variant now aligns DB → chain (Truth) or DB → new dir (crystalline).
+- V3 mechanism unchanged (verified same run: all six V3 contracts answer
+  `https://ipfs.bitmark.com/ipfs/<bare CID>`; per-token `updateArtworkEditionIPFSCid` stands
+  — note the V3 gateway host is ipfs.bitmark.com, not ipfs.feralfile.com as the
+  acceptance bullet above guessed).
+- **V3 full-contract chain audit (2026-09-02, `v3_audit.csv`, 2,476 tokens): needs_fix
+  2,341 — EXACTLY the census set, zero drift in either direction.** Single base URI across
+  all six contracts; trustee/owner per contract in `v3_audit.contracts.csv`; no legacy-format
+  tokens. Two findings beyond the counts:
+  - **135 Peer to Peer tokens have `data:application/json;base64` tokenURI** (fully inline
+    on-chain metadata): `animation_url` is inline `data:text/html` (FF-free), `image` is an
+    FF-gateway URL — no CDN anywhere, so out of phase-2 scope; the gateway-named image is
+    phase-3's normalization class.
+  - **590 of the 2,341 carry RELATIVE image paths on chain**
+    (`previews/<uuid>/<ts>/_unique-thumbnails/N-large.jpg`, no scheme/host) — the API
+    prefixes the CDN host when serving, so the census showed full URLs; on chain these are
+    unresolvable for any wallet. All 590 fall inside `_unique-thumbnails/` subtrees of
+    preview dirs already in the 104-unit mirror list (13 dirs). The gen rewrite rule must
+    treat a relative `previews/…`/`thumbnails/…` value as a CDN link (implied host) and
+    rewrite it to `ipfs://<unitCID>/<subpath>`. Related: the server's own IPFS uploads
+    historically EXCLUDED `_unique-thumbnails` (`internal/infra/ipfs/ipfs.go` exclusion
+    regex) — the phase-2 mirror deliberately includes them.
+  With crystalline (9,048, all needs_fix) and Truth (896, none) audited on 9/02 as well,
+  every phase-2 contract now has a chain-authoritative fix list; the 104-unit mirror list is
+  final (chain CDN URL coverage: 100%; only crystalline's own dir and Truth's drift dir are
+  not referenced by V3 docs, both accounted for).
 
 ## The plan
 
@@ -198,7 +366,7 @@ Everything verified so far, so the next phase starts from facts, not archaeology
 ## Working notes
 
 - `tools/pin-referenced`, `tools/census-rescan`, `tools/archive-probe`: unchanged, use as in phase 1.
-- Phase-1 runbooks to mirror: `tools/v2-metadata-regen/README.md` (pipeline + data policy),
+- Phase-1 runbooks to mirror: `tools/metadata-regen/README.md` (pipeline + data policy),
   `tools/update-token-uri/README.md` (vault signing, quiet window, trial-first),
   `ops/bitmark-cdn-retirement/SUMMARY.md` (what a finished phase record looks like).
 - RPC notes: 1rpc.io free tier exhausted this week; publicnode/flashbots DNS-blocked on this
