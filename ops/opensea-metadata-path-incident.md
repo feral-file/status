@@ -35,7 +35,7 @@ and that duplicate was then **delisted for a "suspected Terms of Service violati
    `ops/bitmark-cdn-retirement/audit_2026-08-28.csv`). The "goes through the FF API"
    behaviour lives on OpenSea's side of the integration, not on chain.
 3. **The on-chain metadata docs have NO collection fields.** Checked raw docs for
-   three contracts incl. this one (`tools/v2-metadata-regen/src/` cache): no
+   three contracts incl. this one (`tools/metadata-regen/src/` cache): no
    `collection_name`, no `collection_uuid`. Byte-preserving regen means the new docs
    don't either. Note: Infinite Entropy's docs are the **2021 legacy format**
    (`bitmark_id`, `prev_provenance`, no `id`/`symbols`/`access_artwork_files`) — one
@@ -114,7 +114,7 @@ verified collection → automated fake-collection detection → duplicate delist
    config (collection metadata editor / contract-level settings) so the docs can be
    FF-free without regrouping risk. This decision gates phase 3's
    `setTokenBaseURI` switches too.
-4. Before unpausing: re-run `tools/opensea-delist-scan.py` after any V3 trial
+4. Before unpausing: re-run `tools/opensea/delist-scan.py` after any V3 trial
    contract (smallest first) as the canary check.
 
 ## Separate finding — background item-level delists (not phase-2 blocking)
@@ -128,7 +128,7 @@ CSV (`group=control:untouched, status=DelistedItem`).
 
 ## Artifacts
 
-- Scanner: `tools/opensea-delist-scan.py` (public persisted GraphQL, no auth,
+- Scanner: `tools/opensea/delist-scan.py` (public persisted GraphQL, no auth,
   resumable; `DelistedItem` typename = delisted)
 - Scan state/report: `ops/cdn-retirement-phase2/opensea_delist_state.jsonl`,
   `…/opensea_delist_report.csv`

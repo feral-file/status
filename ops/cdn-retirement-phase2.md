@@ -110,6 +110,17 @@ Owner: Sean/Hieu + (for source-file changes) the artists. The HLS precedent repl
 playlists with MP4s under operator authority — a written rule for when touching the work
 is OK would close this class permanently.
 
+## Where things stand — see STATUS.md (2026-09-04)
+
+Current state, remaining work, and all close-out numbers live in
+`ops/cdn-retirement-phase2/STATUS.md` (updated 2026-09-04): the V3 arc is
+CLOSED end-to-end (2,341/2,341 chain txs + DB align + reference rows +
+explicit pins), crystalline's DB align is applied ahead of its pending owner
+tx, and what remains is census close-out, the #3435 checkpoint, and the unpin
+backlog. The section below is the 2026-09-01 snapshot, kept as history.
+Side-track closed along the way: nonipfs-scan (status PR #10) — the 5 Art of
+Survival thumbnail 403s were fixed at origin 2026-09-02 and verified.
+
 ## Where things stand (2026-09-01)
 
 - **Phase 1 (Bitmark-era) is done.** Goal 1: swap code fails closed, all 4,959 still-Bitmark
@@ -214,11 +225,11 @@ Server-side pieces still used, deliberately small:
 
 | tool | change |
 |---|---|
-| `tools/v2-metadata-regen/audit.py` | V3: works as-is (same `tokenURI`/`artworkEditions` ABI; note V3 tokenURI has NO `/metadata.json` suffix — the cid parser needs that case). V4: new mode — the "current metadata" comes from `artworks.metadata.ipfs_cid` (DB export) fetched via gateway, not from the chain; chain read only confirms `tokenBaseURI` |
-| `tools/v2-metadata-regen/gen.py` | works as-is once the export supplies (token, current doc CID, refs, medium); keys confirmed `animation_url`/`image` for V3/V4 too (server `GenerateEthereumArtworkMintingMetadata` emits the same map; still diff one live doc per series before running). Rewrite rule = phase 1 exactly: replace a media value iff it is a CDN link (`cdn.feralfileassets.com`/`imagedelivery.net`), preserve query params (`--allow-param-diff` only with code evidence), leave every other value — including FF-gateway URLs — byte-identical |
+| `tools/metadata-regen/audit.py` | V3: works as-is (same `tokenURI`/`artworkEditions` ABI; note V3 tokenURI has NO `/metadata.json` suffix — the cid parser needs that case). V4: new mode — the "current metadata" comes from `artworks.metadata.ipfs_cid` (DB export) fetched via gateway, not from the chain; chain read only confirms `tokenBaseURI` |
+| `tools/metadata-regen/gen.py` | works as-is once the export supplies (token, current doc CID, refs, medium); keys confirmed `animation_url`/`image` for V3/V4 too (server `GenerateEthereumArtworkMintingMetadata` emits the same map; still diff one live doc per series before running). Rewrite rule = phase 1 exactly: replace a media value iff it is a CDN link (`cdn.feralfileassets.com`/`imagedelivery.net`), preserve query params (`--allow-param-diff` only with code evidence), leave every other value — including FF-gateway URLs — byte-identical |
 | `check-dirs.py`, `verify-media.py`, `pin.sh` | as-is |
 | `tools/update-token-uri` | V3 support only this phase: gateway-check for suffix-less tokenURI; per-contract configs unchanged (base-URI extensions belong to phase 3) |
-| `tools/v2-metadata-regen/gen-sql.py` | add the V4/V3 variant: `artworks.metadata.ipfs_cid` UPDATE keyed on the old value (phase-1 WHERE discipline) |
+| `tools/metadata-regen/gen-sql.py` | add the V4/V3 variant: `artworks.metadata.ipfs_cid` UPDATE keyed on the old value (phase-1 WHERE discipline) |
 
 ## Revision 2026-09-02 — measured V4 reality (step 0 run; supersedes the V4 mechanism above)
 
@@ -355,7 +366,7 @@ Everything verified so far, so the next phase starts from facts, not archaeology
 ## Working notes
 
 - `tools/pin-referenced`, `tools/census-rescan`, `tools/archive-probe`: unchanged, use as in phase 1.
-- Phase-1 runbooks to mirror: `tools/v2-metadata-regen/README.md` (pipeline + data policy),
+- Phase-1 runbooks to mirror: `tools/metadata-regen/README.md` (pipeline + data policy),
   `tools/update-token-uri/README.md` (vault signing, quiet window, trial-first),
   `ops/bitmark-cdn-retirement/SUMMARY.md` (what a finished phase record looks like).
 - RPC notes: 1rpc.io free tier exhausted this week; publicnode/flashbots DNS-blocked on this
