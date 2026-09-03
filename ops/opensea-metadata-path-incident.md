@@ -49,12 +49,18 @@ and that duplicate was then **delisted for a "suspected Terms of Service violati
    **15/15 refreshed tokens = `DelistedItem`**; of the 9 untouched, 8 = `Item`
    (pages load via direct URL) and 1 (`…7086293946`, Infinite Entropy 5 #1) is also
    item-delisted (was already delisted when first checked; timing unknown).
-5. **No other collection is affected.** Scan of every repointed token + per-contract
-   untouched controls (`tools/opensea-delist-scan.py`; state
-   `ops/cdn-retirement-phase2/opensea_delist_state.jsonl`): 5,287/6,179 scanned at
-   writing, **15 delisted, all on this one contract; 5,272 normal across the other
-   16 contracts**. (Final report: `ops/cdn-retirement-phase2/opensea_delist_report.csv`
-   once the scan completes.)
+5. **No other collection is affected BY OUR UPDATE — final scan (6,179 tokens).**
+   Fixed tokens: **15/5,930 delisted, all on this contract; 0 of the 5,865 fixed
+   tokens on the other 16 contracts** (HLS 50 included, all clean). Controls
+   (untouched tokens on the same contracts): **12/249 delisted** — 1 on this
+   contract + 11 scattered over 6 others (Primordium ×3, 0x29c9e04e ×3,
+   0x7a9ea7 ×2, 0x63c828/0x7a15b3/Rewilded ×1 each). So untouched FF tokens carry
+   a ~4–5% BACKGROUND item-delist rate (individual flags, reasons unknown,
+   unrelated to our refresh — fixed tokens on those same contracts have zero),
+   while Infinite Entropy's 15/15 stands far above background and has the
+   duplicate-collection mechanism behind it. The 11 background delists are a
+   SEPARATE follow-up (see below). Report:
+   `ops/cdn-retirement-phase2/opensea_delist_report.csv`.
 6. **The `ipfs://` format itself is fine.** OpenSea translates `ipfs://<cid>?query`
    to its own gateway with query params preserved (observed live:
    `ipfs2.seadn.io/ipfs/<cid>/?edition_number=1&blockchain=ethereum`), and ~2,027 V2
@@ -110,6 +116,15 @@ verified collection → automated fake-collection detection → duplicate delist
    `setTokenBaseURI` switches too.
 4. Before unpausing: re-run `tools/opensea-delist-scan.py` after any V3 trial
    contract (smallest first) as the canary check.
+
+## Separate finding — background item-level delists (not phase-2 blocking)
+
+11 untouched tokens across 6 contracts are individually delisted on OpenSea with
+no connection to our updates (their contracts' FIXED tokens are all clean).
+Sampled controls were only ~15/contract, so extrapolated across all FF tokens the
+true count could be substantially higher. Worth a full-population sweep with the
+same scanner and its own investigation/appeal track. Token list is in the report
+CSV (`group=control:untouched, status=DelistedItem`).
 
 ## Artifacts
 
