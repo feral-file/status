@@ -80,13 +80,19 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    a CDN copy whose only difference from the IPFS version is 168 bytes of
    `crossorigin="anonymous"` on 7 `<img>` tags in index.html (load-bearing:
    WebGL readPixels; see `ops/cdn-retirement-phase2.md` § Pending decisions).
-   Pipeline path is the crystalline one exactly: patched dir → rebuild the
-   tokenId metadata dir → one `setTokenBaseURI` (onlyOwner, same owner
-   `0x1d05cf6c…`) → DB align → drop the overlay. **Gate:** the artist's
-   sign-off on the patched bytes (Sean is asking the artists, #3435
-   2026-09-04). Prep that needs no sign-off can start now: build the patched
-   dir, byte-diff it against the CDN copy, verify the 7-attribute patch is the
-   only change, stage the regen, dry-run the tx.
+   **Prep DONE 2026-09-08 (`filum/README.md`)**: all 11 artwork files
+   byte-compared IPFS vs CDN (10 identical, index.html = the 7 attributes
+   only); patched artwork dir built → `QmQ8qYSYNdiWR5Pjgqudnckf2Mk2R7mkK8T4L12Q3rnCWV`;
+   128 docs rewritten (animation_url dir CID only, reverse-substitution
+   proven), 768 untouched → new base dir
+   `QmZTedFYmyhEH7G77BTnuVk7DHrYWJzdHaWK4wMeXwkPVo`; both CIDs computed
+   offline with the flags that reproduce the current dirs bit-for-bit.
+   **Remaining, operator**: pin on prod-02 via the tunnel
+   (`filum/pin-and-verify.sh`), render check, DB export
+   (`filum/export-truth-db.sql`), then — **gated on the artist's sign-off**
+   (Sean asking, #3435 2026-09-04) — one `setTokenBaseURI` owner tx
+   (`v4-base-uri.config.filum.example.json`, same flow as crystalline) and
+   the DB align (`gen-filum-sql.py`: 896 path swaps + 128 overlay drops).
 2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) — DEFERRED.** Overlay to
    aesthetic.computer (third-party by choice). Decision pending with
    Sean/Hieu; nothing to run. Status page reclassification only.

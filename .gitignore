@@ -16,3 +16,5 @@ tools/update-token-uri/config.json
 tools/update-token-uri/config.v3.json
 tools/update-token-uri/v4-base-uri.config.json
 tools/update-tezos-metadata/config.json
+# filum fix build tree (reproducible: tools/metadata-regen/filum-build.py)
+ops/cdn-retirement-phase2/filum/build/
