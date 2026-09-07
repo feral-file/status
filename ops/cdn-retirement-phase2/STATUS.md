@@ -1,18 +1,32 @@
-# Phase-2 status — V3 arc CLOSED end-to-end; census close-out + crystalline tx remain
+# Phase-2 status — pipeline CLOSED for every platform-minted token; filum next, census deferred
 
-*Updated 2026-09-04 (supersedes HANDOFF-2026-09-04.md). Owner: Brandon.
-Plan + history: `ops/cdn-retirement-phase2.md`. OpenSea incident (read BEFORE
-touching anything OpenSea-facing): `ops/opensea-metadata-path-incident.md`.
+*Updated 2026-09-08 (supersedes the 2026-09-04 version). Owner: Brandon.
+Plan + history: `ops/cdn-retirement-phase2.md`. OpenSea incident + collection
+freeze (read BEFORE touching anything OpenSea-facing):
+`ops/opensea-metadata-path-incident.md`, `ops/opensea-metadata-path/README.md`.
 Intermediates referenced below were removed in the 2026-09-04 repo cleanup
 (`ops/repo-cleanup-2026-09-04.md`); their conclusions are recorded here, and
 every input is regenerable (chain / IPFS pins / fresh DB export).*
 
-## DONE — the full V3 arc (all verified)
+## Where this stands in one paragraph
+
+Every token minted through the Feral File server whose metadata media pointed
+at the CDN has been repointed on chain and in the DB: V2 (5,880, goal 2), V3
+(2,341) and crystalline (9,048, one `setTokenBaseURI`, **landed** — see
+below). What remains on the platform-minted side is exactly the two
+`alternativePreviewURI` overlays, **filum 128 + Ten Whistlegraphs 39**.
+filum is next; Ten Whistlegraphs is deferred. The census rerun + status page
+rebuild is deliberately held until all of it is done, so it runs once.
+A new track opened on 2026-09-04 from OpenSea's audit: tokens on contracts we
+deployed manually (not through the server) — their media CDN handling and how
+their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
+
+## DONE — the full V3 + crystalline arc (all verified)
 
 - **Step 0** population rebuilt: 11,517 tokens, 104 pin units; every contract
   chain-audited (V3 2,341 needs_fix = census exactly; crystalline 9,048/9,048;
   Truth 0 — its 128 census-CDN rows are the filum `alternativePreviewURI`
-  overlay, out of scope). Summary CSVs in `step0/`.
+  overlay). Summary CSVs in `step0/`.
 - **Step 1** all 104 CDN units (40.2 GB, 74k files) mirrored and pinned on
   prod-02, ff-gateway byte-verified — registry: `step1/dir_cids.csv`
   (104/104 verified=yes). prod-02 ~727 GB of 900 GB.
@@ -48,29 +62,66 @@ every input is regenerable (chain / IPFS pins / fresh DB export).*
   by the 6 staging-root pins) — all given direct pins via
   `tools/pin-referenced/batch_pin.py`. Referenced set is now 100% explicitly
   pinned; staging roots decoupled and unpinnable later.
-- **crystalline DB align (2026-09-04, deliberate DB-leads-chain exception)**:
-  9,048/9,048 path-form UPDATEs applied
+- **crystalline DB align (2026-09-04)**: 9,048/9,048 path-form UPDATEs applied
   (`tools/db-align-sql/gen-v4-sql.py`, old dir `QmY67Gq1514Zj1yWtHxoHeoVj8FpFLM5ZNSNQejjirxKTo`
-  → new dir `QmNP6RC7…`). **The DB leads the chain until the owner tx lands**;
-  if the tx is ever abandoned, revert by regenerating with the dirs swapped.
+  → new dir `QmNP6RC7…`). Was a DB-leads-chain exception until the tx below.
+- **crystalline owner tx — LANDED.** Verified on chain 2026-09-08 by reading
+  `tokenURI` on `0xBE0A4E26a156B2a60cF515E86b3Df9756DEE1952` through a public
+  RPC: it returns `ipfs://QmNP6RC7…/<tokenId>`. The DB-leads-chain exception
+  is closed; DB and chain agree. Broadcast was done by the owner-key holder
+  per `RUNBOOK-crystalline-base-uri.md`; the tx hash is not recorded here
+  (the chain is the receipt — look up the contract's latest owner tx if it is
+  ever needed).
 
 ## NOT DONE — in order
 
-1. **HARD RULE unchanged: no OpenSea metadata refresh** for V3 or crystalline
-   until OpenSea confirms the metadata-path fix (refresh is the known
-   re-bucketing trigger). Delist monitoring is on OpenSea's side (Ryan
-   thread); `tools/opensea/delist-scan.py` remains for spot-checks.
-2. **crystalline owner tx** — with the key-holding teammate:
-   `RUNBOOK-crystalline-base-uri.md` (one `setTokenBaseURI` tx; config
-   example prefilled; `tools/update-token-uri/v4-base-uri.mjs`). DB side is
-   already done (see above) — after the tx lands, nothing further.
-3. **Close-out measurement**: census on prod-02 → `census-rescan` → status
-   page rebuild → `census/<date>` branch → PR. Target: ETH `dependent` drops
-   11,389 → ~167 (overlay-only: filum 128 + Ten Whistlegraphs 39).
-4. **#3435 checkpoint comment** — everything since 9/1 is unreported (V3
-   completion + DB/reference/pin close-out + OpenSea incident); write it once
-   census numbers are in.
-5. **Unpin backlog** — only after the census confirms nothing references
+1. **filum (Truth `0xBb12686c360e9057be3CD031140035A705e19ceC`, 128 tokens)
+   — NEXT.** The `alternativePreviewURI` overlay points the display layer at
+   a CDN copy whose only difference from the IPFS version is 168 bytes of
+   `crossorigin="anonymous"` on 7 `<img>` tags in index.html (load-bearing:
+   WebGL readPixels; see `ops/cdn-retirement-phase2.md` § Pending decisions).
+   Pipeline path is the crystalline one exactly: patched dir → rebuild the
+   tokenId metadata dir → one `setTokenBaseURI` (onlyOwner, same owner
+   `0x1d05cf6c…`) → DB align → drop the overlay. **Gate:** the artist's
+   sign-off on the patched bytes (Sean is asking the artists, #3435
+   2026-09-04). Prep that needs no sign-off can start now: build the patched
+   dir, byte-diff it against the CDN copy, verify the 7-attribute patch is the
+   only change, stage the regen, dry-run the tx.
+2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) — DEFERRED.** Overlay to
+   aesthetic.computer (third-party by choice). Decision pending with
+   Sean/Hieu; nothing to run. Status page reclassification only.
+3. **HARD RULE, narrowed 2026-09-04: no OpenSea metadata refresh for the 17
+   unbound special-project collections** (Ryan: on hold, refreshes paused
+   there). Everything platform-minted is frozen and bound on OpenSea's side;
+   the resume/pause split from Ryan's mail stands. Still: do not dispatch a
+   platform-wide refresh without checking `ops/opensea-metadata-path/README.md`
+   first.
+4. **Special-project class (contracts deployed manually from our address,
+   not through the server) — NEW TRACK.** Two problems, one population:
+   (a) OpenSea `collection_uuid` for this class is derived per token
+   (uuid5 of the embedded `collection_name`), so it forks on any name
+   inconsistency; OpenSea holds **57** such collections (17 unbound, 15 bound
+   to v5 values, the rest unbound variants), and five projects have already
+   forked (a2p-v1 ×2, a2p-v2 ×2, aorist-art ×3, artificial-natural-history
+   ×2, temporally-uncaptured ×2, plus coral-arena). Ryan: uuid version is
+   irrelevant to them; what matters is one stable value per collection. We
+   owe Ryan a pinned mapping for all 57 with a winner per fork (promised
+   "next week" on 2026-09-04 = this week). (b) Their media: these tokens have
+   no series rows in our DB, so none of the phase-2 tooling (census pin
+   units, `ipfs_reference`, regen) covers them — their CDN dependency is
+   unmeasured. Enumerate the population from the chain/OpenSea list first
+   (`ops/opensea-metadata-path/opensea_ff_collections_full_2026-09-04.csv`,
+   categories 2/3/7), then decide the storage design for the pinned uuid
+   (server-side, since there are no series rows) before touching media.
+5. **Close-out measurement — ONE run, after 1 (and the decisions on 2/4).**
+   census on prod-02 → `census-rescan` → status page rebuild →
+   `census/<date>` branch → PR. Expected today if run: ETH `dependent`
+   11,389 → ~167 (overlay-only); after filum → ~39.
+6. **#3435 checkpoint comment** — everything since 9/3 is unreported (V3 DB
+   align + reference rows + explicit pins, crystalline tx landed, OpenSea
+   freeze + Ryan's audit, filum-first ordering). Post it with the census
+   numbers, or before if the wait for 1 stretches.
+7. **Unpin backlog** — only after the census confirms nothing references
    them; re-derive the reference set first. Candidates: superseded HLS dirs,
    old V2 metadata dirs, old V3 doc CIDs (old halves of `step3/updates_0x*.csv`),
    crystalline old dir `QmY67Gq1…`, the 6 V3 staging roots
@@ -78,20 +129,29 @@ every input is regenerable (chain / IPFS pins / fresh DB export).*
 
 ## Parallel / pending (not blocking)
 
-- **OpenSea/Ryan thread**: restore IE's 15 tokens, remove duplicate
-  collection, per-collection metadata-source list; confirm bypass from FF API
-  access logs (prod-01, refresh window 2026-09-01). Background item-delists:
-  11 untouched tokens on 6 contracts (~4-5% control rate), separate sweep +
-  appeal track. Report: `opensea_delist_report.csv`.
-- **Overlay/product decisions**: filum 128 (7-attribute crossorigin patch
-  would make the IPFS version whole — needs artist sign-off) + Ten
-  Whistlegraphs 39. See `ops/cdn-retirement-phase2.md` § Pending decisions.
-- **Scheduled archive-probe** (Sean's two independent checks; both nodes on
-  kubo 0.43); ff-pin-1 pre-upgrade DO snapshot deletable after ~2026-09-05.
-- **agentic-workflows**: upstream issue for the 21 contract-held Tezos works
-  (census refetch drops them; rescan mode A is the workaround).
+- **OpenSea (Ryan thread), state 2026-09-04**: Infinite Entropy FIXED (bound
+  to `71513905-…`, 24/24 tokens back in the verified collection, duplicate
+  empty); five collections bound (IE, Study for Unsupervised, MONOPOLY SET,
+  Peer to Peer Launch Party Exclusive, Inaugural SuperBridge Summit); 198
+  tokens moved from exhibition-level groupings into their series (36 Points,
+  Venuses included). Total 410 FF collections on their side, breakdown in
+  `ops/opensea-metadata-path/README.md`. Background item-delists (11 untouched
+  tokens on 6 contracts, ~4-5% control rate): separate sweep + appeal track,
+  report `opensea_delist_report.csv`.
+- **Scheduled archive-probe** (Sean's two independent checks: real child
+  bytes through a public gateway + ff-pin-1 itself listed as provider for
+  every manifest root; both nodes on kubo 0.43). Not yet scheduled; ff-deploy
+  has no job for it. ff-pin-1 pre-upgrade DO snapshot is past its
+  ~2026-09-05 keep date — delete.
+- **agentic-workflows**: upstream regression for the 21 contract-held Tezos
+  works (census refetch still drops them after #50; rescan mode A is the
+  workaround). Not filed yet.
+- **Manifest v2 `setManifest`** (#3502, Sean + Safe signers): still open,
+  live page `archive_registry.version` = 1.
 - **nonipfs-scan (closed)**: status PR #10; the 5 Art of Survival thumbnail
   403s were fixed at origin 2026-09-02 and verified.
+- **Open PRs**: status #10 (nonipfs-scan), #11 (this branch,
+  tools/phase2-step0) — merge.
 
 ## goal-2 / V2 rollout receipts (2026-09-01..03)
 
@@ -117,6 +177,9 @@ every input is regenerable (chain / IPFS pins / fresh DB export).*
 
 - OpenSea per-token metadata source varies (FF API vs direct tokenURI) —
   grouping comes from API-injected collection_name/uuid; direct reads lose it.
+  Since 2026-09-04 both fields are stored explicitly on every ETH series
+  (`ops/opensea-metadata-path/freeze_collection_fields.sql`); new series
+  still need a server-side guard so they don't fall back to derivation.
 - `artworks.metadata.ipfs_cid`: V4 = PATH `<dirCID>/<tokenId>`; V3 = bare CID
   (confirmed 2026-09-04); V2 uses `swaps.ipfs_cid`.
 - The CDN rewrites `generated_images/<name>?variant=<v>` →
@@ -124,13 +187,14 @@ every input is regenerable (chain / IPFS pins / fresh DB export).*
 - V3 has no `trustee()` getter — authorization proven via per-token eth_call
   dry-runs; sender was `0xbeb9f810…` (same vault key as goal-2). V4/V4_2
   `setTokenBaseURI` is **onlyOwner** (owner `0x1d05cf6c…`, key held by a
-  teammate, not the platform trustee key).
+  teammate, not the platform trustee key). Truth (filum) is the same shape.
 - kubo API: pin/add streams errors after the 200 header (check for `"Pins"`
   in the body); prefer batched pin/add (multiple `arg`s per call — 2,341
   one-by-one calls froze; `tools/pin-referenced/batch_pin.py`); big uploads
   go per-file/batched into MFS, never one giant POST; `sort | head -1` under
   pipefail dies on SIGPIPE for big lists.
-- Public RPCs are DNS-blocked on this network — use Infura; Etag parsing:
-  strip `W/` prefix then quotes only (`.strip('"W/')` eats trailing W's).
+- Public RPCs: most are DNS-blocked or rate-limited on this network — use
+  Infura; `1rpc.io/eth` worked for a read on 2026-09-08. Etag parsing: strip
+  `W/` prefix then quotes only (`.strip('"W/')` eats trailing W's).
 - psql discipline: generators emit `BEGIN;` without `COMMIT` — first run with
   `-f` is a free dry-run (rollback on disconnect), append `COMMIT` to apply.

@@ -99,3 +99,75 @@ displays). Re-check after the fix: 30/30 tokens return the expected `collection_
 Re-run: `python3 tools/opensea/collection-metadata-scan.py --state … --out … --md … --refresh`
 (≈25 min at 1 OpenSea page/s); use `--series <id>` for a single collection as a canary
 after OpenSea re-points it.
+
+---
+
+# 2026-09-04 — grouping fields frozen; OpenSea's audit reconciled; special-project class opened
+
+## What we did
+
+- **Froze both grouping fields on every ETH series** (`freeze_collection_fields.sql`, as
+  applied): `collectionUUID := series.id` where unset (280 rows) and
+  `collectionName := "<title> by <PrettyAlias(artist)>"` where unset (283 rows). Values
+  are exactly what the API already returned (verified live before applying: uuid 439/442
+  equal + 3 n/a, name 283/283 equal), so OpenSea saw zero change; what changed is that a
+  series-row rebuild or an alias/title edit can no longer move a token to a new
+  collection. Pre-freeze snapshot: `collection_uuid_audit.csv` (280 FALLBACK / 162 FROZEN).
+- **Sent OpenSea the authoritative mapping**: `opensea_collection_mapping_2026-09-04-2.csv`
+  — 440 series → 294 collections (the `-2` version drops two internal English-auction test
+  series, see `followup_to_ryan_csv_correction.md`). Cover letter:
+  `reply_to_ryan_2026-09-04.md`.
+- **Still open server-side**: new series fall back to derivation until someone sets the
+  fields — a publish-time guard in `api/swap.go` (write `collectionUUID`/`collectionName`
+  on series creation, or CI check) is needed so the freeze doesn't erode. Not filed yet.
+
+## What OpenSea did / answered (`ryan_reply_2026-09-04.md`, attachment
+`opensea_ff_collections_full_2026-09-04.csv`)
+
+| | |
+|---|---|
+| Infinite Entropy | **fixed**: bound to `71513905-…`, 24/24 tokens back in the verified collection, duplicate empty |
+| Bound to our CSV values | 5 collections: Infinite Entropy, Study for Unsupervised, MONOPOLY SET, Peer to Peer Launch Party Exclusive, Inaugural SuperBridge Summit |
+| Regrouped | 198 tokens moved from exhibition-level groupings into their series (36 Points, Venuses included) |
+| uuid version | irrelevant to them (opaque string); what matters: one stable value per collection |
+| The 17 v5 rows | on hold, refreshes paused on them, per our ask |
+
+Their full picture, 410 collections (their `category` column):
+
+| category | n | what it is |
+|---|---|---|
+| 1 live series in our mapping | 291 | done |
+| 2 v5 special-project awaiting freeze | 17 | non-platform contracts, unbound |
+| 3 bound to uuid not in our mapping | 39 | 23 IE duplicates (emptied) + 15 special-project bound to v5 |
+| 4 exhibition-level grouping | 33 | theirs, one per exhibition, expected |
+| 5 auto-created duplicate | 5 | emptied |
+| 7 unbound / unidentified | 25 | almost all special-project class |
+
+## The special-project class (NEW — next OpenSea deliverable, promised for the week of 2026-09-07)
+
+Contracts we deployed manually from our address but never published through the server
+(Aorist-era projects, a2p, chromatophores, launch-party/summit drops…). No series rows in
+our DB, so the API serves their metadata straight from the on-chain docs and derives
+`collection_uuid = uuid5(namespace, collection_name)` **per token** (live since
+2025-07-21). OpenSea holds **57** such collections; five projects have already forked from
+name inconsistencies (a2p-v1 ×2, a2p-v2 ×2, aorist-art ×3, artificial-natural-history ×2,
+temporally-uncaptured ×2) plus the coral-arena capitalization split.
+
+What "done" needs:
+1. A pinned uuid **per collection** (not per token), stored server-side (no series rows
+   to hang it on — design needed in `feral-file-server`), covering all 57, with a chosen
+   winner for each fork. v5-derived values can stay as the stored value (Ryan: no cost
+   either way; keeping them avoids rebinding the 15 already bound).
+2. Send OpenSea the 57-row mapping; they rebind the 17 + fork losers and resume refreshes.
+3. Separately (`ops/cdn-retirement-phase2/STATUS.md` item 4): these tokens are outside
+   every phase-2 tool (no series → no census pin units, no `ipfs_reference`), so their
+   media CDN dependency is unmeasured. Enumerate from the chain before deciding.
+
+## Files (this section)
+
+- `freeze_collection_fields.sql` — the two UPDATEs as applied 2026-09-04
+- `collection_uuid_audit.csv` — pre-freeze snapshot of every ETH series' effective uuid/state
+- `opensea_collection_mapping_2026-09-04-2.csv` — **authoritative mapping sent to OpenSea** (440 → 294)
+- `reply_to_ryan_2026-09-04.md`, `followup_to_ryan_csv_correction.md` — what we sent
+- `ryan_reply_2026-09-04.md` — what OpenSea answered
+- `opensea_ff_collections_full_2026-09-04.csv` — OpenSea's 410-row attachment (their view; the 57-collection class is categories 2/3/7)

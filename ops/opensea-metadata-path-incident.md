@@ -1,9 +1,10 @@
 # OpenSea metadata-path incident — refresh bypassed the Feral File API, tokens re-bucketed into an auto-generated duplicate collection, duplicate delisted
 
-*Written 2026-09-04 for the next agent. Owner: Brandon. Self-contained — no prior
-conversation context needed. Tracks feral-file/feral-file#3435 (phase-2 rollout is
-PAUSED on this incident). An email describing it has been sent to Ryan at OpenSea
-(subject: "Feral File: collection delisted after metadata refresh — request for help").*
+*Written 2026-09-04 for the next agent; resolution appended 2026-09-08. Owner: Brandon.
+Self-contained — no prior conversation context needed. Tracks feral-file/feral-file#3435.
+**Status: RESOLVED for Infinite Entropy and the platform-minted contracts (see
+"Resolution" below); the special-project class remains open.** The sections between
+here and "Resolution" are the 2026-09-04 analysis, kept as written.*
 
 ## The problem in one paragraph
 
@@ -90,16 +91,35 @@ verified collection → automated fake-collection detection → duplicate delist
 - Whether OpenSea's fix will be config (re-point integration) or manual
   (merge tokens back + remove duplicate) — asked in the email to Ryan.
 
-## Current state / holds
+## Resolution (2026-09-04) — Infinite Entropy fixed; root cause was our own field drift
 
-- **Phase-2 chain rollout is PAUSED** (V3 ~2,341 txs + crystalline setTokenBaseURI
-  are ready but NOT sent): V3 contracts are the same tokenURI-direct shape, so the
-  same re-bucketing risk applies until the metadata-path question is answered.
-  Everything up to and including doc regen + pinning is done and verified
-  (see `ops/cdn-retirement-phase2.md`).
-- Email sent to Ryan @ OpenSea proposing the fix: point this collection's metadata
-  back at the FF API like the others, restore the 15 into the verified collection,
-  remove the duplicate.
+OpenSea's audit found the real mechanism: our `collection_uuid` for these tokens had
+changed between their original binding (`87eafff7-…`, an old series row id) and what the
+API returns now (`71513905-…`, an explicit uuid set later), so the refresh legitimately
+saw a "new" collection. The per-collection integration is not the issue; the fallback
+derivation in `api/swap.go` (uuid := series row id when unset; name := derived at
+request time) was. Fixed on both sides:
+
+- **Ours**: both fields frozen as explicit values on every ETH series
+  (`ops/opensea-metadata-path/freeze_collection_fields.sql`, 280 + 283 rows, zero
+  visible change), authoritative mapping (440 series → 294 collections) sent.
+- **OpenSea's**: Infinite Entropy bound to `71513905-…`, 24/24 tokens back in the
+  verified collection, duplicate empty; four more collections bound to our values; 198
+  tokens moved from exhibition-level buckets into their series (36 Points, Venuses).
+  Details: `ops/opensea-metadata-path/README.md` § 2026-09-04, `ryan_reply_2026-09-04.md`.
+
+## Current state / holds (2026-09-08)
+
+- **Phase-2 chain rollout resumed and finished** after the freeze: V3 2,341/2,341 txs
+  (2026-09-03) and crystalline `setTokenBaseURI` (landed; verified on chain 2026-09-08).
+- **Refresh rule, narrowed**: platform-minted contracts are frozen + bound — the
+  resume/pause split from Ryan's mail stands. The only hard hold is the **17 unbound
+  special-project collections** (refreshes paused on OpenSea's side too).
+- **Open, and larger than it looked**: the non-platform "special-project" class is 57
+  collections on OpenSea, uuid derived per token, five projects already forked. We owe
+  OpenSea a pinned per-collection mapping (README § special-project class).
+- **Still to file**: the server-side guard so new series get explicit
+  `collectionUUID`/`collectionName` at publish time.
 
 ## What resolution needs (for whoever picks this up)
 

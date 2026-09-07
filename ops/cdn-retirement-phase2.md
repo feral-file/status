@@ -110,6 +110,12 @@ Owner: Sean/Hieu + (for source-file changes) the artists. The HLS precedent repl
 playlists with MP4s under operator authority — a written rule for when touching the work
 is OK would close this class permanently.
 
+**Ordering decided 2026-09-08 (Brandon):** filum first — it is the last platform-minted
+population with a pipeline fix (option a, the crystalline path), and its prep needs no
+sign-off. Sean is asking the artists (#3435, 2026-09-04); the chain tx waits on that.
+Ten Whistlegraphs is deferred (reclassify only). The census/status-page rebuild is held
+until both are settled so it runs once. Live state: `cdn-retirement-phase2/STATUS.md`.
+
 ## Where things stand — see STATUS.md (2026-09-04)
 
 Current state, remaining work, and all close-out numbers live in
