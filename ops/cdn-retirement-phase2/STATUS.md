@@ -115,20 +115,35 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    `collection_name` → one stored value per collection, server-side; every
    token's `collection_name` is now on record; design + the 57-row mapping
    for Ryan (promised week of 2026-09-07) still open.
-5. **Close-out measurement — census 2026-09-08 RUN, close-out in progress.**
-   `token_census_20260908T051950Z.csv` (34,987 tokens scanned, 5 h; +21
-   contract-held Tezos works appended via rescan mode A → 35,008). Two
-   defects in the checker surfaced and were fixed upstream
-   (feral-file/agentic-workflows#52 + ff-deploy#34, not yet deployed):
-   (a) 24,606 ipfs.io / 24,696 dweb.link probes came back HTTP 429 at
-   4 req/s/host with 429 excluded from retries → paced re-probe running
-   (2,477 distinct CIDs; all pass so far); (b) Ethereum metadata was read from
-   feralfile.com/api, so filum's overlay still shows 128 CDN rows although
-   the chain is clean → census now reads `tokenURI` on chain. Expected page
-   numbers from this CSV: `depend entirely on Feral File` 0 (build.py counts
-   a work dependent only when it has NO content-addressed file; filum's
-   thumbnails are IPFS), gateway-gap 0 after the re-probe, third-party 0.
-   Data lands on this branch (PR #11); CI builds the page.
+5. **Close-out measurement — the 2026-09-08 census exposed the checker; the
+   checker was rebuilt; the measurement is re-run next.** The v1 run
+   (`token_census_20260908T051950Z.csv`, 34,987 tokens, 5 h; summary in
+   `census_summary_2026-09-08.md`) produced 24,606 ipfs.io + 24,696 dweb.link
+   HTTP 429s (one Cloudflare quota shared by both gateways, refilling on a
+   ~10–20 min cycle; a 1 req/s re-probe still failed in waves) and counted
+   filum as CDN-hosted from the feralfile.com API's display overlay although
+   the chain was already clean. **That CSV is NOT committed** — `build.py`
+   picks the newest census and would have published 14,300 throttled works as
+   gateway gaps; it stays on Brandon's machine as a record of the defect.
+   Fixed upstream, all merged 2026-09-08: agentic-workflows#52 (Ethereum
+   metadata read from `tokenURI` on chain; 429 = cooldown + adaptive spacing +
+   bounded retry), agentic-workflows#54 (census schema 2: per-CID verdict from
+   our gateway + one non-FF public gateway rotated by operator + delegated-
+   routing providers with our peer IDs subtracted → `redundant` /
+   `independent` / `ff_only` / `unreachable` / `unmeasured`; CID-level
+   measurement), status#13 (page reads schema 2: "resolve without us" split
+   into redundant vs only-copy-ours, `ff_only` folded into "depends on us",
+   `unmeasured` shown as its own state, `rescan-cids.py`). Plan:
+   `agentic-workflows/token-health-monitor/docs/plan-artwork-independence-probe.md`.
+   **Remaining to publish:** (a) token-health image build from agentic-workflows
+   main (run 34264370854, triggered 2026-09-08) → bump `token_health_image` in
+   ff-deploy#34 (already carries the schema-2 config, 1 req/s/host, chain
+   metadata); (b) add `token_health_eth_rpc_url` to the token-health vault;
+   (c) deploy prod-02, run `docker compose run … token-health census` (v2);
+   (d) commit the v2 CSV to `data/census/` on this branch — CI builds the page.
+   Expected: `depend entirely on Feral File` = CDN-only 0 + `ff_only` = the
+   content only we announce (a real number the page has never shown);
+   `unmeasured` small and listed.
 6. **#3435 checkpoint comment** — everything since 9/3 is unreported (V3 DB
    align + reference rows + explicit pins, crystalline tx landed, OpenSea
    freeze + Ryan's audit, filum-first ordering). Post it with the census
