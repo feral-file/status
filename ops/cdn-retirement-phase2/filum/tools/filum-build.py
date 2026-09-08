@@ -17,7 +17,7 @@ the same flags that reproduce BOTH current dirs bit-for-bit):
 Nothing is uploaded; pin-and-verify.sh (operator, tunnel) adds the two dirs on prod-02
 and asserts the CIDs match what is recorded here.
 
-Usage: python3 tools/metadata-regen/filum-build.py --art-ipfs <dir> --art-cdn <dir> \
+Usage: python3 ops/cdn-retirement-phase2/filum/tools/filum-build.py --art-ipfs <dir> --art-cdn <dir> \
            --truth-src <dir of 896 docs> --out ops/cdn-retirement-phase2/filum
 """
 import argparse, csv, json, os, shutil, subprocess, sys

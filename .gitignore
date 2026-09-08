@@ -19,3 +19,7 @@ tools/update-tezos-metadata/config.json
 # filum fix build tree (reproducible: tools/metadata-regen/filum-build.py)
 ops/cdn-retirement-phase2/filum/build/
 ops/cdn-retirement-phase2/filum/truth_db_export.csv
+# indexer walk raw output (hundreds of MB, regenerable: ops/special-project-contracts/tools/indexer-walk.py)
+ops/special-project-contracts/indexer_universe.csv
+ops/special-project-contracts/indexer_universe.csv.state
+ops/special-project-contracts/indexer_universe.log

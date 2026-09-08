@@ -14,7 +14,7 @@ Two changes, both WHERE-pinned to the exact current values (expect UPDATE 1 each
      AND its query string equals the on-chain animation_url's (doc_updates.csv).
 Run only AFTER v4-base-uri.mjs broadcast succeeded (DB follows the chain).
 
-  python3 tools/db-align-sql/gen-filum-sql.py --db-export ops/cdn-retirement-phase2/filum/truth_db_export.csv \
+  python3 ops/cdn-retirement-phase2/filum/tools/gen-filum-sql.py --db-export ops/cdn-retirement-phase2/filum/truth_db_export.csv \
       --cids ops/cdn-retirement-phase2/filum/cids.csv --doc-updates ops/cdn-retirement-phase2/filum/doc_updates.csv > filum-align.sql
 """
 import argparse, csv, re, sys
