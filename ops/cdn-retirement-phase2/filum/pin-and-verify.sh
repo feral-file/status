@@ -5,8 +5,8 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 API="${API:-/ip4/127.0.0.1/tcp/5001}"
-NEW_ART=$(awk -F, '/^artwork_dir/{print $3}' cids.csv)
-NEW_BASE=$(awk -F, '/^base_dir/{print $3}' cids.csv)
+NEW_ART=$(awk -F, '/^artwork_dir/{print $3}' cids.csv | tr -d '\r ')
+NEW_BASE=$(awk -F, '/^base_dir/{print $3}' cids.csv | tr -d '\r ')
 [ -d build/art-new ] && [ -d build/base-new ] || { echo "build/ missing — run tools/metadata-regen/filum-build.py first"; exit 1; }
 add() { ipfs --api "$API" add -r -Q --cid-version 0 --pin=true "$1"; }
 got=$(add build/art-new);  [ "$got" = "$NEW_ART" ]  || { echo "artwork dir CID mismatch: $got != $NEW_ART"; exit 1; }

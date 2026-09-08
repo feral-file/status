@@ -34,7 +34,7 @@ for rel,cid in rows:
     same = ib==cb
     rep.append((rel,cid,ist,len(ib),cst,len(cb),'identical' if same else 'DIFF'))
     print(f'{rel:40s} ipfs={ist}/{len(ib):>7} cdn={cst}/{len(cb):>7} {"identical" if same else "DIFF"}')
-w=csv.writer(open(os.path.join(S,'art_compare.csv'),'w')); w.writerow(['path','ipfs_cid','ipfs_http','ipfs_bytes','cdn_http','cdn_bytes','verdict']); w.writerows(rep)
+w=csv.writer(open(os.path.join(S,'art_compare.csv'),'w'),lineterminator='\n'); w.writerow(['path','ipfs_cid','ipfs_http','ipfs_bytes','cdn_http','cdn_bytes','verdict']); w.writerows(rep)
 # reproduce the dir CID locally from the IPFS bytes
 out=subprocess.run(['ipfs','add','-n','-Q','-r','--cid-version','0',ipfs_dir],capture_output=True,text=True)
 print('reproduced dir CID:',out.stdout.strip(),'| expected',ROOT,'| MATCH' if out.stdout.strip()==ROOT else '| MISMATCH')

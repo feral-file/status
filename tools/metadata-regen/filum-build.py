@@ -107,9 +107,9 @@ ok(f'128 filum docs rewritten (animation_url dir only), 768 docs byte-identical;
 
 # ---- 3. records
 with open(os.path.join(a.out, 'doc_updates.csv'), 'w', newline='') as f:
-    w = csv.DictWriter(f, fieldnames=list(updates[0])); w.writeheader(); w.writerows(updates)
+    w = csv.DictWriter(f, fieldnames=list(updates[0]), lineterminator='\n'); w.writeheader(); w.writerows(updates)
 with open(os.path.join(a.out, 'cids.csv'), 'w', newline='') as f:
-    w = csv.writer(f); w.writerow(['what', 'old_cid', 'new_cid'])
+    w = csv.writer(f, lineterminator='\n'); w.writerow(['what', 'old_cid', 'new_cid'])
     w.writerow(['artwork_dir (animation_url target)', OLD_ART, NEW_ART]); w.writerow(['base_dir (tokenBaseURI)', OLD_BASE, NEW_BASE])
 open(os.path.join(a.out, 'index.html.diff'), 'w').write(subprocess.run(['diff', '-u', os.path.join(a.art_ipfs, 'index.html'), os.path.join(art_new, 'index.html')], capture_output=True, text=True).stdout)
 print(f'\nold artwork dir  {OLD_ART}\nnew artwork dir  {NEW_ART}\nold base dir     {OLD_BASE}\nnew base dir     {NEW_BASE}\n'
