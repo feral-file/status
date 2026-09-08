@@ -3,7 +3,8 @@
 *Prepared 2026-09-08 (Brandon). Part of CDN-retirement phase 2, feral-file/feral-file#3435.
 Decision context: `ops/cdn-retirement-phase2.md` § Pending decisions (option a).
 State 2026-09-08: steps 1–3 DONE (pinned, render-checked, DB measured + align SQL generated);
-step 4 (chain tx) gated on the artist; step 5 is `filum-align.sql`, apply only after 4.*
+step 4 (chain tx) gated on the artist; step 5 is `filum-align.sql` (896 `ipfs_cid` swaps only —
+the display overlay stays, decision 2026-09-08), apply only after 4.*
 
 ## What is wrong, measured
 
@@ -83,18 +84,25 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
    RELATIVE key `previews/71e2bed5…/1706081014/index.html?<params>` (the API prefixes the
    CDN host), and every one's query string equals its on-chain `animation_url`'s (0
    mismatches); the other 768 rows have no overlay. `filum-align.sql` is generated from it:
-   896 path swaps + 128 overlay drops, each WHERE-pinned to the exact current value.
+   **896 `ipfs_cid` path swaps only**, each WHERE-pinned to the exact current value.
+   **Decision 2026-09-08 (Brandon): the `alternativePreviewURI` overlay is NOT touched** —
+   the goal is chain alignment (tokenURI → permanent, self-contained IPFS version), not
+   changing how feralfile.com displays the piece. `gen-filum-sql.py --drop-overlay` still
+   exists if that is ever wanted. Consequence to keep in mind: the API (and therefore the
+   census/status page) will keep seeing the CDN overlay for these 128, so they stay in the
+   overlay class on the page — reclassify there rather than counting them as CDN-dependent docs.
 4. **Chain tx** (after sign-off): `tools/update-token-uri/v4-base-uri.config.filum.example.json`
    → `v4-base-uri.config.json`, then `preflight` → `tx` → vault sign → `broadcast`, exactly as
    `RUNBOOK-crystalline-base-uri.md` (same owner `0x1d05cf6c…`, same tool, ~50k gas).
 5. **DB align** (after the tx) — `filum-align.sql` is READY (generated 2026-09-08; regenerate
    from a fresh export if anything on Truth changes first):
    ```
-   psql "<back-office>" -v ON_ERROR_STOP=1 -f ops/cdn-retirement-phase2/filum/filum-align.sql | sort | uniq -c   # dry-run: expect 1024 × "UPDATE 1"
+   psql "<back-office>" -v ON_ERROR_STOP=1 -f ops/cdn-retirement-phase2/filum/filum-align.sql | sort | uniq -c   # dry-run: expect 896 × "UPDATE 1"
    { cat ops/cdn-retirement-phase2/filum/filum-align.sql; echo 'COMMIT;'; } | psql "<back-office>" -v ON_ERROR_STOP=1 | sort | uniq -c
    ```
-   Any count other than 1,024 → ROLLBACK and re-export. After this the API serves the IPFS
-   version for filum and the CDN overlay is gone.
+   Any count other than 896 → ROLLBACK and re-export. After this the DB's `ipfs_cid` matches
+   the new on-chain base dir for all 896 Truth tokens; wallets following `tokenURI` get the
+   patched, self-contained IPFS version. feralfile.com's display path is unchanged.
 6. **No OpenSea refresh** is needed for this contract (tokenURI-direct, same as crystalline;
    the refresh hold in STATUS.md still applies). Re-derive the reference set + pin-referenced
    afterwards if `ipfs_reference` rows point at the old artwork dir.
@@ -108,7 +116,7 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
 - `art_compare.csv` — per-file IPFS-vs-CDN byte comparison (11 files)
 - `pin-and-verify.sh` — operator step 1
 - `export-truth-db.sql` — operator step 3 (export is gitignored)
-- `filum-align.sql` — operator step 5, generated 2026-09-08 (1,024 WHERE-pinned UPDATEs)
+- `filum-align.sql` — operator step 5, generated 2026-09-08 (896 WHERE-pinned `ipfs_cid` UPDATEs; overlay kept)
 - `../../tools/metadata-regen/filum-build.py` — the builder (all proofs)
 - `../../tools/db-align-sql/gen-filum-sql.py` — operator step 5
 - `../../tools/update-token-uri/v4-base-uri.config.filum.example.json` — operator step 4
