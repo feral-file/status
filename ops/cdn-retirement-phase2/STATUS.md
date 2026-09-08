@@ -76,29 +76,14 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
 ## NOT DONE — in order
 
 1. **filum (Truth `0xBb12686c360e9057be3CD031140035A705e19ceC`, 128 tokens)
-   — NEXT.** The `alternativePreviewURI` overlay points the display layer at
-   a CDN copy whose only difference from the IPFS version is 168 bytes of
-   `crossorigin="anonymous"` on 7 `<img>` tags in index.html (load-bearing:
-   WebGL readPixels; see `ops/cdn-retirement-phase2.md` § Pending decisions).
-   **Prep DONE 2026-09-08 (`filum/README.md`)**: all 11 artwork files
-   byte-compared IPFS vs CDN (10 identical, index.html = the 7 attributes
-   only); patched artwork dir built → `QmQ8qYSYNdiWR5Pjgqudnckf2Mk2R7mkK8T4L12Q3rnCWV`;
-   128 docs rewritten (animation_url dir CID only, reverse-substitution
-   proven), 768 untouched → new base dir
-   `QmZTedFYmyhEH7G77BTnuVk7DHrYWJzdHaWK4wMeXwkPVo`; both CIDs computed
-   offline with the flags that reproduce the current dirs bit-for-bit.
-   **Pinned on prod-02 + render-checked 2026-09-08** (`filum/pin-and-verify.sh`
-   green, `filum/render-check/`). **DB measured 2026-09-08**: all 896
-   `ipfs_cid` already path-form on the current base dir, 128 overlays stored
-   as relative keys with params identical to chain; `filum/filum-align.sql`
-   generated — **896 `ipfs_cid` path swaps only; the display overlay is kept
-   (decision 2026-09-08: align the chain, not feralfile.com's display)**, so
-   the 128 stay in the status page's overlay class. **DB align APPLIED
-   2026-09-08** (896 × UPDATE 1). **Only the owner tx remains**: requested
-   from the key holder 2026-09-08, pending (gas-capped at 1 gwei); until it
-   lands the DB leads the chain (chain read 2026-09-08 still `QmQjzv…`).
-   Done when `tokenURI` returns `ipfs://QmZTed…/<id>`; then filum is closed
-   and the platform-minted side is down to Ten Whistlegraphs (deferred).
+   — CLOSED 2026-09-08.** Owner tx landed: `tokenURI` on chain now returns
+   `ipfs://QmZTedFYmyhEH7G77BTnuVk7DHrYWJzdHaWK4wMeXwkPVo/<id>` (verified
+   2026-09-08 by direct read; smoke-tested end to end through the chain-sourced
+   census path: image + animation `ipfs://`, all gateways ok). DB `ipfs_cid`
+   aligned (896 × UPDATE 1) the same day; the `alternativePreviewURI` overlay
+   stays by decision (chain alignment, not feralfile.com display). Full record:
+   `filum/README.md`. **Every platform-minted token whose tokenURI doc pointed
+   at the CDN is now repointed on chain.**
 2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) — DEFERRED.** Overlay to
    aesthetic.computer (third-party by choice). Decision pending with
    Sean/Hieu; nothing to run. Status page reclassification only.
@@ -130,10 +115,20 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    `collection_name` → one stored value per collection, server-side; every
    token's `collection_name` is now on record; design + the 57-row mapping
    for Ryan (promised week of 2026-09-07) still open.
-5. **Close-out measurement — ONE run, after 1 (and the decisions on 2/4).**
-   census on prod-02 → `census-rescan` → status page rebuild →
-   `census/<date>` branch → PR. Expected today if run: ETH `dependent`
-   11,389 → ~167 (overlay-only); after filum → ~39.
+5. **Close-out measurement — census 2026-09-08 RUN, close-out in progress.**
+   `token_census_20260908T051950Z.csv` (34,987 tokens scanned, 5 h; +21
+   contract-held Tezos works appended via rescan mode A → 35,008). Two
+   defects in the checker surfaced and were fixed upstream
+   (feral-file/agentic-workflows#52 + ff-deploy#34, not yet deployed):
+   (a) 24,606 ipfs.io / 24,696 dweb.link probes came back HTTP 429 at
+   4 req/s/host with 429 excluded from retries → paced re-probe running
+   (2,477 distinct CIDs; all pass so far); (b) Ethereum metadata was read from
+   feralfile.com/api, so filum's overlay still shows 128 CDN rows although
+   the chain is clean → census now reads `tokenURI` on chain. Expected page
+   numbers from this CSV: `depend entirely on Feral File` 0 (build.py counts
+   a work dependent only when it has NO content-addressed file; filum's
+   thumbnails are IPFS), gateway-gap 0 after the re-probe, third-party 0.
+   Data lands on this branch (PR #11); CI builds the page.
 6. **#3435 checkpoint comment** — everything since 9/3 is unreported (V3 DB
    align + reference rows + explicit pins, crystalline tx landed, OpenSea
    freeze + Ryan's audit, filum-first ordering). Post it with the census
