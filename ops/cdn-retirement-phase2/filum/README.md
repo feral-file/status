@@ -22,7 +22,7 @@ the chain (chain read 2026-09-08: tokenURI still `ipfs://QmQjzv…/<id>`). Nothi
   canvas → black screen), which is why the 2024 patch was made — but it went to the CDN
   behind the overlay instead of to IPFS + a chain pointer update.
 
-## The fix, built and proven locally (`tools/metadata-regen/filum-build.py`)
+## The fix, built and proven locally (`ops/cdn-retirement-phase2/filum/tools/filum-build.py`)
 
 | | old | new |
 |---|---|---|
@@ -45,13 +45,13 @@ Reproduce from scratch (fetches everything from ipfs.feralfile.com + the CDN, ~2
 the raw dir blocks decoded via local kubo — the fetchers do that with `ipfs --offline`):
 ```
 S=<scratch>
-python3 tools/metadata-regen/filum-fetch-art.py  $S    # → $S/art-ipfs, $S/art-cdn, art_compare.csv; asserts the dir CID reproduces
-python3 tools/metadata-regen/filum-fetch-docs.py $S    # → $S/truth-src (896 docs); asserts every doc CID + the base dir CID reproduce
-python3 tools/metadata-regen/filum-build.py --art-ipfs $S/art-ipfs --art-cdn $S/art-cdn --truth-src $S/truth-src --out ops/cdn-retirement-phase2/filum
+python3 ops/cdn-retirement-phase2/filum/tools/filum-fetch-art.py  $S    # → $S/art-ipfs, $S/art-cdn, art_compare.csv; asserts the dir CID reproduces
+python3 ops/cdn-retirement-phase2/filum/tools/filum-fetch-docs.py $S    # → $S/truth-src (896 docs); asserts every doc CID + the base dir CID reproduce
+python3 ops/cdn-retirement-phase2/filum/tools/filum-build.py --art-ipfs $S/art-ipfs --art-cdn $S/art-cdn --truth-src $S/truth-src --out ops/cdn-retirement-phase2/filum
 ```
 (`filum-fetch-docs.py` expects `$S/QmQjzv….links.csv`, the decoded base-dir listing —
 `ipfs --offline block put` the `?format=raw` block, then `ipfs --offline dag get`.)
-`build/` (7.4 MB: `art-new/`, `base-new/` 896 docs) is gitignored — regenerate with the command above.
+`build/` (7.4 MB: `art-new/`, `base-new/` 896 docs) is gitignored and was deleted after pinning (2026-09-08 cleanup) — regenerate with the command above. The DB export was deleted after the align was applied (re-export with `export-truth-db.sql`).
 
 ## Gate
 
@@ -123,6 +123,6 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
 - `pin-and-verify.sh` — operator step 1
 - `export-truth-db.sql` — operator step 3 (export is gitignored)
 - `filum-align.sql` — operator step 5, generated 2026-09-08 (896 WHERE-pinned `ipfs_cid` UPDATEs; overlay kept)
-- `../../tools/metadata-regen/filum-build.py` — the builder (all proofs)
-- `../../tools/db-align-sql/gen-filum-sql.py` — operator step 5
+- `../../ops/cdn-retirement-phase2/filum/tools/filum-build.py` — the builder (all proofs)
+- `../../ops/cdn-retirement-phase2/filum/tools/gen-filum-sql.py` — operator step 5
 - `../../tools/update-token-uri/v4-base-uri.config.filum.example.json` — operator step 4
