@@ -63,7 +63,12 @@ def measurement_scope(census, bucket3):
     return {
         "layer": "artwork_media",
         "measures": (
-            "resolves, media layer: every artwork file fetchable from the "
+            "resolves, media layer: every artwork file fetched through a public "
+            "gateway Feral File does not operate, plus who provides it "
+            "(delegated routing) -- a file is redundant only when a "
+            "non-Feral-File provider holds it"
+            if census and census.get("schema") == 2
+            else "resolves, media layer: every artwork file fetchable from the "
             "public gateways wallets and browsers use"
         ),
         "media_probe_as_of": census["date"] if census else None,
@@ -155,15 +160,47 @@ def load_bucket3():
     }
 
 
+# Census schema 2 (token-health-monitor, 2026-09): one verdict per file.
+# Page state per verdict; a work takes the worst of its files.
+V2_STATE = {
+    "redundant": "redundant",      # a non-Feral-File provider holds it
+    "independent": "independent",  # public infrastructure serves it; only known copy is ours
+    "ff_only": "ff_only",          # only our node serves it
+    "unreachable": "gateway_gap",  # nobody serves it
+    "unmeasured": "unmeasured",    # probe rate-limited / errored: neither gap nor pass
+}
+V2_SEVERITY = {"unreachable": 0, "ff_only": 1, "unmeasured": 2, "independent": 3, "redundant": 4}
+
+
+def worst_verdict(verdicts):
+    """Work-level verdict = worst file. Anything unknown/empty is unmeasured:
+    a rate limit must never turn into a claim in either direction."""
+    vs = [v if v in V2_SEVERITY else "unmeasured" for v in verdicts]
+    return min(vs, key=V2_SEVERITY.__getitem__) if vs else "unmeasured"
+
+
 def load_census():
     """Media-layer rollup of the token-health-monitor census, if present.
 
     The census fetches metadata via Feral File's API, so metadata rows say
     nothing about on-chain tokenURI hosting — they are EXCLUDED here. A work
-    is classified by its media resources only:
+    is classified by its media resources only.
+
+    Schema 2 CSVs (a ``verdict`` column) roll the per-file verdicts up to
+    the worst one per work:
+      redundant     every content-addressed file resolves on a gateway we do
+                    not operate AND a non-Feral-File provider holds it
+      independent   public infrastructure serves every file; the only known
+                    copy of at least one is ours
+      ff_only       at least one file is served only by our node
+      gateway_gap   at least one file nobody serves
+      unmeasured    at least one file's probe was rate-limited/errored
+    Schema 1 CSVs (pre-2026-09, ``ipfs_io_ok`` column) keep the old split:
       independent   has content-addressed media, all of it resolving on ipfs.io
       gateway_gap   has content-addressed media, at least one file failing
+    Both:
       dependent     no content-addressed media at all (CDN/other hosting only)
+      third_party   every file on a third-party host
     """
     candidates = sorted(glob.glob(str(DATA / "census" / "token_census_*.csv")))
     if not candidates:
@@ -171,16 +208,20 @@ def load_census():
     path = Path(candidates[-1])
 
     per_work = {}
-    for r in csv.DictReader(open(path)):
+    reader = csv.DictReader(open(path))
+    v2 = "verdict" in (reader.fieldnames or [])
+    for r in reader:
         if r["resource"] == "metadata":
             continue
         key = (r["chain"], r["contract"], r["token_id"])
         st = per_work.setdefault(
-            key, {"cid": 0, "fail": 0, "other": 0, "rest": 0, "ex": r["exhibition"]}
+            key, {"cid": 0, "fail": 0, "other": 0, "rest": 0, "ex": r["exhibition"], "verdicts": []}
         )
         if r["cid"]:
             st["cid"] += 1
-            if r.get("ipfs_io_ok", "") != "ok":
+            if v2:
+                st["verdicts"].append(r.get("verdict", ""))
+            elif r.get("ipfs_io_ok", "") != "ok":
                 st["fail"] += 1
         elif r["hosting"] == "other":
             st["other"] += 1
@@ -191,7 +232,10 @@ def load_census():
     per_ex = defaultdict(Counter)
     for st in per_work.values():
         if st["cid"]:
-            state = "gateway_gap" if st["fail"] else "independent"
+            if v2:
+                state = V2_STATE[worst_verdict(st["verdicts"])]
+            else:
+                state = "gateway_gap" if st["fail"] else "independent"
         elif st["other"] and not st["rest"]:
             state = "third_party"
         else:
@@ -203,6 +247,7 @@ def load_census():
     return {
         "file": path.name,
         "date": f"{d[:4]}-{d[4:6]}-{d[6:]}",
+        "schema": 2 if v2 else 1,
         "works": len(per_work),
         "buckets": dict(buckets),
         "per_exhibition": {k: dict(v) for k, v in per_ex.items()},
@@ -224,14 +269,41 @@ def emit_work_shards(census, bucket3, exhibitions):
 
     if census:
         per_work = {}
-        for r in csv.DictReader(open(DATA / "census" / census["file"])):
+        v2 = census.get("schema") == 2
+        reader = csv.DictReader(open(DATA / "census" / census["file"]))
+        # The "ours" column is named from census.own_gateways[0] upstream
+        # (ipfs_feralfile_com_ok today); read it off the header, not by name.
+        own_col = next((c for c in (reader.fieldnames or []) if c.endswith("_ok")), "")
+        if v2 and not own_col:
+            raise SystemExit(f"census {census['file']}: schema 2 without an own-gateway *_ok column")
+        for r in reader:
             if r["resource"] == "metadata":
                 continue
             key = (r["chain"], r["contract"], r["token_id"], r["exhibition"])
             w = per_work.setdefault(
                 key, {"chain": r["chain"], "contract": r["contract"], "files": []}
             )
-            if r["cid"]:
+            if r["cid"] and v2:
+                f = {
+                    "res": r["resource"],
+                    "host": "ipfs",
+                    "cid": r["cid"],
+                    "verdict": r.get("verdict") or "unmeasured",
+                    # Raw census cells: "ok", "fail: HTTP 404 from media host",
+                    # "fail: HTTP 429 ..." -- shown as recorded, never
+                    # collapsed to a verdict the census did not give.
+                    "ours": (r.get(own_col) or "unmeasured")[:80],
+                    "public": r.get("public_fetch", ""),
+                }
+                if (r.get("providers_total") or "").isdigit():
+                    f["providers"] = {
+                        "total": int(r["providers_total"]),
+                        "ff": int(r.get("providers_ff") or 0) if (r.get("providers_ff") or "0").isdigit() else 0,
+                        "nonff": int(r.get("providers_nonff") or 0) if (r.get("providers_nonff") or "0").isdigit() else 0,
+                        "ids": [i for i in (r.get("provider_ids") or "").split(";") if i],
+                    }
+                w["files"].append(f)
+            elif r["cid"]:
                 f = {"res": r["resource"], "host": "ipfs", "cid": r["cid"]}
                 for gw_col, gw in (
                     ("ipfs_io_ok", "ipfs.io"),
@@ -254,6 +326,8 @@ def emit_work_shards(census, bucket3, exhibitions):
             if not cids:
                 others = [f for f in w["files"] if f.get("host") == "other"]
                 state = "third_party" if others and len(others) == len(w["files"]) else "dependent"
+            elif v2:
+                state = V2_STATE[worst_verdict(f["verdict"] for f in cids)]
             elif any(f["ipfs.io"] != "ok" for f in cids):
                 state = "gateway_gap"
             else:
@@ -326,6 +400,37 @@ def tile(number, label, note):
       </div>"""
 
 
+# Catalog table columns: (key, header). "resolves" = independent + redundant,
+# "depend" = dependent + ff_only (see catalog_cell).
+CATALOG_COLUMNS_V1 = (
+    ("works", "Works"),
+    ("independent", "Resolving via gateways"),
+    ("gateway_gap", "Failing probe"),
+    ("dependent", "Depend on us"),
+    ("not_migrated", "Not yet migrated"),
+    ("third_party", "Third party"),
+)
+CATALOG_COLUMNS_V2 = (
+    ("works", "Works"),
+    ("resolves", "Resolve without us"),
+    ("redundant", "of which redundant"),
+    ("gateway_gap", "Nobody serves"),
+    ("depend", "Depend on us"),
+    ("unmeasured", "Unmeasured"),
+    ("not_migrated", "Not yet migrated"),
+    ("third_party", "Third party"),
+)
+CATALOG_KEYS = ("works", "independent", "redundant", "gateway_gap", "dependent", "ff_only", "unmeasured", "not_migrated", "third_party")
+
+
+def catalog_cell(row, key):
+    if key == "resolves":
+        return row["independent"] + row.get("redundant", 0)
+    if key == "depend":
+        return row["dependent"] + row.get("ff_only", 0)
+    return row.get(key, 0)
+
+
 def catalog_rows(exhibitions, census, bucket3):
     """One row per curatorial exhibition. data/exhibition_groups.json merges
     API entities that are mint events of the same exhibition (display only —
@@ -353,6 +458,14 @@ def catalog_rows(exhibitions, census, bucket3):
             "not_migrated": bm,
             "third_party": c.get("third_party", 0),
         }
+        if census and census.get("schema") == 2:
+            # Only a schema-2 census can tell these apart; a v1 build must
+            # not publish hard zeros for states it never measured.
+            row.update(
+                redundant=c.get("redundant", 0),
+                ff_only=c.get("ff_only", 0),
+                unmeasured=c.get("unmeasured", 0),
+            )
         g = member_of.get(e["slug"])
         if g is None:
             rows.append(row)
@@ -367,8 +480,9 @@ def catalog_rows(exhibitions, census, bucket3):
             rows.append(merged)
         else:
             m = by_group[key]
-            for k in ("works", "independent", "gateway_gap", "dependent", "not_migrated", "third_party"):
-                m[k] += row[k]
+            for k in CATALOG_KEYS:
+                if k in row:
+                    m[k] += row[k]
             m["start"] = min(m["start"], row["start"])
     return rows
 
@@ -401,7 +515,49 @@ def registry_paragraph(registry):
 def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     registry_html = registry_paragraph(registry)
     media_probe = census["date"] if census else bucket3["series_probe"]["date"]
-    if census:
+    tile5 = ""
+    if census and census.get("schema") == 2:
+        b = census["buckets"]
+        resolves = b.get("independent", 0) + b.get("redundant", 0)
+        tile1 = tile(
+            n(resolves),
+            "works whose media resolves without Feral File",
+            f"Every content-addressed media file was served on "
+            f"{esc(census['date'])} by a public gateway we do not operate. "
+            f"{n(b.get('redundant', 0))} of these are <strong>redundant</strong>: a "
+            "provider other than Feral File also holds every file (peer IDs in "
+            f"the census data). The other {n(b.get('independent', 0))} resolve, "
+            "but the only known copy of at least one file is ours &mdash; "
+            "pinning by anyone else is what makes them durable.",
+        )
+        tile2 = tile(
+            n(b.get("gateway_gap", 0)),
+            "works whose content-addressed media nobody serves",
+            f"At least one content-addressed media file failed on "
+            f"{esc(census['date'])} both through our own node and through "
+            "public gateways. Listed per file in the census data.",
+        )
+        tile3_note = (
+            f"{n(b.get('dependent', 0))} works on Ethereum and Tezos whose "
+            "published media references point only at our CDN &mdash; the open "
+            "CDN-retirement phase (ops/cdn-retirement-phase2.md in the repo). "
+            f"A further {n(b.get('ff_only', 0))} are content-addressed but on "
+            f"{esc(census['date'])} only our own node served them: pinned by "
+            "us, held by no one else yet. Their content addresses are in the "
+            f"per-work lookup below. Another {n(b.get('third_party', 0))} depend "
+            "on a third-party platform, listed separately in the data."
+        )
+        tile5 = tile(
+            n(b.get("unmeasured", 0)),
+            "works whose media could not be measured",
+            f"On {esc(census['date'])} at least one file's probe ended in a "
+            "gateway rate limit or a routing error after its retry budget. "
+            "Neither a gap nor a pass: they are re-probed file by file (a "
+            "CID-level rescan, run by hand) before the next publish, and "
+            "never counted in the tiles above.",
+        )
+        census_note = ""
+    elif census:
         b = census["buckets"]
         tile1 = tile(
             n(b.get("independent", 0)),
@@ -451,8 +607,16 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
         )
 
     tile3 = tile(
-        n(census["buckets"].get("dependent", 0)) if census else "&mdash;",
-        "works whose published media depends entirely on Feral File",
+        (
+            n(census["buckets"].get("dependent", 0) + census["buckets"].get("ff_only", 0))
+            if census
+            else "&mdash;"
+        ),
+        (
+            "works whose media depends entirely on Feral File"
+            if census and census.get("schema") == 2
+            else "works whose published media depends entirely on Feral File"
+        ),
         tile3_note,
     )
     tile4 = tile(
@@ -469,35 +633,38 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     catalog_html = ""
     if census:
         cat_data = catalog_rows(exhibitions, census, bucket3)
+        cols = CATALOG_COLUMNS_V2 if census.get("schema") == 2 else CATALOG_COLUMNS_V1
         cat_rows = "\n".join(
             f"""        <tr>
           <td><span class="dated">{esc(r["start"])}</span> <a href="https://feralfile.com/exhibitions/shows/{esc(r["slug"])}">{esc(r["title"])}</a></td>
-          <td class="num">{n(r["works"])}</td>
-          <td class="num">{n(r["independent"])}</td>
-          <td class="num">{n(r["gateway_gap"])}</td>
-          <td class="num">{n(r["dependent"])}</td>
-          <td class="num">{n(r["not_migrated"])}</td>
-          <td class="num">{n(r["third_party"])}</td>
+"""
+            + "\n".join(f'          <td class="num">{n(catalog_cell(r, k))}</td>' for k, _ in cols)
+            + """
         </tr>"""
             for r in cat_data
         )
-        cat_totals = {k: sum(r[k] for r in cat_data) for k in ("works","independent","gateway_gap","dependent","not_migrated","third_party")}
-        cat_rows += f"""
+        cat_totals = {k: sum(catalog_cell(r, k) for r in cat_data) for k, _ in cols}
+        cat_rows += (
+            """
         <tr>
           <td><strong>All exhibitions</strong></td>
-          <td class="num"><strong>{n(cat_totals["works"])}</strong></td>
-          <td class="num"><strong>{n(cat_totals["independent"])}</strong></td>
-          <td class="num"><strong>{n(cat_totals["gateway_gap"])}</strong></td>
-          <td class="num"><strong>{n(cat_totals["dependent"])}</strong></td>
-          <td class="num"><strong>{n(cat_totals["not_migrated"])}</strong></td>
-          <td class="num"><strong>{n(cat_totals["third_party"])}</strong></td>
+"""
+            + "\n".join(f'          <td class="num"><strong>{n(cat_totals[k])}</strong></td>' for k, _ in cols)
+            + """
         </tr>"""
+        )
+        cat_head = "".join(f'<th class="num">{esc(label)}</th>' for _, label in cols)
+        cat_states_note = (
+            " (redundant is the subset of resolving works a third party also holds)"
+            if census.get("schema") == 2
+            else ""
+        )
         catalog_html = f"""
   <section id="catalog">
     <h2>Every exhibition</h2>
     <p>The whole catalog, oldest first: every published exhibition, how many
     works it holds, and what each work&rsquo;s media depends on today. The
-    same states as the tiles above, plus the third-party class. Counting
+    same states as the tiles above, plus the third-party class{cat_states_note}. Counting
     note: this table counts the works the census measured (the indexer's
     view) plus never-migrated Bitmark-era works; the Bitmark-era table below
     counts works enumerated from the public API. The two sources diverge by
@@ -508,7 +675,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     files, all published under Data.</span></p>
     <table>
       <thead>
-        <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Resolving via gateways</th><th class="num">Failing probe</th><th class="num">Depend on us</th><th class="num">Not yet migrated</th><th class="num">Third party</th></tr>
+        <tr><th>Exhibition</th>{cat_head}</tr>
       </thead>
       <tbody>
 {cat_rows}
@@ -556,6 +723,25 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     <a href="data/{esc(ps["file"])}">{esc(ps["file"])}</a>). Each
     work&rsquo;s own published references update when its collector
     migrates it; until then it is counted above as not yet migrated.</p>"""
+
+    if census and census.get("schema") == 2:
+        method_gateways = (
+            "one public gateway Feral File does not operate per file "
+            "(rotated across operators; currently ipfs.io/dweb.link, Pinata "
+            "and 4EVERLAND, per the census config) and, separately, our own "
+            "node ipfs.feralfile.com"
+        )
+        method_providers = (
+            " Each file is also looked up in delegated routing "
+            "(<code>/routing/v1/providers</code>): a work counts as "
+            "<strong>redundant</strong> only when a provider other than "
+            "Feral File&rsquo;s nodes holds every file. A probe the gateway "
+            "rate-limited is recorded as <strong>unmeasured</strong> and "
+            "re-run, never as a gap."
+        )
+    else:
+        method_gateways = "named public gateways (ipfs.io, dweb.link, ipfs.feralfile.com)"
+        method_providers = ""
 
     eth_dep_para = ""
     if census:
@@ -626,7 +812,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
   </section>
 
   <section class="tiles" aria-label="Summary">
-{tile1}{tile2}{tile3}{tile4}
+{tile1}{tile2}{tile3}{tile5}{tile4}
   </section>
   {census_note}
 {catalog_html}
@@ -704,11 +890,10 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     <strong>resolves</strong> when every reference in its chain can be fetched
     from public infrastructure. These checks currently measure the
     <strong>artwork files</strong>, as HTTP HEAD probes: content-addressed
-    references through named public gateways (ipfs.io, dweb.link,
-    ipfs.feralfile.com), and CDN or third-party references directly from
+    references through {method_gateways}, and CDN or third-party references directly from
     their stated hosts. A content-addressed file counts as resolving only
     when a public gateway answers for it &mdash; our own infrastructure
-    answering is not enough. Bitmark-era media was probed once per series
+    answering is not enough.{method_providers} Bitmark-era media was probed once per series
     entry file (editions of a series share files); Ethereum and Tezos works
     were probed per enumerated file reference.</p>
     <p>Known gap, found 2026-08-03 and closed 2026-08-25: HLS video was followed only to its master playlist, and for 184 works the stream files were never on IPFS. Those works now reference plain MP4s on IPFS (on-chain and in our records); the census still does not traverse HLS playlists, so any future HLS reference would show up here as a gateway failure, not as a pass.</p>
@@ -760,7 +945,52 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry=None):
     """The whole page as plain Markdown — the cheap read for a model."""
     probe = bucket3["series_probe"]
-    if census:
+    b5 = ""
+    bitmark_item_no = 5 if (census and census.get("schema") == 2) else 4
+    if census and census.get("schema") == 2:
+        b = census["buckets"]
+        b1 = (
+            f"{b.get('independent', 0) + b.get('redundant', 0):,} works (every "
+            f"content-addressed media file was served on {census['date']} by a public "
+            f"gateway Feral File does not operate; {b.get('redundant', 0):,} of them are "
+            "redundant — a non-Feral-File provider also holds every file, per delegated "
+            f"routing — and {b.get('independent', 0):,} resolve with the only known copy "
+            "of at least one file being ours)"
+        )
+        b2 = (
+            f"{b.get('gateway_gap', 0):,} works (at least one content-addressed media file "
+            f"failed on {census['date']} both through our own node and through public "
+            "gateways; listed per file in the census data)"
+        )
+        b3 = (
+            f"{b.get('dependent', 0) + b.get('ff_only', 0):,} works on Ethereum and Tezos: "
+            f"{b.get('dependent', 0):,} whose media lives only on our CDN (as of "
+            f"{census['date']}; the repointing plan is ops/cdn-retirement-phase2.md in "
+            f"the repo, target 2026-11-01) and {b.get('ff_only', 0):,} whose media is "
+            "content-addressed but was served only by our own node — pinned by us, held "
+            f"by no one else yet. A further {b.get('third_party', 0):,} works depend on a "
+            "third-party platform instead of us — different dependency, different owner."
+        )
+        b5 = (
+            f"\n4. Could not be measured: {b.get('unmeasured', 0):,} works (at least one "
+            f"file's probe on {census['date']} ended in a gateway rate limit or routing "
+            "error after its retry budget; re-probed file by file, by hand, before "
+            "the next publish; never counted above)"
+        )
+        catalog_md = "\n".join(
+            f"| {r['start']} | {r['title']} | {r['works']:,} | {catalog_cell(r, 'resolves'):,} "
+            f"| {r['redundant']:,} | {r['gateway_gap']:,} | {catalog_cell(r, 'depend'):,} "
+            f"| {r['unmeasured']:,} | {r['not_migrated']:,} |"
+            for r in catalog_rows(exhibitions, census, bucket3)
+        )
+        catalog_section = f"""
+## Every exhibition (oldest first)
+
+| Started | Exhibition | Works | Resolve without us | of which redundant | Nobody serves | Depend on us | Unmeasured | Not yet migrated |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+{catalog_md}
+"""
+    elif census:
         b = census["buckets"]
         b1 = f"{b.get('independent', 0):,} works (every content-addressed media file answered the {census['date']} HEAD probe on ipfs.io; who holds the copies is not measured)"
         b2 = f"{b.get('gateway_gap', 0):,} works (at least one content-addressed media file failed the {census['date']} HEAD probe on ipfs.io; listed per file in the census data)"
@@ -855,8 +1085,8 @@ work's rendering.
 2. Should resolve without us, but currently fail on public gateways: {b2}
 3. Published media references depend entirely on Feral File: {b3}
    Exceptions to the target will name the work, reason, responsible
-   person, and review date.
-4. Not yet migrated from Bitmark: {bucket3["works_on_bitmark"]:,} works
+   person, and review date.{b5}
+{bitmark_item_no}. Not yet migrated from Bitmark: {bucket3["works_on_bitmark"]:,} works
    across {bucket3["series_count"]:,} series, in the
    {bucket3["exhibitions_affected"]} of 18 Bitmark-era exhibitions with at
    least one unmigrated work (as of {bucket3["as_of"]}). Their published
@@ -1044,9 +1274,33 @@ def main():
         "site": SITE_URL,
         "works_by_media_dependency": {
             "resolve_without_feralfile": (
-                {"works": census["buckets"].get("independent", 0), "as_of": census["date"]}
+                (
+                    {
+                        "works": census["buckets"].get("independent", 0) + census["buckets"].get("redundant", 0),
+                        "redundant": census["buckets"].get("redundant", 0),
+                        "only_known_copy_ours": census["buckets"].get("independent", 0),
+                        "as_of": census["date"],
+                    }
+                    if census.get("schema") == 2
+                    else {"works": census["buckets"].get("independent", 0), "as_of": census["date"]}
+                )
                 if census
                 else {"status": "census_in_progress", "started": "2026-08-03"}
+            ),
+            **(
+                {
+                    "could_not_be_measured": {
+                        "works": census["buckets"].get("unmeasured", 0),
+                        "as_of": census["date"],
+                        "meaning": "at least one file's probe was rate-limited or errored after its retry budget; re-probed per CID (manual rescan) before the next publish; never a gap, never a pass",
+                    },
+                    # Sum identity checked by tools/check_claims.py: every
+                    # measured work is in exactly one state, and unmeasured
+                    # is never folded into another.
+                    "works_measured": census["works"],
+                }
+                if census and census.get("schema") == 2
+                else {}
             ),
             "depend_on_third_party": (
                 {"works": census["buckets"].get("third_party", 0), "as_of": census["date"]}
@@ -1054,12 +1308,29 @@ def main():
                 else None
             ),
             "failing_public_gateways": (
-                {"works": census["buckets"].get("gateway_gap", 0), "as_of": census["date"]}
+                (
+                    {
+                        "works": census["buckets"].get("gateway_gap", 0),
+                        "as_of": census["date"],
+                        "meaning": "at least one content-addressed file that neither our own node nor a public gateway served (schema 2: works our node serves but public gateways cannot are counted under depend_entirely_on_feralfile.ipfs_only_our_node)",
+                    }
+                    if census.get("schema") == 2
+                    else {"works": census["buckets"].get("gateway_gap", 0), "as_of": census["date"]}
+                )
                 if census
                 else {"status": "census_in_progress", "started": "2026-08-03"}
             ),
             "depend_entirely_on_feralfile": (
                 {
+                    "works": census["buckets"].get("dependent", 0) + census["buckets"].get("ff_only", 0),
+                    "cdn_only": census["buckets"].get("dependent", 0),
+                    "ipfs_only_our_node": census["buckets"].get("ff_only", 0),
+                    "as_of": census["date"],
+                    "host": "cdn.feralfileassets.com",
+                    "remediation": "media repointing to content-addressed copies; plan: ops/cdn-retirement-phase2.md (repo), target 2026-11-01; ipfs_only_our_node works need a second pinner",
+                }
+                if census and census.get("schema") == 2
+                else {
                     "works": census["buckets"].get("dependent", 0),
                     "as_of": census["date"],
                     "host": "cdn.feralfileassets.com",

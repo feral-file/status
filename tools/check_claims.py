@@ -72,6 +72,51 @@ check("status.json",
       bool(scope.get("media_probe_as_of") or scope.get("bitmark_reference_probe_as_of")),
       "scope must carry a probe date, separate from generated_at")
 
+status = json.loads((PUBLIC / "data" / "status.json").read_text())
+w = status["works_by_media_dependency"]
+if "could_not_be_measured" in w:
+    # Census schema 2: every measured work sits in exactly one state, and
+    # `unmeasured` is a state of its own -- never folded into a pass or a
+    # gap. A drift here means a rate limit became a claim.
+    parts = {
+        "resolve_without_feralfile": w["resolve_without_feralfile"]["works"],
+        "failing_public_gateways": w["failing_public_gateways"]["works"],
+        "depend_entirely_on_feralfile": w["depend_entirely_on_feralfile"]["works"],
+        "depend_on_third_party": w["depend_on_third_party"]["works"],
+        "could_not_be_measured": w["could_not_be_measured"]["works"],
+    }
+    total = w.get("works_measured")
+    check("status.json", total is not None, "schema 2 must publish works_measured")
+    check("status.json", sum(parts.values()) == total,
+          f"media states must partition works_measured: {parts} != {total}")
+    rw = w["resolve_without_feralfile"]
+    check("status.json", rw.get("redundant", 0) + rw.get("only_known_copy_ours", 0) == rw["works"],
+          "resolve_without_feralfile must equal redundant + only_known_copy_ours")
+    # Independent recount from the published census itself (the sum
+    # identity alone cannot see an unmeasured work quietly moved into
+    # another bucket): a work is unmeasured when at least one of its
+    # content-addressed files is, and none is unreachable / ff_only
+    # (worse states win the roll-up).
+    import csv, gzip
+    gz = sorted((PUBLIC / "data" / "census").glob("token_census_*.csv.gz"))
+    check("status.json", bool(gz), "schema 2 must publish the census CSV")
+    if gz:
+        per_work = {}
+        with gzip.open(gz[-1], "rt", encoding="utf-8", newline="") as fh:
+            for r in csv.DictReader(fh):
+                if r["resource"] == "metadata" or not r["cid"]:
+                    continue
+                per_work.setdefault((r["chain"], r["contract"], r["token_id"]), set()).add(r.get("verdict") or "unmeasured")
+        recount = sum(
+            1 for vs in per_work.values()
+            if "unmeasured" in vs and not vs & {"unreachable", "ff_only"}
+        )
+        check("status.json", recount == w["could_not_be_measured"]["works"],
+              f"could_not_be_measured.works ({w['could_not_be_measured']['works']}) must equal the CSV recount ({recount})")
+    page_text = flat(page)
+    check("index.html", "could not be measured" in page_text,
+          "schema 2 must show the unmeasured state on the page")
+
 if errors:
     print("claim-boundary check FAILED:")
     for e in errors:
