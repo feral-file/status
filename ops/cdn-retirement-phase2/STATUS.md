@@ -88,11 +88,14 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    `QmZTedFYmyhEH7G77BTnuVk7DHrYWJzdHaWK4wMeXwkPVo`; both CIDs computed
    offline with the flags that reproduce the current dirs bit-for-bit.
    **Pinned on prod-02 + render-checked 2026-09-08** (`filum/pin-and-verify.sh`
-   green, `filum/render-check/`). **Remaining, operator**: DB export
-   (`filum/export-truth-db.sql`), then — **gated on the artist's sign-off**
-   (Sean asking, #3435 2026-09-04) — one `setTokenBaseURI` owner tx
-   (`v4-base-uri.config.filum.example.json`, same flow as crystalline) and
-   the DB align (`gen-filum-sql.py`: 896 path swaps + 128 overlay drops).
+   green, `filum/render-check/`). **DB measured 2026-09-08**: all 896
+   `ipfs_cid` already path-form on the current base dir, 128 overlays stored
+   as relative keys with params identical to chain; `filum/filum-align.sql`
+   generated (896 path swaps + 128 overlay drops, WHERE-pinned). **Remaining**:
+   **gated on the artist's sign-off** (Sean asking, #3435 2026-09-04) — one
+   `setTokenBaseURI` owner tx (`v4-base-uri.config.filum.example.json`, same
+   flow as crystalline), then apply `filum-align.sql` (dry-run → 1,024 ×
+   UPDATE 1 → COMMIT).
 2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) — DEFERRED.** Overlay to
    aesthetic.computer (third-party by choice). Decision pending with
    Sean/Hieu; nothing to run. Status page reclassification only.

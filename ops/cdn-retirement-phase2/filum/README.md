@@ -2,7 +2,8 @@
 
 *Prepared 2026-09-08 (Brandon). Part of CDN-retirement phase 2, feral-file/feral-file#3435.
 Decision context: `ops/cdn-retirement-phase2.md` § Pending decisions (option a).
-State 2026-09-08: steps 1–2 DONE (pinned on prod-02, render check passed); 3–5 open, 4 gated.*
+State 2026-09-08: steps 1–3 DONE (pinned, render-checked, DB measured + align SQL generated);
+step 4 (chain tx) gated on the artist; step 5 is `filum-align.sql`, apply only after 4.*
 
 ## What is wrong, measured
 
@@ -75,17 +76,25 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
    `https://ipfs.feralfile.com/ipfs/QmQ8qY…/index.html?edition_number=0&artwork_number=1&blockchain=ethereum&contract=0xBb12686c360e9057be3CD031140035A705e19ceC&token_id=2439046679443273982118864381573244666655869184&token_id_hash=0x24549d9c4200fb1c06d243fff577cb323640f16ab4352a8e0f0fcf30fa91f572`
    in a browser and, embedded cross-origin (e.g. from feralfile.com's viewer), confirm it draws
    rather than a black canvas — that is the failure mode the patch exists for.
-3. **DB export** (read-only): `psql … -f export-truth-db.sql` → `truth_db_export.csv` (896 rows).
-   Needed to learn the current `ipfs_cid` form for Truth (the 2026-09-02 note in
-   `tools/db-align-sql/truth-db-align.py` says the DB may still carry an older doc
-   generation, not `QmQjzv…/<id>`; the generator refuses rows it can't pin).
+3. **DB export — DONE 2026-09-08** (`export-truth-db.sql` → `truth_db_export.csv`, 896 rows,
+   gitignored as a DB export). Measured: **all 896 `ipfs_cid` are path-form
+   `QmQjzv…/<tokenId>`** (the 2026-09-02 "older generation" worry does not apply — DB and
+   chain already agree); the 128 filum rows carry `alternativePreviewURI` stored as the
+   RELATIVE key `previews/71e2bed5…/1706081014/index.html?<params>` (the API prefixes the
+   CDN host), and every one's query string equals its on-chain `animation_url`'s (0
+   mismatches); the other 768 rows have no overlay. `filum-align.sql` is generated from it:
+   896 path swaps + 128 overlay drops, each WHERE-pinned to the exact current value.
 4. **Chain tx** (after sign-off): `tools/update-token-uri/v4-base-uri.config.filum.example.json`
    → `v4-base-uri.config.json`, then `preflight` → `tx` → vault sign → `broadcast`, exactly as
    `RUNBOOK-crystalline-base-uri.md` (same owner `0x1d05cf6c…`, same tool, ~50k gas).
-5. **DB align** (after the tx): `python3 tools/db-align-sql/gen-filum-sql.py --db-export … --cids cids.csv
-   --doc-updates doc_updates.csv > filum-align.sql`; dry-run with `-f`, then COMMIT. Two
-   parts: 896 `ipfs_cid` path swaps + 128 `alternativePreviewURI` drops (WHERE-pinned to the
-   exact CDN URL). Expected UPDATE 1 × 1,024. After this the API serves the IPFS version.
+5. **DB align** (after the tx) — `filum-align.sql` is READY (generated 2026-09-08; regenerate
+   from a fresh export if anything on Truth changes first):
+   ```
+   psql "<back-office>" -v ON_ERROR_STOP=1 -f ops/cdn-retirement-phase2/filum/filum-align.sql | sort | uniq -c   # dry-run: expect 1024 × "UPDATE 1"
+   { cat ops/cdn-retirement-phase2/filum/filum-align.sql; echo 'COMMIT;'; } | psql "<back-office>" -v ON_ERROR_STOP=1 | sort | uniq -c
+   ```
+   Any count other than 1,024 → ROLLBACK and re-export. After this the API serves the IPFS
+   version for filum and the CDN overlay is gone.
 6. **No OpenSea refresh** is needed for this contract (tokenURI-direct, same as crystalline;
    the refresh hold in STATUS.md still applies). Re-derive the reference set + pin-referenced
    afterwards if `ipfs_reference` rows point at the old artwork dir.
@@ -98,7 +107,8 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
 - `index.html.diff` — the exact 168-byte patch
 - `art_compare.csv` — per-file IPFS-vs-CDN byte comparison (11 files)
 - `pin-and-verify.sh` — operator step 1
-- `export-truth-db.sql` — operator step 3
+- `export-truth-db.sql` — operator step 3 (export is gitignored)
+- `filum-align.sql` — operator step 5, generated 2026-09-08 (1,024 WHERE-pinned UPDATEs)
 - `../../tools/metadata-regen/filum-build.py` — the builder (all proofs)
 - `../../tools/db-align-sql/gen-filum-sql.py` — operator step 5
 - `../../tools/update-token-uri/v4-base-uri.config.filum.example.json` — operator step 4

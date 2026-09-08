@@ -7,7 +7,9 @@ Two changes, both WHERE-pinned to the exact current values (expect UPDATE 1 each
      rows in any other form are listed on stderr and NOT updated (investigate: the
      Truth DB may still carry an older doc generation, see truth-db-align.py).
   B. the 128 filum rows: remove metadata.alternativePreviewURI (the CDN overlay) —
-     only where it equals the recorded CDN URL for that token.
+     only where it equals the recorded value for that token (stored as the relative
+     key `previews/71e2bed5…/1706081014/index.html?<params>`; the API prefixes the host)
+     AND its query string equals the on-chain animation_url's (doc_updates.csv).
 Run only AFTER v4-base-uri.mjs broadcast succeeded (DB follows the chain).
 
   python3 tools/db-align-sql/gen-filum-sql.py --db-export ops/cdn-retirement-phase2/filum/truth_db_export.csv \
@@ -19,9 +21,11 @@ ap.add_argument('--db-export', required=True); ap.add_argument('--cids', require
 a = ap.parse_args()
 cids = {r['what'].split()[0]: r for r in csv.DictReader(open(a.cids))}
 old_base, new_base = cids['base_dir']['old_cid'], cids['base_dir']['new_cid']
-filum = {r['token_id'] for r in csv.DictReader(open(a.doc_updates))}
+filum = {r['token_id']: r['old_animation_url'].split('?', 1)[1] for r in csv.DictReader(open(a.doc_updates))}
 rows = list(csv.DictReader(open(a.db_export)))
-CDN = 'https://cdn.feralfileassets.com/previews/71e2bed5-e224-4ead-8fea-88a8cc067dbe/1706081014/index.html?'
+# stored form measured 2026-09-08: a RELATIVE key (the API prefixes the CDN host); accept the full URL too
+CDN = ('previews/71e2bed5-e224-4ead-8fea-88a8cc067dbe/1706081014/index.html?',
+       'https://cdn.feralfileassets.com/previews/71e2bed5-e224-4ead-8fea-88a8cc067dbe/1706081014/index.html?')
 def q(s): return s.replace("'", "''")
 A, B, skipped, overlay_other = [], [], [], []
 for r in rows:
@@ -31,7 +35,7 @@ for r in rows:
     else: skipped.append((t, r['series_title'], r['ipfs_cid']))
     ov = r['alternative_preview_uri'] or ''
     if t in filum:
-        if ov.startswith(CDN): B.append((t, sid, ov))
+        if ov.startswith(CDN) and ov.split('?', 1)[1] == filum[t]: B.append((t, sid, ov))
         else: overlay_other.append((t, ov))
     elif ov: overlay_other.append((t, ov))
 for t, s, c in skipped: print(f'-- SKIP ipfs_cid not in path form: {t} ({s}): {c[:60]}', file=sys.stderr)
