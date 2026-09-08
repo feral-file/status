@@ -87,8 +87,8 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    proven), 768 untouched → new base dir
    `QmZTedFYmyhEH7G77BTnuVk7DHrYWJzdHaWK4wMeXwkPVo`; both CIDs computed
    offline with the flags that reproduce the current dirs bit-for-bit.
-   **Remaining, operator**: pin on prod-02 via the tunnel
-   (`filum/pin-and-verify.sh`), render check, DB export
+   **Pinned on prod-02 + render-checked 2026-09-08** (`filum/pin-and-verify.sh`
+   green, `filum/render-check/`). **Remaining, operator**: DB export
    (`filum/export-truth-db.sql`), then — **gated on the artist's sign-off**
    (Sean asking, #3435 2026-09-04) — one `setTokenBaseURI` owner tx
    (`v4-base-uri.config.filum.example.json`, same flow as crystalline) and

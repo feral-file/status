@@ -2,7 +2,7 @@
 
 *Prepared 2026-09-08 (Brandon). Part of CDN-retirement phase 2, feral-file/feral-file#3435.
 Decision context: `ops/cdn-retirement-phase2.md` § Pending decisions (option a).
-Everything below the "Operator steps" line is NOT yet done.*
+State 2026-09-08: steps 1–2 DONE (pinned on prod-02, render check passed); 3–5 open, 4 gated.*
 
 ## What is wrong, measured
 
@@ -58,13 +58,20 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
 
 ## Operator steps (in order)
 
-1. **Pin on prod-02** — tunnel from ff-deploy, then:
+1. **Pin on prod-02 — DONE 2026-09-08** (`pin-and-verify.sh` green: both CIDs reproduced by
+   prod-02's `ipfs add`, recursive pins present, gateway 200 on index.html / js/base.js / a
+   base-dir doc, served index.html carries the 7 attributes). Command, for the record:
    ```
    make ipfs-port-forward ENV=prod HOST=prod-02          # in ff-deploy
    ops/cdn-retirement-phase2/filum/pin-and-verify.sh     # adds both dirs, asserts CIDs == cids.csv, checks gateway 200 + 7 attrs
    ```
    Unpin is the rollback (`ipfs pin rm` both new CIDs) if the fix is abandoned.
-2. **Render check** (once served): open
+2. **Render check — DONE 2026-09-08** (`render-check/`): the new dir's index.html opened in
+   Chrome with the token's query params draws the piece on a WebGL canvas exactly like the
+   CDN copy collectors see today (same frame at the same elapsed time), all 7 `<img>` loaded
+   with `crossorigin="anonymous"`, zero page-side console errors; the unpatched old IPFS dir
+   behaves the same when opened same-origin, as expected (the taint only bites cross-origin).
+   Original instruction, kept: open
    `https://ipfs.feralfile.com/ipfs/QmQ8qY…/index.html?edition_number=0&artwork_number=1&blockchain=ethereum&contract=0xBb12686c360e9057be3CD031140035A705e19ceC&token_id=2439046679443273982118864381573244666655869184&token_id_hash=0x24549d9c4200fb1c06d243fff577cb323640f16ab4352a8e0f0fcf30fa91f572`
    in a browser and, embedded cross-origin (e.g. from feralfile.com's viewer), confirm it draws
    rather than a black canvas — that is the failure mode the patch exists for.
