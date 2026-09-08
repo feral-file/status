@@ -109,22 +109,23 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    platform-wide refresh without checking `ops/opensea-metadata-path/README.md`
    first.
 4. **Special-project class (contracts deployed manually from our address,
-   not through the server) — NEW TRACK.** Two problems, one population:
-   (a) OpenSea `collection_uuid` for this class is derived per token
-   (uuid5 of the embedded `collection_name`), so it forks on any name
-   inconsistency; OpenSea holds **57** such collections (17 unbound, 15 bound
-   to v5 values, the rest unbound variants), and five projects have already
-   forked (a2p-v1 ×2, a2p-v2 ×2, aorist-art ×3, artificial-natural-history
-   ×2, temporally-uncaptured ×2, plus coral-arena). Ryan: uuid version is
-   irrelevant to them; what matters is one stable value per collection. We
-   owe Ryan a pinned mapping for all 57 with a winner per fork (promised
-   "next week" on 2026-09-04 = this week). (b) Their media: these tokens have
-   no series rows in our DB, so none of the phase-2 tooling (census pin
-   units, `ipfs_reference`, regen) covers them — their CDN dependency is
-   unmeasured. Enumerate the population from the chain/OpenSea list first
-   (`ops/opensea-metadata-path/opensea_ff_collections_full_2026-09-04.csv`,
-   categories 2/3/7), then decide the storage design for the pinned uuid
-   (server-side, since there are no series rows) before touching media.
+   not through the server) — media MEASURED 2026-09-08**
+   (`ops/special-project-contracts/README.md`). Population = the 103 contracts
+   created by the deployer `0x1d05cf6c…` (Blockscout): 45 platform, 18
+   helpers/tests, **40 NFT contracts / 1,588 tokens outside every census and
+   tool**. The 38 real special projects (1,335 tokens: a2p, Machine
+   Hallucinations, Aorist-era, 2024-25 drops) are **100% `ipfs://` on chain
+   and all 368 media CIDs are served by prod-02** — nothing to repoint. The
+   CDN dependency is **200 tokens on two exhibition-era extra contracts**:
+   `Feral File — Peer to Peer` V3_1 `0x22e130a4…` (198 of 251; all 296 CDN
+   refs already inside phase-2 pin units → doc regen + ~198 trustee txs, no
+   DB) and `Feral File 007` `0xc764a826…` (2). Scope decision needed. Side
+   findings: the indexer does not index 30 of the 40 (registry gap, issue to
+   file); the census cannot take a contract list (issue to file).
+   (b) **collection_uuid pinning** for the 38: per-token uuid5 of
+   `collection_name` → one stored value per collection, server-side; every
+   token's `collection_name` is now on record; design + the 57-row mapping
+   for Ryan (promised week of 2026-09-07) still open.
 5. **Close-out measurement — ONE run, after 1 (and the decisions on 2/4).**
    census on prod-02 → `census-rescan` → status page rebuild →
    `census/<date>` branch → PR. Expected today if run: ETH `dependent`

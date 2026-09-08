@@ -1,84 +1,117 @@
 # Special-project contracts — media dependency + OpenSea collection uuid
 
-*Started 2026-09-08 (Brandon). Track opened by OpenSea's 2026-09-04 audit
+*Measured 2026-09-08 (Brandon). Track opened by OpenSea's 2026-09-04 audit
 (`ops/opensea-metadata-path/ryan_reply_2026-09-04.md`): 57 collections on their side belong
-to contracts we deployed from the deployer address but never published as an exhibition.
-Two questions, one population: (a) does their media depend on the CDN? (b) how does their
-`collection_uuid` get pinned? This directory answers (a) and enumerates the population for (b).*
+to contracts we deployed but never published as an exhibition. Two questions, one
+population: (a) does their media depend on the CDN? (b) how does their `collection_uuid`
+get pinned? This directory answers (a) in full and gives (b) its population.*
 
-## Definition (from the server, `api/swap.go`)
+## Answer in one paragraph
 
-A "special-project" contract is one where `exhibition_contract` has no row for the address
-and `owner() == opensea.deployer_address` (`0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6`).
-For those, the API reads `tokenURI` on chain, fetches the doc from IPFS, rewrites `ipfs://`
-to our gateway, and derives `collection_uuid = uuid5(ns, doc.collection_name)` per token.
-No DB rows exist for these tokens → none of the phase-2 tooling (census pin units,
-`ipfs_reference`, regen) has ever looked at them, and **the census universe cannot see
-them by construction** (token-health-monitor walks FF-API exhibitions → exhibition-contracts
-→ artworks; `discovery.py`).
+Every Ethereum contract created by the Feral File deployer (`0x1d05cf6c…`, 103 contracts,
+2021-10 → 2025-07) was classified. Outside the 45 platform exhibition contracts and 18
+helpers/tests, there are **40 NFT contracts, 1,588 tokens** that no census, DB table or
+phase-2 tool has ever looked at. **1,335 of them (38 contracts, the actual "special
+projects": a2p, Machine Hallucinations, Aorist-era and 2024-25 drops) are already 100%
+`ipfs://` on chain and every one of their media CIDs is served by prod-02.** The CDN
+dependency is concentrated in **two exhibition-era extra contracts: 200 tokens** — 198 on
+`Feral File — Peer to Peer` (`0x22e130a4…`, a `FeralfileExhibitionV3_1`, 251 tokens) and 2
+on `Feral File 007` (`0xc764a826…`, 2021). All 296 CDN references on the P2P contract are
+already inside phase-2's pin units (26 of the 104), so that fix is doc regen + per-token
+`updateArtworkEditionIPFSCid` txs, no new bytes.
 
-## Population — how it was built
+## Definition (server, `api/swap.go`) and why nothing saw these
 
-1. **Ryan's list** (`opensea_ff_collections_full_2026-09-04.csv`, categories 2/3/7 = 81 rows)
-   carries **no contract addresses** for this class (`eth_contracts` empty).
-2. **OpenSea collection pages** (`tools/opensea-slug-contracts.py` → `slug_contracts.csv`): the
-   page HTML embeds the collection's contract. Yield: 21 real-looking addresses; 41 pages
-   only carried template noise (`0x4200…0006`, OP-stack WETH) and 19 returned 404 (the
-   unbound/auto-created ones). **Of the 21, only 8 exist on Ethereum mainnet** — the other
-   13 have no code at `latest` (`zero_token_contracts_chain.csv`), so those OpenSea
-   collections are either on another chain or the page's most-mentioned address is not the
-   collection contract. Not ours on mainnet either way.
-3. **The indexer** (`indexer-v2.feralfile.com/graphql`) is registry-driven by
-   `deployer_addresses` (ff-deploy `ansible/app_defaults/indexer/registry/publisher.json`),
-   so everything deployed from `0x1d05cf6c…` should be in it under publisher "Feral File".
-   `tools/indexer-walk.py` walks the whole Ethereum index (light fields, 255/page) into
-   `indexer_universe.csv` (gitignored, ~250-400k rows across all publishers); the derived
-   per-contract table is `indexer_contracts_feralfile.csv` (see below once the walk lands).
-   Note the registry's `collection_addresses` list (53) is exactly the platform set — it
-   adds nothing for this class.
+A non-exhibition contract is served when `exhibition_contract` has no row for the address
+and `owner() == opensea.deployer_address`: the API reads `tokenURI` on chain, fetches the
+doc from IPFS, rewrites `ipfs://` to our gateway, and derives
+`collection_uuid = uuid5(ns, doc.collection_name)` **per token**. No DB rows exist for
+these tokens → the census (`token-health-monitor/discovery.py` walks FF-API exhibitions →
+exhibition-contracts → artworks) excludes them by construction, and so do the phase-2
+tools. The indexer (`indexer-v2.feralfile.com`) holds only 9 of the 40 (see below).
 
-## Media audit — the 8 mainnet special-project contracts (2026-09-08)
+## Population — how it was built (`population.csv`, 103 rows)
 
-`tools/audit-contracts.py` pulls every token per contract from the indexer with the raw
-on-chain doc (`metadata.origin_json`) and classifies `image` / `animation_url` by host.
+1. **Ryan's list** carries no contract addresses for this class (`eth_contracts` empty on
+   all 81 rows); OpenSea collection pages embed a contract for some (21 real ones,
+   `slug_contracts.csv`) but 41 pages only show template noise and 19 are 404.
+2. **Blockscout, contracts created by the deployer** (`deployer_created_contracts.csv`):
+   557 txs → **103 contracts**. This is the authoritative population. The other creators
+   behind the 8 platform contracts not on that list (`other_deployers_created.csv`:
+   `0x4f269268…` = the V4/V4_1 family incl. Truth, `0x2033606b…` and `0x8f3db771…` =
+   test contracts only) add no special projects.
+3. **Indexer walk** (`tools/indexer-walk.py`, 242,009 Ethereum tokens across all
+   publishers; raw output deleted, derived table `indexer_contracts_feralfile.csv`): Feral
+   File = 24,879 tokens on 60 contracts, **51 platform + 9 non-platform** — the 8
+   a2p/Machine-Hallucinations-era contracts plus the P2P V3_1. **The 30 Aorist-era and
+   2024-25 contracts are not indexed at all** (registry gap: `deployer_addresses` in
+   `publisher.json` does not pull them in) — an ff-indexer-v2 issue to file.
+   Two platform contracts are also absent (`0x87355eb8…` internal auction, `0x14a62abf…`).
 
-| collection (OpenSea slug) | contract | tokens | media |
-|---|---|---|---|
-| a2p-v1 | `0x3892f76b…` | 346 | all `ipfs://` |
-| a2p-v2 | `0xc3ecd59b…` | 519 | all `ipfs://` |
-| machine-hallucinations-coral-artificial-reef | `0x7acc33c0…` | 66 | all `ipfs://` |
-| machine-hallucinations-coral-generative-ai-data-painting | `0x4ce2b581…` | 53 | all `ipfs://` |
-| the-adventures-of-minoriea (Auriea Harvey) | `0xdb8acab6…` | 4 | all `ipfs://` |
-| take-over-miami (Reisinger) | `0xbcb540b5…` | 2 | all `ipfs://` |
-| self-contained (Entangled Others) | `0x6b7f2e36…` | 1 | all `ipfs://` |
-| social-sacrifice (DRIFT) | `0xb1676ce8…` | 1 | all `ipfs://` |
+| class | contracts | tokens | media all `ipfs://` | media on FF CDN |
+|---|---|---|---|---|
+| platform exhibition contracts | 45 | (census scope) | — | — |
+| special projects, indexed (a2p-v1/v2, MH Coral ×2, Minoriea, Take Over Miami, self-contained, Social Sacrifice) | 8 | 992 | 992 | 0 |
+| special projects, un-indexed (AoristArt ×9, Coral Arena ×2, Hall of Visions, Mushroom Cloud, Quayola ×3, Reisinger ×4, chromatophores, Neural Zoo ×2, Temporally Uncaptured ×2, Artificial Natural History ×2, Take Over Madrid, Collide, Decohering Delineation, …) | 30 | 343 | 343 | 0 |
+| exhibition-era extra: `Feral File — Peer to Peer` V3_1 `0x22e130a4…` (METASOTO, Winslow Homer's Croquet Challenge, Wheel of Life, Bend, Caryatid ×4, … — 15 Peer to Peer series, AE/PP-style editions) | 1 | 251 | 53 | **198** |
+| exhibition-era extra: `Feral File 007` `0xc764a826…` (2021) | 1 | 2 | 0 | **2** |
+| helpers / tests (TokenBatchTransfer, Vault, EnglishAuction, SeriesRegistry, MerkleRegistry, OwnerData, LibBytes, unnamed 0-tx) | 18 | — | — | — |
 
-**992 tokens, 0 on `cdn.feralfileassets.com` / `imagedelivery.net`, 0 third-party, 0 burned.**
-662 docs have `image` + `animation_url`, 330 have `image` only. Every doc carries a
-`collection_name` (this is what the API hashes into `collection_uuid`).
+## How the media was measured
 
-**Resolvability** (`media_cid_probe.csv`): the 227 distinct media CIDs behind those 992
-docs — **227/227 served by `ipfs.feralfile.com` (prod-02, `NoFetch`, so 200/206 means
-locally present)** and 226/227 by `ipfs.io` (one transient 504). So this class is not
-CDN-dependent and is already pinned on our serving node; nothing to repoint.
+- Indexed contracts: `tools/audit-contracts.py` — every token's raw on-chain doc
+  (`metadata.origin_json`) from the indexer, `image`/`animation_url` classified by host
+  (`special_project_tokens.csv` 992 rows, `special_project_summary.csv`; the P2P contract's
+  206 indexed tokens are in `round2_tokens.csv`).
+- Un-indexed contracts: Blockscout token instances + metadata
+  (`round2_chain_tokens.csv`, 596 rows incl. P2P's 251), and for the 247 tokens Blockscout
+  had no metadata for, the FF API's own non-exhibition path
+  (`/api/contracts/<c>/tokens/<id>` → chain `tokenURI` → IPFS): **247/247 HTTP 200, all
+  `ipfs://`** (`round2_ffapi_tokens.csv`). Contract facts: `round2_contracts_blockscout.csv`.
+- Resolvability of the docs' media CIDs (`Range: bytes=0-0` GET):
+  - indexed 8: 227 distinct CIDs — **227/227 on `ipfs.feralfile.com`**, 226/227 on ipfs.io
+    (`media_cid_probe.csv`);
+  - un-indexed 30: 141 distinct CIDs — **141/141 on `ipfs.feralfile.com`**; ipfs.io 26 ok +
+    115 HTTP 429 (rate-limited, not a miss — a paced re-probe is recorded in
+    `round2_media_cid_reprobe_slow.csv` when it lands).
+  prod-02 runs `Gateway.NoFetch`, so a 200/206 there means the bytes are locally present.
+  Whether they are explicitly pinned or only cached is not distinguishable from outside —
+  feed the 368 CIDs to the next `tools/pin-referenced` run (they are not in any DB export).
 
-Caveat: these are the on-chain docs. Whether the CIDs are *explicitly pinned* on prod-02
-or only cached (the 2026-08-28 finding for platform tokens) is not distinguished by a
-gateway probe — fold them into the next `tools/pin-referenced` run (they are not in the DB
-export that tool starts from, so give it this directory's CID list).
+## The 200 CDN-dependent tokens — what the fix would be
 
-Records: `special_project_tokens.csv` (992 rows), `special_project_summary.csv`,
-`media_cid_probe.csv`, `candidate_contracts.csv`, `zero_token_contracts_chain.csv`.
+**`0x22e130a4…` (P2P V3_1, verified on Sourcify as `FeralfileExhibitionV3_1`)**: docs are
+server-generated (`id`, `symbols`, `metadata_version` keys), media point at
+`previews/<series>/<ts>/…` and `thumbnails/…` of 15 Peer to Peer series that live in our DB
+under the V3 contract `0x2A86C546…`. All 296 CDN references fall inside 26 existing phase-2
+pin units (`step1/dir_cids.csv`), so the bytes are pinned already. The contract exposes
+`updateArtworkEditionIPFSCid(uint256,string)` (trustee) and `setTokenBaseURI(string)` —
+the V3 phase-2 path applies unchanged: byte-preserving doc regen (`v3-doc-regen.py` over
+the 198 docs) → pin → ~198 trustee txs. No DB rows to align. **Not started; needs a
+decision that this contract is in scope** (it is not on the status page and not an
+exhibition contract, but it is Feral File-published work).
+**`0xc764a826…` (Feral File 007, 2021, 2 tokens)**: same shape, 2 docs.
 
 ## Open
 
-- **Population completeness**: the indexer walk (`indexer_universe.csv` →
-  `indexer_contracts_feralfile.csv`) is the authoritative check; any contract it holds
-  under "Feral File" that is not in the platform 53 and not in the 8 above gets the same
-  audit. Independently, ask Ryan for the contract address + chain per collection — his 57
-  are keyed on collection ownership on OpenSea's side and may include non-mainnet chains.
-- **(b) collection_uuid pinning** for this class: per-token uuid5 of `collection_name` →
-  needs one stored value per collection, server-side (no series rows). Design pending;
-  see `ops/opensea-metadata-path/README.md` § special-project class.
-- Census blind spot: file an agentic-workflows issue so token-health-monitor can take a
-  contract list in addition to the exhibition walk.
+- (b) `collection_uuid` pinning for the 38 special-project contracts: per-token uuid5 of
+  `collection_name` → one stored value per collection, server-side. The population and
+  every token's `collection_name` are in this directory (`special_project_tokens.csv`,
+  `round2_chain_tokens.csv`, `round2_ffapi_tokens.csv`). Design + Ryan's 57-row mapping
+  pending (`ops/opensea-metadata-path/README.md` § special-project class).
+- Decide scope for the 200 CDN-dependent exhibition-era tokens (above).
+- File: ff-indexer-v2 (30 deployer-created ERC-721 contracts not indexed),
+  agentic-workflows (census cannot take a contract list).
+- Fold the 368 media CIDs into `tools/pin-referenced`.
+
+## Files
+
+`population.csv` (the 103-contract table) · `deployer_created_contracts.csv` ·
+`other_deployers_created.csv` · `indexer_contracts_feralfile.csv` ·
+`indexer_releases_feralfile.csv` · `slug_contracts.csv` · `candidate_contracts*.csv` ·
+`round2_contracts_blockscout.csv` · `special_project_tokens.csv` ·
+`special_project_summary.csv` · `round2_tokens.csv` · `round2_summary.csv` ·
+`round2_chain_tokens.csv` · `round2_chain_summary.csv` · `round2_ffapi_tokens.csv` ·
+`media_cid_probe.csv` · `round2_media_cid_probe.csv` · `round2_media_cid_reprobe*.csv` ·
+`zero_token_contracts_chain.csv` (superseded: its "no code" verdicts were 1rpc rate-limit
+nulls, see `round2_contracts_blockscout.csv`) · `tools/` (walker, auditors, slug scraper).
