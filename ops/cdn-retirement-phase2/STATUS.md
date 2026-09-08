@@ -115,7 +115,9 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    helpers/tests, **40 NFT contracts / 1,588 tokens outside every census and
    tool**. The 38 real special projects (1,335 tokens: a2p, Machine
    Hallucinations, Aorist-era, 2024-25 drops) are **100% `ipfs://` on chain
-   and all 368 media CIDs are served by prod-02** — nothing to repoint. The
+   and all 368 media CIDs are on prod-02** — nothing to repoint; 367 of them
+   were cache-only and were given recursive pins 2026-09-08 (ff-deploy#28
+   policy). The
    CDN dependency is **200 tokens on two exhibition-era extra contracts**:
    `Feral File — Peer to Peer` V3_1 `0x22e130a4…` (198 of 251; all 296 CDN
    refs already inside phase-2 pin units → doc regen + ~198 trustee txs, no

@@ -13,7 +13,8 @@ Every Ethereum contract created by the Feral File deployer (`0x1d05cf6c…`, 103
 helpers/tests, there are **40 NFT contracts, 1,588 tokens** that no census, DB table or
 phase-2 tool has ever looked at. **1,335 of them (38 contracts, the actual "special
 projects": a2p, Machine Hallucinations, Aorist-era and 2024-25 drops) are already 100%
-`ipfs://` on chain and every one of their media CIDs is served by prod-02.** The CDN
+`ipfs://` on chain and every one of their 368 media CIDs is on prod-02 — served, and
+since 2026-09-08 explicitly pinned (367 had been cache-only).** The CDN
 dependency is concentrated in **two exhibition-era extra contracts: 200 tokens** — 198 on
 `Feral File — Peer to Peer` (`0x22e130a4…`, a `FeralfileExhibitionV3_1`, 251 tokens) and 2
 on `Feral File 007` (`0xc764a826…`, 2021). All 296 CDN references on the P2P contract are
@@ -68,17 +69,17 @@ tools. The indexer (`indexer-v2.feralfile.com`) holds only 9 of the 40 (see belo
   had no metadata for, the FF API's own non-exhibition path
   (`/api/contracts/<c>/tokens/<id>` → chain `tokenURI` → IPFS): **247/247 HTTP 200, all
   `ipfs://`** (`round2_ffapi_tokens.csv`). Contract facts: `round2_contracts_blockscout.csv`.
-- Resolvability of the docs' media CIDs (`Range: bytes=0-0` GET):
-  - indexed 8: 227 distinct CIDs — **227/227 on `ipfs.feralfile.com`**, 226/227 on ipfs.io
-    (`media_cid_probe.csv`);
-  - un-indexed 30: 141 distinct CIDs — **141/141 on `ipfs.feralfile.com`**; ipfs.io 26 ok +
-    115 HTTP 429 (rate-limited, not a miss). A paced re-probe (12 s apart) was started and
-    killed by the OS before finishing; rerun it before claiming public resolvability for
-    this class: `round2_media_cid_reprobe.csv` holds the 115 CIDs, probe each on ipfs.io
-    with ≥10 s spacing and record to `round2_media_cid_reprobe_slow.csv`.
-  prod-02 runs `Gateway.NoFetch`, so a 200/206 there means the bytes are locally present.
-  Whether they are explicitly pinned or only cached is not distinguishable from outside —
-  feed the 368 CIDs to the next `tools/pin-referenced` run (they are not in any DB export).
+- Resolvability + **pin status on prod-02** (the serving node, `Gateway.NoFetch`):
+  - indexed 8: 227 distinct media CIDs, un-indexed 30: 141 — **368/368 served by
+    `ipfs.feralfile.com`** (`media_cid_probe.csv`, `round2_media_cid_probe.csv`).
+  - **Pin check through the kubo API (2026-09-08, `prod02_pin_status_before.csv`): only 1 of
+    the 368 was a recursive pin root; 367 were present as unpinned cache** — the same
+    survive-only-because-GC-is-off exposure found for platform tokens on 2026-08-28
+    (ff-deploy#28 policy: everything referenced must be pinned). Fixed on the spot with
+    `tools/pin-referenced/batch_pin.py` (local pinset operation, no fetch):
+    **368/368 now recursive pin roots** (`prod02_pin_status.csv`; recursive pins 82,555 →
+    82,922). Public-gateway reachability was deliberately not re-measured (decision
+    2026-09-08: pinned on prod-02 is the requirement).
 
 ## The 200 CDN-dependent tokens — what the fix would be
 
@@ -104,7 +105,7 @@ exhibition contract, but it is Feral File-published work).
 - Decide scope for the 200 CDN-dependent exhibition-era tokens (above).
 - File: ff-indexer-v2 (30 deployer-created ERC-721 contracts not indexed),
   agentic-workflows (census cannot take a contract list).
-- Fold the 368 media CIDs into `tools/pin-referenced`.
+- Keep this directory's 368 CIDs in future `tools/pin-referenced` runs (they are in no DB export): `prod02_pin_status.csv` is the list.
 
 ## Files
 
@@ -114,6 +115,6 @@ exhibition contract, but it is Feral File-published work).
 `round2_contracts_blockscout.csv` · `special_project_tokens.csv` ·
 `special_project_summary.csv` · `round2_tokens.csv` · `round2_summary.csv` ·
 `round2_chain_tokens.csv` · `round2_chain_summary.csv` · `round2_ffapi_tokens.csv` ·
-`media_cid_probe.csv` · `round2_media_cid_probe.csv` · `round2_media_cid_reprobe*.csv` ·
+`media_cid_probe.csv` · `round2_media_cid_probe.csv` · `prod02_pin_status_before.csv` · `prod02_pin_status.csv` · `prod02_unpinned_cids.txt` ·
 `zero_token_contracts_chain.csv` (superseded: its "no code" verdicts were 1rpc rate-limit
 nulls, see `round2_contracts_blockscout.csv`) · `tools/` (walker, auditors, slug scraper).
