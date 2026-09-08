@@ -1,5 +1,5 @@
 contract,created,class,contract_name,token_name,tokens_onchain,in_indexer,tokens_indexed,media_all_ipfs,media_ff_cdn,media_third_party,source_of_media_audit
-0xc764a826285a75715db602108d706f72418586c2,2021-10-26,exhibition-era extra contract (2021),FeralfileExhibition,Feral File 007,2,False,,0,2,0,blockscout metadata + FF API
+0xc764a826285a75715db602108d706f72418586c2,2021-10-26,"superseded contract (2021 pre-V2; 2/2 in deployer wallet, twins on official V2 0x29C9 held by collectors)",FeralfileExhibition,Feral File 007,2,False,,0,2,0,blockscout metadata + FF API
 0x63c8282c8705e7873b3302bd623b2bc8ebcdddd3,2021-11-14,platform,,,,True,266,,,,
 0xe5163c74ffe6563d75d750e5d767122500a1c337,2021-11-14,platform,,,,True,113,,,,
 0x1d5bdc75918600541c115b74b81a404c9e4af7d4,2021-11-19,platform,,,,True,355,,,,
@@ -22,7 +22,7 @@ contract,created,class,contract_name,token_name,tokens_onchain,in_indexer,tokens
 0xd74745721e3b9c3d784f15bfba2802fa2e9955d9,2022-11-08,platform,,,,True,200,,,,
 0x6e82e4b398ca4137007ba69ddd6ff699334d13b5,2022-11-09,platform,,,,True,158,,,,
 0x7e6c132b8cb00899d17750e0fd982ea122c6b0f2,2022-11-17,platform,,,,True,269,,,,
-0x22e130a4ef1effddafdf0b9825dc03d83747664e,2022-11-21,exhibition-era extra contract (P2P V3_1),Feral File — Peer to Peer,Feral File — Peer to Peer,251,True,206,53,198,0,blockscout metadata + FF API
+0x22e130a4ef1effddafdf0b9825dc03d83747664e,2022-11-21,"superseded contract (P2P V3_1; 204/251 in FF vault, 47 AE/PP all re-issued on official V3 0x2A86)",Feral File — Peer to Peer,Feral File — Peer to Peer,251,True,206,53,198,0,blockscout metadata + FF API
 0x2a86c5466f088caebf94e071a77669bae371cd87,2022-11-26,platform,,,,True,584,,,,
 0xb14b42814895fc1b0a528a475f8a5b070eb4c671,2022-11-29,platform,,,,True,274,,,,
 0x14a62abfec0e09159fbe9c050f3b03044fc7ea52,2022-12-12,platform,,,,False,,,,,

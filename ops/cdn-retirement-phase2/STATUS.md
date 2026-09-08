@@ -118,10 +118,12 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    and all 368 media CIDs are on prod-02** — nothing to repoint; 367 of them
    were cache-only and were given recursive pins 2026-09-08 (ff-deploy#28
    policy). The
-   CDN dependency is **200 tokens on two exhibition-era extra contracts**:
-   `Feral File — Peer to Peer` V3_1 `0x22e130a4…` (198 of 251; all 296 CDN
-   refs already inside phase-2 pin units → doc regen + ~198 trustee txs, no
-   DB) and `Feral File 007` `0xc764a826…` (2). Scope decision needed. Side
+   only CDN dependency (200 tokens) is on **two superseded contracts** —
+   P2P V3_1 `0x22e130a4…` (204/251 in the FF vault, the 47 AE/PP all
+   re-issued on the official V3) and the 2021 `Feral File 007` `0xc764a826…`
+   (2/2 back in the deployer wallet, twins on V2 held by collectors) —
+   **nothing to remediate**; recorded as superseded. So this class needs no
+   media work at all. Side
    findings: the indexer does not index 30 of the 40 (registry gap, issue to
    file); the census cannot take a contract list (issue to file).
    (b) **collection_uuid pinning** for the 38: per-token uuid5 of

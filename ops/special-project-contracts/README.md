@@ -14,12 +14,12 @@ helpers/tests, there are **40 NFT contracts, 1,588 tokens** that no census, DB t
 phase-2 tool has ever looked at. **1,335 of them (38 contracts, the actual "special
 projects": a2p, Machine Hallucinations, Aorist-era and 2024-25 drops) are already 100%
 `ipfs://` on chain and every one of their 368 media CIDs is on prod-02 — served, and
-since 2026-09-08 explicitly pinned (367 had been cache-only).** The CDN
-dependency is concentrated in **two exhibition-era extra contracts: 200 tokens** — 198 on
-`Feral File — Peer to Peer` (`0x22e130a4…`, a `FeralfileExhibitionV3_1`, 251 tokens) and 2
-on `Feral File 007` (`0xc764a826…`, 2021). All 296 CDN references on the P2P contract are
-already inside phase-2's pin units (26 of the 104), so that fix is doc regen + per-token
-`updateArtworkEditionIPFSCid` txs, no new bytes.
+since 2026-09-08 explicitly pinned (367 had been cache-only).** The only CDN
+dependency (200 tokens) sits on **two superseded contracts** — `Feral File — Peer to Peer`
+V3_1 `0x22e130a4…` (251 tokens) and `Feral File 007` `0xc764a826…` (2 tokens) — each
+replaced within days by the official contract that the DB, census and collectors use
+(evidence below). Nothing on them needs repointing; they should be recorded as superseded,
+not as a remediation population.
 
 ## Definition (server, `api/swap.go`) and why nothing saw these
 
@@ -54,8 +54,8 @@ tools. The indexer (`indexer-v2.feralfile.com`) holds only 9 of the 40 (see belo
 | platform exhibition contracts | 45 | (census scope) | — | — |
 | special projects, indexed (a2p-v1/v2, MH Coral ×2, Minoriea, Take Over Miami, self-contained, Social Sacrifice) | 8 | 992 | 992 | 0 |
 | special projects, un-indexed (AoristArt ×9, Coral Arena ×2, Hall of Visions, Mushroom Cloud, Quayola ×3, Reisinger ×4, chromatophores, Neural Zoo ×2, Temporally Uncaptured ×2, Artificial Natural History ×2, Take Over Madrid, Collide, Decohering Delineation, …) | 30 | 343 | 343 | 0 |
-| exhibition-era extra: `Feral File — Peer to Peer` V3_1 `0x22e130a4…` (METASOTO, Winslow Homer's Croquet Challenge, Wheel of Life, Bend, Caryatid ×4, … — 15 Peer to Peer series, AE/PP-style editions) | 1 | 251 | 53 | **198** |
-| exhibition-era extra: `Feral File 007` `0xc764a826…` (2021) | 1 | 2 | 0 | **2** |
+| **superseded** contract: `Feral File — Peer to Peer` V3_1 `0x22e130a4…` (METASOTO, Winslow Homer's Croquet Challenge, Wheel of Life, Bend, Caryatid ×4, … — 15 Peer to Peer series, AE/PP-style editions) | 1 | 251 | 53 | **198** |
+| **superseded** contract: `Feral File 007` `0xc764a826…` (2021) | 1 | 2 | 0 | **2** |
 | helpers / tests (TokenBatchTransfer, Vault, EnglishAuction, SeriesRegistry, MerkleRegistry, OwnerData, LibBytes, unnamed 0-tx) | 18 | — | — | — |
 
 ## How the media was measured
@@ -81,19 +81,35 @@ tools. The indexer (`indexer-v2.feralfile.com`) holds only 9 of the 40 (see belo
     82,922). Public-gateway reachability was deliberately not re-measured (decision
     2026-09-08: pinned on prod-02 is the requirement).
 
-## The 200 CDN-dependent tokens — what the fix would be
+## The two CDN-dependent contracts are superseded (verified 2026-09-08)
 
-**`0x22e130a4…` (P2P V3_1, verified on Sourcify as `FeralfileExhibitionV3_1`)**: docs are
-server-generated (`id`, `symbols`, `metadata_version` keys), media point at
-`previews/<series>/<ts>/…` and `thumbnails/…` of 15 Peer to Peer series that live in our DB
-under the V3 contract `0x2A86C546…`. All 296 CDN references fall inside 26 existing phase-2
-pin units (`step1/dir_cids.csv`), so the bytes are pinned already. The contract exposes
-`updateArtworkEditionIPFSCid(uint256,string)` (trustee) and `setTokenBaseURI(string)` —
-the V3 phase-2 path applies unchanged: byte-preserving doc regen (`v3-doc-regen.py` over
-the 198 docs) → pin → ~198 trustee txs. No DB rows to align. **Not started; needs a
-decision that this contract is in scope** (it is not on the status page and not an
-exhibition contract, but it is Feral File-published work).
-**`0xc764a826…` (Feral File 007, 2021, 2 tokens)**: same shape, 2 docs.
+**`0x22e130a4…` P2P V3_1** (deployed 2022-11-21; all its activity is 2022-11-21 → 11-26):
+- **204 of 251 tokens sit in the Feral File vault-trustee wallet `0xbeb9f810…`** — never
+  distributed. 150 of them have a same-named twin on the official V3 `0x2A86C546…`.
+- The other **47 are all AE/PP editions** (artist editions / publisher proofs) sent to 15
+  wallets on 2022-11-21; **every one has a same-named twin on the official V3** — 45 held
+  there by a different wallet, 2 by the same wallet (`Winslow Homer's Croquet Challenge
+  AE`, `0x63ff78ef…`). I.e. the AE/PP were re-issued on V3 and these are stale duplicates.
+- The official V3 (584 tokens today, 611 at phase-2 time) holds the same 15 series incl.
+  46 AE/PP-named tokens, and is what the DB's `exhibition_contract`, the census and
+  phase-2 covered.
+- `tokenURI` here is `https://ipfs.bitmark.com/ipfs/<docCID>` (V3 shape); the contract
+  has `updateArtworkEditionIPFSCid` + `setTokenBaseURI`, so a fix *could* be done (docs'
+  296 CDN refs are all inside phase-2 pin units), but there is nothing to fix for
+  collectors — the live editions are on V3.
+
+**`0xc764a826…` Feral File 007** (`FeralfileExhibition`, 2021-10-26, compiler 0.8.0, the
+pre-V2 contract with `swapArtworkFromBitmark`):
+- Both remaining tokens (`Vague Recollection #67`, `Solstice Sky Dream #40`, exhibition
+  "Reflections in the Water") were **returned to the deployer wallet on 2021-11-22** and
+  sit there today; **the same editions exist on the official V2 `0x29C9E04E…`** held by
+  the original collectors (e.g. `0xE2dbEB9e…`, the wallet that received #67 on this
+  contract first). Classic early-swap → re-swap-on-V2 history.
+
+**Recommendation**: classify both as *superseded contracts* in `population.csv` (done) and
+on any future status-page scope note; do not spend txs on them. Optional hygiene: burn the
+204 + 2 vault/deployer-held tokens so they stop surfacing on OpenSea/indexers (a decision
+for Sean; not required for permanence).
 
 ## Open
 
@@ -102,7 +118,6 @@ exhibition contract, but it is Feral File-published work).
   every token's `collection_name` are in this directory (`special_project_tokens.csv`,
   `round2_chain_tokens.csv`, `round2_ffapi_tokens.csv`). Design + Ryan's 57-row mapping
   pending (`ops/opensea-metadata-path/README.md` § special-project class).
-- Decide scope for the 200 CDN-dependent exhibition-era tokens (above).
 - File: ff-indexer-v2 (30 deployer-created ERC-721 contracts not indexed),
   agentic-workflows (census cannot take a contract list).
 - Keep this directory's 368 CIDs in future `tools/pin-referenced` runs (they are in no DB export): `prod02_pin_status.csv` is the list.
