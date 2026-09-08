@@ -29,7 +29,15 @@ data/  →  build.py  →  public/
 - `data/census/token_census_*.csv` — output of the token-health-monitor
   census (`agentic-workflows/token-health-monitor`, `--census` mode).
   Optional: until the first census lands, buckets 1 and 2 render as
-  "census in progress".
+  "census in progress". Two shapes: schema 2 (2026-09 on; a `verdict`
+  column per file — `redundant` / `independent` / `ff_only` /
+  `unreachable` / `unmeasured`, from our own gateway + one public gateway we
+  do not operate + delegated-routing providers) and schema 1 (older; one
+  `<gateway>_ok` column per gateway, bucketed on `ipfs_io_ok`). `build.py`
+  detects the shape by the `verdict` column; `unmeasured` renders as its
+  own state and is never folded into a gap or a pass. Re-probe a schema 2
+  census's `unmeasured` files with `tools/census-rescan/rescan-cids.py`
+  (CID-level, resumable, minutes not hours).
 - `data/updates.json` — dated changelog entries; rendered on the page and
   as `feed.xml` (RSS).
 

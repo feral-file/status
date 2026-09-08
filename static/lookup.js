@@ -2,8 +2,14 @@
 // Same data as the tiles; no backend, everything fetched same-origin.
 
 const STATE_LABEL = {
+  redundant:
+    "resolves without Feral File, and a provider other than Feral File holds every file (redundant)",
   independent: "resolves without Feral File",
-  gateway_gap: "content-addressed, but failing on a public gateway",
+  gateway_gap: "is content-addressed, but failed the last probe through every gateway checked",
+  ff_only:
+    "is content-addressed, but only Feral File's own node served it on the last probe — pinned by us, held by no one else yet",
+  unmeasured:
+    "could not be measured on the last census (the probe was rate-limited or errored) — neither a gap nor a pass; it is re-probed before the next publish",
   dependent: "depends entirely on Feral File",
   not_migrated: "is not yet migrated from Bitmark — its published references resolve through Feral File's CDN until its collector migrates it; a byte-verified archival copy exists on IPFS (address below)",
   third_party: "depends on a third-party platform",
@@ -51,7 +57,20 @@ function el(tag, attrs, ...children) {
 function fileRow(f) {
   let where;
   let result;
-  if (f.host === "ipfs") {
+  if (f.host === "ipfs" && f.verdict) {
+    // Census schema 2: ours + one public gateway + providers -> verdict.
+    where = "IPFS " + f.cid.slice(0, 10) + "…";
+    const pub = f.public || "";
+    const prov = f.providers
+      ? `providers: ${f.providers.total} (${f.providers.nonff} not Feral File)`
+      : "providers: unmeasured";
+    result = [
+      `ours: ${(f.ours || "unmeasured").replace(/ from media host.*$/, "")}`,
+      `public: ${pub || "unmeasured"}`,
+      prov,
+      `verdict: ${f.verdict.replace("_", " ")}`,
+    ].join(" · ");
+  } else if (f.host === "ipfs") {
     where = "IPFS " + f.cid.slice(0, 10) + "…";
     result = ["ipfs.io", "ipfs.feralfile.com", "dweb.link"]
       .map((gw) => `${gw}: ${f[gw]}`)

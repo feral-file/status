@@ -12,8 +12,12 @@ own scanner, and emit rows in the same CSV shape so the two files align.
   #    whose files ALL pass now has its rows replaced in --target
   python3 rescan.py --monitor … --target data/census/token_census_B.csv --retry-failed
 
-Both modes use census._TokenScanner (identical probes: metadata endpoint,
-per-CID checks on every census.ipfs_probe_gateways, CDN/other health).
+Both modes use census._TokenScanner (identical probes: metadata endpoint, the
+census's per-CID measurement, CDN/other health). Mode B is for SCHEMA-1
+CSVs (per-gateway `_ok` columns) only; a schema-2 census (`verdict`
+column) is re-probed per CID with rescan-cids.py instead -- token-level
+re-probing of `unmeasured` rows would repeat the rate-limit storm it is
+meant to fix.
 
 Mode A exists because the daemon's universe walk drops tokens held by Feral
 File contracts (vault / bridge); this keeps them measured rather than missing.
@@ -46,10 +50,11 @@ scanner = census._TokenScanner(cfg, requests.Session())
 if scanner.header != header: sys.exit(f'header mismatch: scanner {scanner.header} vs target {header} — gateway list differs')
 gw_cols = [c for c in header if c.endswith('_ok')]
 ref_of = lambda r: discovery.TokenRef(chain=r['chain'], contract=r['contract'], token_id=r['token_id'], exhibition_id=r['exhibition'])
-def show(t, out): return f"  …{t.token_id[-8:]} " + ' | '.join(f"{r['resource']}:{(r['ipfs_io_ok'] or r['http_status'])[:14]}" for r in out)
+def show(t, out): return f"  …{t.token_id[-8:]} " + ' | '.join(f"{r['resource']}:{(r.get('verdict') or r.get('ipfs_io_ok') or r['http_status'])[:14]}" for r in out)
 def summary(rows): return collections.Counter(tuple(r[c] for c in gw_cols) for r in rows if r['cid']).most_common()
 
 if a.retry_failed:
+    if 'verdict' in header: sys.exit('schema-2 census (verdict column): use rescan-cids.py for a CID-level re-probe')
     failed = {key(r) for r in tgt if r['cid'] and any(r[c] != 'ok' for c in gw_cols)}
     todo = {k: ref_of(r) for r in tgt if r['resource'] == 'metadata' and (k := key(r)) in failed}
     print(f'{len(todo)} tokens with a failed gateway probe — re-probing once', file=sys.stderr)
@@ -83,4 +88,4 @@ with open(out_path, 'a' if a.append else 'w', newline='') as f:
     if not a.append: w.writeheader()
     w.writerows(rows)
 print(f'{len(rows)} rows {"appended to" if a.append else "written to"} {out_path}', file=sys.stderr)
-print('gateway results:', summary(rows), file=sys.stderr)
+print('gateway-column results (schema 2: the own-gateway column only):', summary(rows), file=sys.stderr)
