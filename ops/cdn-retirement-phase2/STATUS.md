@@ -93,11 +93,12 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    as relative keys with params identical to chain; `filum/filum-align.sql`
    generated — **896 `ipfs_cid` path swaps only; the display overlay is kept
    (decision 2026-09-08: align the chain, not feralfile.com's display)**, so
-   the 128 stay in the status page's overlay class. **Remaining**:
-   **gated on the artist's sign-off** (Sean asking, #3435 2026-09-04) — one
-   `setTokenBaseURI` owner tx (`v4-base-uri.config.filum.example.json`, same
-   flow as crystalline), then apply `filum-align.sql` (dry-run → 896 ×
-   UPDATE 1 → COMMIT).
+   the 128 stay in the status page's overlay class. **DB align APPLIED
+   2026-09-08** (896 × UPDATE 1). **Only the owner tx remains**: requested
+   from the key holder 2026-09-08, pending (gas-capped at 1 gwei); until it
+   lands the DB leads the chain (chain read 2026-09-08 still `QmQjzv…`).
+   Done when `tokenURI` returns `ipfs://QmZTed…/<id>`; then filum is closed
+   and the platform-minted side is down to Ten Whistlegraphs (deferred).
 2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) — DEFERRED.** Overlay to
    aesthetic.computer (third-party by choice). Decision pending with
    Sean/Hieu; nothing to run. Status page reclassification only.

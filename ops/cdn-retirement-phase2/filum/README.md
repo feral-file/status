@@ -3,8 +3,9 @@
 *Prepared 2026-09-08 (Brandon). Part of CDN-retirement phase 2, feral-file/feral-file#3435.
 Decision context: `ops/cdn-retirement-phase2.md` § Pending decisions (option a).
 State 2026-09-08: steps 1–3 DONE (pinned, render-checked, DB measured + align SQL generated);
-step 4 (chain tx) gated on the artist; step 5 is `filum-align.sql` (896 `ipfs_cid` swaps only —
-the display overlay stays, decision 2026-09-08), apply only after 4.*
+Step 5 (`filum-align.sql`, 896 `ipfs_cid` swaps, overlay kept) APPLIED 2026-09-08; step 4 (the
+owner tx) requested from the key holder the same day and PENDING — until it lands the DB leads
+the chain (chain read 2026-09-08: tokenURI still `ipfs://QmQjzv…/<id>`). Nothing else remains.*
 
 ## What is wrong, measured
 
@@ -91,11 +92,16 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
    exists if that is ever wanted. Consequence to keep in mind: the API (and therefore the
    census/status page) will keep seeing the CDN overlay for these 128, so they stay in the
    overlay class on the page — reclassify there rather than counting them as CDN-dependent docs.
-4. **Chain tx** (after sign-off): `tools/update-token-uri/v4-base-uri.config.filum.example.json`
+4. **Chain tx — REQUESTED 2026-09-08, PENDING** (request sent to the owner-key holder; the tool
+   waits for gas ≤ 1 gwei, so landing can lag). Verify with a `tokenURI` read: done when it
+   returns `ipfs://QmZTed…/<tokenId>`. If the tx is ever abandoned, revert step 5 by
+   regenerating `filum-align.sql` with the dirs swapped in `cids.csv` (same WHERE-pinned shape).
+   Original instruction: `tools/update-token-uri/v4-base-uri.config.filum.example.json`
    → `v4-base-uri.config.json`, then `preflight` → `tx` → vault sign → `broadcast`, exactly as
    `RUNBOOK-crystalline-base-uri.md` (same owner `0x1d05cf6c…`, same tool, ~50k gas).
-5. **DB align** (after the tx) — `filum-align.sql` is READY (generated 2026-09-08; regenerate
-   from a fresh export if anything on Truth changes first):
+5. **DB align — APPLIED 2026-09-08** (896 × UPDATE 1, before the tx landed: a deliberate
+   DB-leads-chain window, harmless because the 768 non-filum docs are byte-identical and the
+   128 filum docs' only change is masked by the kept overlay). Commands, for the record:
    ```
    psql "<back-office>" -v ON_ERROR_STOP=1 -f ops/cdn-retirement-phase2/filum/filum-align.sql | sort | uniq -c   # dry-run: expect 896 × "UPDATE 1"
    { cat ops/cdn-retirement-phase2/filum/filum-align.sql; echo 'COMMIT;'; } | psql "<back-office>" -v ON_ERROR_STOP=1 | sort | uniq -c
