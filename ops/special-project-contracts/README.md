@@ -72,8 +72,10 @@ tools. The indexer (`indexer-v2.feralfile.com`) holds only 9 of the 40 (see belo
   - indexed 8: 227 distinct CIDs — **227/227 on `ipfs.feralfile.com`**, 226/227 on ipfs.io
     (`media_cid_probe.csv`);
   - un-indexed 30: 141 distinct CIDs — **141/141 on `ipfs.feralfile.com`**; ipfs.io 26 ok +
-    115 HTTP 429 (rate-limited, not a miss — a paced re-probe is recorded in
-    `round2_media_cid_reprobe_slow.csv` when it lands).
+    115 HTTP 429 (rate-limited, not a miss). A paced re-probe (12 s apart) was started and
+    killed by the OS before finishing; rerun it before claiming public resolvability for
+    this class: `round2_media_cid_reprobe.csv` holds the 115 CIDs, probe each on ipfs.io
+    with ≥10 s spacing and record to `round2_media_cid_reprobe_slow.csv`.
   prod-02 runs `Gateway.NoFetch`, so a 200/206 there means the bytes are locally present.
   Whether they are explicitly pinned or only cached is not distinguishable from outside —
   feed the 368 CIDs to the next `tools/pin-referenced` run (they are not in any DB export).
