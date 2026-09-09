@@ -63,8 +63,9 @@ def measurement_scope(census, bucket3):
     return {
         "layer": "artwork_media",
         "measures": (
-            "resolves, media layer: every artwork file fetched through a public "
-            "gateway Feral File does not operate, plus who provides it "
+            "resolves, media layer: every artwork file fetched through a gateway "
+            "Feral File does not operate (a dedicated gateway run by Filebase, "
+            "public gateways as backups), plus who provides it "
             "(delegated routing) -- a file is redundant only when a "
             "non-Feral-File provider holds it"
             if census and census.get("schema") == 2
@@ -164,7 +165,7 @@ def load_bucket3():
 # Page state per verdict; a work takes the worst of its files.
 V2_STATE = {
     "redundant": "redundant",      # a non-Feral-File provider holds it
-    "independent": "independent",  # public infrastructure serves it; only known copy is ours
+    "independent": "independent",  # a gateway we do not operate serves it; only known copy is ours
     "ff_only": "ff_only",          # only our node serves it
     "unreachable": "gateway_gap",  # nobody serves it
     "unmeasured": "unmeasured",    # probe rate-limited / errored: neither gap nor pass
@@ -179,6 +180,26 @@ def worst_verdict(verdicts):
     return min(vs, key=V2_SEVERITY.__getitem__) if vs else "unmeasured"
 
 
+# The host that served the public fetch, as a label. The census cell is
+# "ok:<host>[;<host>:<reason>…]"; the serving host is between "ok:" and the
+# first ";" (the same parse the census summary uses). Unknown hosts pass
+# through so the raw record is never hidden.
+GATEWAY_LABELS = {
+    "ipfs.io": "ipfs.io (Shipyard)",
+    "dweb.link": "dweb.link (Shipyard)",
+    "gateway.pinata.cloud": "gateway.pinata.cloud (Pinata)",
+}
+
+
+def public_via(cell):
+    if not cell.startswith("ok:"):
+        return ""
+    host = cell[3:].split(";", 1)[0].strip().lower()
+    if host.endswith(".myfilebase.com"):
+        return "Filebase dedicated gateway"
+    return GATEWAY_LABELS.get(host, host)
+
+
 def load_census():
     """Media-layer rollup of the token-health-monitor census, if present.
 
@@ -190,7 +211,7 @@ def load_census():
     the worst one per work:
       redundant     every content-addressed file resolves on a gateway we do
                     not operate AND a non-Feral-File provider holds it
-      independent   public infrastructure serves every file; the only known
+      independent   a gateway we do not operate serves every file; the only known
                     copy of at least one is ours
       ff_only       at least one file is served only by our node
       gateway_gap   at least one file nobody serves
@@ -294,6 +315,7 @@ def emit_work_shards(census, bucket3, exhibitions):
                     # collapsed to a verdict the census did not give.
                     "ours": (r.get(own_col) or "unmeasured")[:80],
                     "public": r.get("public_fetch", ""),
+                    "public_via": public_via(r.get("public_fetch", "")),
                 }
                 if (r.get("providers_total") or "").isdigit():
                     f["providers"] = {
@@ -523,7 +545,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
             n(resolves),
             "works whose media resolves without Feral File",
             f"Every content-addressed media file was served on "
-            f"{esc(census['date'])} by a public gateway we do not operate. "
+            f"{esc(census['date'])} by a gateway we do not operate. "
             f"{n(b.get('redundant', 0))} of these are <strong>redundant</strong>: a "
             "provider other than Feral File also holds every file (peer IDs in "
             f"the census data). The other {n(b.get('independent', 0))} resolve, "
@@ -535,7 +557,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
             "works whose content-addressed media nobody serves",
             f"At least one content-addressed media file failed on "
             f"{esc(census['date'])} both through our own node and through "
-            "public gateways. Listed per file in the census data.",
+            "a gateway we do not operate. Listed per file in the census data.",
         )
         tile3_note = (
             f"{n(b.get('dependent', 0))} works on Ethereum and Tezos whose "
@@ -726,10 +748,12 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
 
     if census and census.get("schema") == 2:
         method_gateways = (
-            "one public gateway Feral File does not operate per file "
-            "(rotated across operators; currently ipfs.io/dweb.link, Pinata "
-            "and 4EVERLAND, per the census config) and, separately, our own "
-            "node ipfs.feralfile.com"
+            "one gateway Feral File does not operate per file: a dedicated "
+            "gateway operated by Filebase that fetches from the IPFS network, "
+            "with the public gateways (ipfs.io/dweb.link, Pinata) as backups "
+            "when it cannot answer &mdash; the census records which host "
+            "served each file &mdash; and, separately, our own node "
+            "ipfs.feralfile.com"
         )
         method_providers = (
             " Each file is also looked up in delegated routing "
@@ -892,8 +916,8 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     <strong>artwork files</strong>, as HTTP HEAD probes: content-addressed
     references through {method_gateways}, and CDN or third-party references directly from
     their stated hosts. A content-addressed file counts as resolving only
-    when a public gateway answers for it &mdash; our own infrastructure
-    answering is not enough.{method_providers} Bitmark-era media was probed once per series
+    when a gateway we do not operate answers for it &mdash; our own
+    infrastructure answering is not enough.{method_providers} Bitmark-era media was probed once per series
     entry file (editions of a series share files); Ethereum and Tezos works
     were probed per enumerated file reference.</p>
     <p>Known gap, found 2026-08-03 and closed 2026-08-25: HLS video was followed only to its master playlist, and for 184 works the stream files were never on IPFS. Those works now reference plain MP4s on IPFS (on-chain and in our records); the census still does not traverse HLS playlists, so any future HLS reference would show up here as a gateway failure, not as a pass.</p>
@@ -951,7 +975,7 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
         b = census["buckets"]
         b1 = (
             f"{b.get('independent', 0) + b.get('redundant', 0):,} works (every "
-            f"content-addressed media file was served on {census['date']} by a public "
+            f"content-addressed media file was served on {census['date']} by a "
             f"gateway Feral File does not operate; {b.get('redundant', 0):,} of them are "
             "redundant — a non-Feral-File provider also holds every file, per delegated "
             f"routing — and {b.get('independent', 0):,} resolve with the only known copy "
@@ -1113,9 +1137,10 @@ work's rendering.
 
 A work RESOLVES when every reference in its chain can be fetched from public
 infrastructure. These checks currently measure the ARTWORK FILES: every file
-of every edition is requested over the public gateways wallets and browsers
-use. A file counts as resolving only when a public gateway serves it — our
-own infrastructure answering is not enough.
+of every edition is requested through a gateway we do not operate (a
+dedicated Filebase gateway, public gateways as backups). A file counts as
+resolving only when a gateway we do not operate serves it — our own
+infrastructure answering is not enough.
 
 Not yet measured: the METADATA LINK (whether each token's on-chain reference
 is itself content-addressed), and whether a work PLAYS (what resolves also
@@ -1312,7 +1337,7 @@ def main():
                     {
                         "works": census["buckets"].get("gateway_gap", 0),
                         "as_of": census["date"],
-                        "meaning": "at least one content-addressed file that neither our own node nor a public gateway served (schema 2: works our node serves but public gateways cannot are counted under depend_entirely_on_feralfile.ipfs_only_our_node)",
+                        "meaning": "at least one content-addressed file that neither our own node nor a gateway we do not operate served (schema 2: works our node serves but no outside gateway can fetch are counted under depend_entirely_on_feralfile.ipfs_only_our_node)",
                     }
                     if census.get("schema") == 2
                     else {"works": census["buckets"].get("gateway_gap", 0), "as_of": census["date"]}

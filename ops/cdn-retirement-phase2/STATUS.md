@@ -135,12 +135,19 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    into redundant vs only-copy-ours, `ff_only` folded into "depends on us",
    `unmeasured` shown as its own state, `rescan-cids.py`). Plan:
    `agentic-workflows/token-health-monitor/docs/plan-artwork-independence-probe.md`.
-   **Remaining to publish:** (a) token-health image build from agentic-workflows
-   main (run 34264370854, triggered 2026-09-08) → bump `token_health_image` in
-   ff-deploy#34 (already carries the schema-2 config, 1 req/s/host, chain
-   metadata); (b) add `token_health_eth_rpc_url` to the token-health vault;
-   (c) deploy prod-02, run `docker compose run … token-health census` (v2);
-   (d) commit the v2 CSV to `data/census/` on this branch — CI builds the page.
+   **Remaining to publish (updated 2026-09-09):** (a)–(c) of the original
+   list are done (ff-deploy#34–#40 merged, image `a2686ed` deployed) — but
+   the v2 census through the public gateways alone ran at ~530 requests/hour
+   from prod-02 (Shipyard/Pinata quotas) and is superseded: the publishing
+   run is the **tiered census** (agentic-workflows
+   `token-health-monitor/docs/plan-tiered-gateway-pool.md`: a dedicated
+   Filebase gateway as the primary source, public gateways as backups, ≈2 h
+   per census). Steps: agentic-workflows refactor + tiered PRs merged → image
+   built → ff-deploy tiered-pool PR (vault `token_health_gateway_auth_filebase`,
+   host_vars primary) deployed → census → (d) unchanged: commit the CSV to
+   `data/census/` on this branch — CI builds the page. This branch already
+   carries the page copy for it ("a gateway we do not operate", Filebase
+   named in the method, `public_via` in the lookup).
    Expected: `depend entirely on Feral File` = CDN-only 0 + `ff_only` = the
    content only we announce (a real number the page has never shown);
    `unmeasured` small and listed.
