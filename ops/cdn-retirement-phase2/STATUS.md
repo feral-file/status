@@ -176,7 +176,9 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
 6. **#3435 checkpoint comment — POSTED 2026-09-10**
    (feral-file/feral-file#3435, comment `issuecomment-5611733862`): crystalline
    + filum landed, special-project class, OpenSea state, checker rebuild, the
-   2026-09-09 census numbers, the four corrections, remaining items.
+   2026-09-09 census numbers, the four corrections, remaining items. Edited
+   the same day to the closed state (Ten Whistlegraphs closed, FYEO align
+   applied, backlog/follow-ups closed by decision; CRAWL tx the only open item).
 7. **Unpin backlog — CLOSED 2026-09-10, no action (Brandon).** The superseded
    pins (old HLS dirs, old V2 metadata dirs, old V3 doc CIDs — old halves of
    `step3/updates_0x*.csv` — crystalline old dir `QmY67Gq1…`, the 6 V3 staging
