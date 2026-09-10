@@ -16,9 +16,10 @@ at the CDN has been repointed on chain and in the DB: V2 (5,880, goal 2), V3
 below) and filum / Truth (896, one `setTokenBaseURI`, **landed 2026-09-08**,
 item 1 below). Nothing platform-minted is left to repoint. The two
 `alternativePreviewURI` overlays remain by decision: filum's 128 (kept — chain
-alignment, not feralfile.com display) and Ten Whistlegraphs' 39 (deferred,
-third-party by choice). The close-out census ran once, 2026-09-09, and is
-published (item 5).
+alignment, not feralfile.com display) and Ten Whistlegraphs' 39 (closed, no
+action — its on-chain metadata was `ipfs://` all along; the overlay is a
+product choice, item 2). The close-out census ran once, 2026-09-09, and is
+published (item 5). **Nothing in the platform-minted pipeline is open.**
 A new track opened on 2026-09-04 from OpenSea's audit: tokens on contracts we
 deployed manually (not through the server) — their media CDN handling and how
 their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
@@ -86,9 +87,13 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    stays by decision (chain alignment, not feralfile.com display). Full record:
    `filum/README.md`. **Every platform-minted token whose tokenURI doc pointed
    at the CDN is now repointed on chain.**
-2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) — DEFERRED.** Overlay to
-   aesthetic.computer (third-party by choice). Decision pending with
-   Sean/Hieu; nothing to run. Status page reclassification only.
+2. **Ten Whistlegraphs (`0x9294c5…`, 39 tokens) — CLOSED 2026-09-10, no
+   action (Brandon).** The on-chain metadata is `ipfs://` for every token
+   (phase-1 verified); what the census saw was the API's
+   `alternativePreviewURI` overlay to aesthetic.computer, the artist's own
+   site — a display choice, not a CDN dependency, and the chain-sourced
+   census of 2026-09-09 already counts them by their on-chain media. Nothing
+   to run on chain, in the DB, or on the status page.
 3. **HARD RULE, narrowed 2026-09-04: no OpenSea metadata refresh for the 17
    unbound special-project collections** (Ryan: on hold, refreshes paused
    there). Everything platform-minted is frozen and bound on OpenSea's side;
