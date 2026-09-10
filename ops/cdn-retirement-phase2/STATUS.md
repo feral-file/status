@@ -116,8 +116,9 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    `0xc764a826…` (pre-V2 007 contract, 2 tokens, both in the deployer
    wallet). **Decided 2026-09-08: out of scope** (official counterparts are
    already covered); fix recipe kept in the README if the 47 ever matter. Side
-   findings: the indexer does not index 30 of the 40 (registry gap, issue to
-   file); the census cannot take a contract list (issue to file).
+   findings: the indexer does not index 30 of the 40 (registry gap); the
+   census cannot take a contract list. Recorded, not filed (decision
+   2026-09-10, Brandon: no follow-up issues from this phase).
    (b) **collection_uuid pinning** for the 38: per-token uuid5 of
    `collection_name` → one stored value per collection, server-side; every
    token's `collection_name` is now on record; design + the 57-row mapping
@@ -176,11 +177,12 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    (feral-file/feral-file#3435, comment `issuecomment-5611733862`): crystalline
    + filum landed, special-project class, OpenSea state, checker rebuild, the
    2026-09-09 census numbers, the four corrections, remaining items.
-7. **Unpin backlog** — only after the census confirms nothing references
-   them; re-derive the reference set first. Candidates: superseded HLS dirs,
-   old V2 metadata dirs, old V3 doc CIDs (old halves of `step3/updates_0x*.csv`),
-   crystalline old dir `QmY67Gq1…`, the 6 V3 staging roots
-   (`step3/staging_roots.csv`).
+7. **Unpin backlog — CLOSED 2026-09-10, no action (Brandon).** The superseded
+   pins (old HLS dirs, old V2 metadata dirs, old V3 doc CIDs — old halves of
+   `step3/updates_0x*.csv` — crystalline old dir `QmY67Gq1…`, the 6 V3 staging
+   roots in `step3/staging_roots.csv`) are small against prod-02's headroom
+   and harmless; they stay pinned. The lists remain in `step1/` and `step3/`
+   if that ever changes.
 8. **CRAWL base URI — owner tx requested from Hieu 2026-09-10.** Contract
    `0x81c882c59799eA442317D020c39174AaAa8d7FC7` (FeralfileExhibitionV4_3,
    owner `0x1d05cf6c…`): `setTokenBaseURI("ipfs://QmfK7MjgYTwyAuRWCS44WzGNFzCd3y2Msu1BeJp1VqwJ47")`
@@ -193,14 +195,16 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    (`0x2033…` → `0x080F…`) and paragraph markup in all 542 other docs
    (full diff + timeline: `census-2026-09-09/README.md`). Verify after:
    `tokenURI(…764)` resolves on ipfs.feralfile.com. No OpenSea refresh (item 3).
-9. **FYEO #96 DB align — SQL ready, not applied.**
+9. **FYEO #96 DB align — APPLIED 2026-09-10.**
    `census-2026-09-09/fyeo-96-swap-token-align.sql`: `swaps.token` and the
-   artwork token id hold the Bitmark 64-hex id; every sibling holds the
+   artwork token id held the Bitmark 64-hex id; every sibling holds the
    decimal uint256 (the on-chain id is the hex read as uint256, verified via
-   `ownerOf`/`tokenURI`). Two `UPDATE … WHERE`-pinned statements; dry-run
-   without COMMIT first (expect `UPDATE 1` twice).
-10. **Checker + API follow-ups from the 67 unreadable tokens** (to file in
-    agentic-workflows / feral-file-server): (a) exclude API artworks whose
+   `ownerOf`/`tokenURI`). Two `UPDATE … WHERE`-pinned statements, `UPDATE 1`
+   each. The next census carries the decimal id.
+10. **Checker + API follow-ups from the 67 unreadable tokens — recorded,
+    NOT being filed** (decision 2026-09-10, Brandon; the CSV corrections
+    stand on their own and the next census is not scheduled). For the
+    record, what a fix would be: (a) exclude API artworks whose
     `ownerAddress` is the zero address from the census universe and report
     the count — 64 CRAWL tokens burned in merges are listed by the API as
     settled artworks; a `tokenURI` revert stays a metadata error for anything
@@ -223,12 +227,12 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
   report `opensea_delist_report.csv`.
 - **Scheduled archive-probe** (Sean's two independent checks: real child
   bytes through a public gateway + ff-pin-1 itself listed as provider for
-  every manifest root; both nodes on kubo 0.43). Not yet scheduled; ff-deploy
-  has no job for it. ff-pin-1 pre-upgrade DO snapshot is past its
-  ~2026-09-05 keep date — delete.
+  every manifest root; both nodes on kubo 0.43). Not being scheduled
+  (decision 2026-09-10, Brandon); `tools/archive-probe` stays for manual
+  runs. ff-pin-1's pre-upgrade DO snapshot: deleted 2026-09-10.
 - **agentic-workflows**: upstream regression for the 21 contract-held Tezos
   works (census refetch still drops them after #50; rescan mode A is the
-  workaround). Not filed yet.
+  workaround). Recorded here, not filed (decision 2026-09-10).
 - **Manifest v2 `setManifest`** (#3502, Sean + Safe signers): still open,
   live page `archive_registry.version` = 1.
 - **nonipfs-scan (closed)**: status PR #10; the 5 Art of Survival thumbnail

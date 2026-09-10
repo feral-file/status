@@ -102,8 +102,8 @@ with a `0x` prefix and failed. On chain the token id is that hex as uint256
 (`58715691114557290052923369262590057385049903455696195926578851682062958379139`;
 `ownerOf` = the swap's recipient; `tokenURI` =
 `https://ipfs.bitmark.com/ipfs/QmRB42NjEJdqoHXGDSWmY4xk5ZhVq8sssKPChYc3WNFWYo/metadata.json`
-= `swaps.ipfs_cid`). DB alignment: `fyeo-96-swap-token-align.sql` (dry run
-without COMMIT first, expect `UPDATE 1` twice). Checker follow-up: accept a
+= `swaps.ipfs_cid`). DB alignment: `fyeo-96-swap-token-align.sql`, applied
+2026-09-10 (`UPDATE 1` twice). Checker follow-up (recorded, not filed): accept a
 64-hex token id. CSV: metadata row set to that tokenURI (200); media rows
 hand-measured 2026-09-10 — ipfs.feralfile.com 200, dweb.link 200 (Pinata
 200), cid.contact 4 non-FF providers → `redundant`. The row keeps the hex

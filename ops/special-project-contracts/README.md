@@ -48,7 +48,7 @@ tools. The indexer (`indexer-v2.feralfile.com`) holds only 9 of the 40 (see belo
    File = 24,879 tokens on 60 contracts, **51 platform + 9 non-platform** — the 8
    a2p/Machine-Hallucinations-era contracts plus the P2P V3_1. **The 30 Aorist-era and
    2024-25 contracts are not indexed at all** (registry gap: `deployer_addresses` in
-   `publisher.json` does not pull them in) — an ff-indexer-v2 issue to file.
+   `publisher.json` does not pull them in) — an ff-indexer-v2 gap, recorded, not filed (2026-09-10).
    Two platform contracts are also absent (`0x87355eb8…` internal auction, `0x14a62abf…`).
 
 | class | contracts | tokens | media all `ipfs://` | media on FF CDN |
