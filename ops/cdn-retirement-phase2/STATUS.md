@@ -1,6 +1,6 @@
-# Phase-2 status — pipeline CLOSED for every platform-minted token; filum next, census deferred
+# Phase-2 status — pipeline CLOSED for every platform-minted token; close-out census PUBLISHED 2026-09-09 (CDN-dependent works 11,389 → 0)
 
-*Updated 2026-09-08 (supersedes the 2026-09-04 version). Owner: Brandon.
+*Updated 2026-09-10 (supersedes the 2026-09-08 version). Owner: Brandon.
 Plan + history: `ops/cdn-retirement-phase2.md`. OpenSea incident + collection
 freeze (read BEFORE touching anything OpenSea-facing):
 `ops/opensea-metadata-path-incident.md`, `ops/opensea-metadata-path/README.md`.
@@ -115,8 +115,21 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    `collection_name` → one stored value per collection, server-side; every
    token's `collection_name` is now on record; design + the 57-row mapping
    for Ryan (promised week of 2026-09-07) still open.
-5. **Close-out measurement — the 2026-09-08 census exposed the checker; the
-   checker was rebuilt; the measurement is re-run next.** The v1 run
+5. **Close-out measurement — DONE, published 2026-09-09/10.** The tiered
+   census (`token_census_20260909T100006Z.csv`, image `f6367b7`, 14.6 h,
+   summary `census_summary_2026-09-09.md`): 34,923 works / 106,116 files,
+   Filebase primary served 70,987 of 70,988 IPFS rows (1 via Pinata), 0 fail,
+   0 unmeasured, no circuit; verdicts redundant 49,019 / independent 21,975 /
+   ff_only 0. Page: `depend on our CDN` 11,389 → **0**, redundant 22,596,
+   independent 12,327. 288 cold CIDs were deferred and retried (287 resolved
+   on Filebase). Four hand corrections to the raw CSV before publishing —
+   64 burned CRAWL tokens dropped from the population, CRAWL `…764` (base
+   URI predates the token) measured by hand, FYEO #96 (hex token id in DB)
+   and Bardo #174 (one RPC transport error) measured by hand — are recorded
+   with evidence in `census-2026-09-09/README.md`; they spawn items 8–10.
+   Phase-3 populations measured by the run: 14,591 ETH tokenURIs through
+   `ipfs.bitmark.com`, 199 media rows on FF gateway URLs (same README).
+   History of the defective 9/8 run, kept for the record: the v1 run
    (`token_census_20260908T051950Z.csv`, 34,987 tokens, 5 h; summary in
    `census_summary_2026-09-08.md`) produced 24,606 ipfs.io + 24,696 dweb.link
    HTTP 429s (one Cloudflare quota shared by both gateways, refilling on a
@@ -150,16 +163,45 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    named in the method, `public_via` in the lookup).
    Expected: `depend entirely on Feral File` = CDN-only 0 + `ff_only` = the
    content only we announce (a real number the page has never shown);
-   `unmeasured` small and listed.
+   `unmeasured` small and listed. **Outcome 2026-09-09: CDN-only 0, ff_only
+   0, unmeasured 0.**
 6. **#3435 checkpoint comment** — everything since 9/3 is unreported (V3 DB
    align + reference rows + explicit pins, crystalline tx landed, OpenSea
-   freeze + Ryan's audit, filum-first ordering). Post it with the census
-   numbers, or before if the wait for 1 stretches.
+   freeze + Ryan's audit, filum-first ordering, the census above). The
+   numbers are now in `data/updates.json` (2026-09-09 entry) — post it.
 7. **Unpin backlog** — only after the census confirms nothing references
    them; re-derive the reference set first. Candidates: superseded HLS dirs,
    old V2 metadata dirs, old V3 doc CIDs (old halves of `step3/updates_0x*.csv`),
    crystalline old dir `QmY67Gq1…`, the 6 V3 staging roots
    (`step3/staging_roots.csv`).
+8. **CRAWL base URI — owner tx requested from Hieu 2026-09-10.** Contract
+   `0x81c882c59799eA442317D020c39174AaAa8d7FC7` (FeralfileExhibitionV4_3,
+   owner `0x1d05cf6c…`): `setTokenBaseURI("ipfs://QmfK7MjgYTwyAuRWCS44WzGNFzCd3y2Msu1BeJp1VqwJ47")`
+   (no trailing slash, same form as the stored `ipfs://QmXfp5…`). Why: the
+   server regenerated the 543-doc directory on 2026-07-02 when it finally
+   created the artwork for the 2025-08-16 merge token `…764`, but the chain
+   still names the 2024-09-04 directory (542 docs) set on 2026-02-02 — that
+   token's `tokenURI` 404s and the DB has led the chain for the whole contract
+   since July. The new dir also changes the platform royalty address
+   (`0x2033…` → `0x080F…`) and paragraph markup in all 542 other docs
+   (full diff + timeline: `census-2026-09-09/README.md`). Verify after:
+   `tokenURI(…764)` resolves on ipfs.feralfile.com. No OpenSea refresh (item 3).
+9. **FYEO #96 DB align — SQL ready, not applied.**
+   `census-2026-09-09/fyeo-96-swap-token-align.sql`: `swaps.token` and the
+   artwork token id hold the Bitmark 64-hex id; every sibling holds the
+   decimal uint256 (the on-chain id is the hex read as uint256, verified via
+   `ownerOf`/`tokenURI`). Two `UPDATE … WHERE`-pinned statements; dry-run
+   without COMMIT first (expect `UPDATE 1` twice).
+10. **Checker + API follow-ups from the 67 unreadable tokens** (to file in
+    agentic-workflows / feral-file-server): (a) exclude API artworks whose
+    `ownerAddress` is the zero address from the census universe and report
+    the count — 64 CRAWL tokens burned in merges are listed by the API as
+    settled artworks; a `tokenURI` revert stays a metadata error for anything
+    else; (b) accept a 64-hex token id without `0x`; (c) retry an RPC
+    transport error once. API side: a burned flag on artworks so census,
+    indexer and status stop guessing. Also seen: ipfs.io answered its only
+    request of the run with 429 `Retry-After: 900` — from prod-02 Shipyard is
+    effectively closed, Pinata answers.
 
 ## Parallel / pending (not blocking)
 

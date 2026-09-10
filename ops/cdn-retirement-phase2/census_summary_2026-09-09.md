@@ -1,0 +1,24 @@
+# Token Census Summary
+
+- Tokens scanned: 34987/34987
+- Rows written: 106174
+- Metadata errors: 67
+- Hosting: data_uri=199, ipfs=70789, ipfs_gateway=199
+- Gateway domains (ipfs_gateway rows): ipfs.bitmark.com=135, ipfs.feralfile.com=64
+- IPFS via ipfs.feralfile.com: ok=70988 fail=0
+- Verdicts (CSV rows): redundant=49015 independent=21973 ff_only=0 unreachable=0 unmeasured=0
+- Public fetch by gateway (CSV rows): ff-test-vnfjcdhs9234rhiuwehb.myfilebase.com=70987, gateway.pinata.cloud=1; fail=0 unmeasured=0
+- Public pool: 429=1 cooldowns-released=0 cooldowns-extended=0 waited=0s (throttled/budget) paced=0s (deliberate spacing)
+- Primary usage: filebase (ff-test-vnfjcdhs9234rhiuwehb.myfilebase.com): ok 19,260/850,000 req 17.2MB/912.7MB; fell back to backups for 1 rows
+- Deferred (primary could not fetch in time): refs=288 resolved-by-primary=287 resolved-by-backup=1 fail=0 unmeasured=0 still-pending=0 rows-still-deferred=0; file=/var/lib/token-health/census/token_census_20260909T100006Z.deferred.jsonl
+- Pool events: /var/lib/token-health/census/token_census_20260909T100006Z.pool_events.jsonl
+- Routing (distinct CIDs): endpoint=cid.contact answered=2, endpoint=delegated-ipfs.dev answered=8377; lookups=8379 429=0 unmeasured=0
+- CDN health: ok=0 fail=0
+- Other-host health: ok=0 fail=0
+- Universe: recovered-by-refetch=0 unresolved-artworks=0 refetch-failed=0
+- Probe cache hits: 62609
+- Probe retries: recovered=0 still-failed=0
+- Rate limited: retries=0 recovered=0 exhausted=0
+- ETH metadata source: chain
+- Elapsed: 52668s
+- CSV: /var/lib/token-health/census/token_census_20260909T100006Z.csv
