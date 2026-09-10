@@ -3,7 +3,7 @@
 *Prepared 2026-09-08 (Brandon). Part of CDN-retirement phase 2, feral-file/feral-file#3435.
 Decision context: `ops/cdn-retirement-phase2.md` § Pending decisions (option a).
 State 2026-09-08: steps 1–3 DONE (pinned, render-checked, DB measured + align SQL generated);
-Step 5 (`filum-align.sql`, 896 `ipfs_cid` swaps, overlay kept) APPLIED 2026-09-08; step 4 (the
+Step 5 (896 `ipfs_cid` swaps, overlay kept) APPLIED 2026-09-08; step 4 (the
 owner tx) requested from the key holder the same day and PENDING — until it lands the DB leads
 the chain (chain read 2026-09-08: tokenURI still `ipfs://QmQjzv…/<id>`). Nothing else remains.*
 
@@ -84,8 +84,10 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
    chain already agree); the 128 filum rows carry `alternativePreviewURI` stored as the
    RELATIVE key `previews/71e2bed5…/1706081014/index.html?<params>` (the API prefixes the
    CDN host), and every one's query string equals its on-chain `animation_url`'s (0
-   mismatches); the other 768 rows have no overlay. `filum-align.sql` is generated from it:
-   **896 `ipfs_cid` path swaps only**, each WHERE-pinned to the exact current value.
+   mismatches); the other 768 rows have no overlay. `gen-filum-sql.py` generates the align SQL from it:
+   **896 `ipfs_cid` path swaps only**, each WHERE-pinned to the exact current value
+   (the applied `filum-align.sql` was removed after the run, 2026-09-10 cleanup — regenerate
+   from a fresh export if ever needed).
    **Decision 2026-09-08 (Brandon): the `alternativePreviewURI` overlay is NOT touched** —
    the goal is chain alignment (tokenURI → permanent, self-contained IPFS version), not
    changing how feralfile.com displays the piece. `gen-filum-sql.py --drop-overlay` still
@@ -96,15 +98,17 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
    waits for gas ≤ 1 gwei, so landing can lag). Verify with a `tokenURI` read: done when it
    returns `ipfs://QmZTed…/<tokenId>`. If the tx is ever abandoned, revert step 5 by
    regenerating `filum-align.sql` with the dirs swapped in `cids.csv` (same WHERE-pinned shape).
-   Original instruction: `tools/update-token-uri/v4-base-uri.config.filum.example.json`
-   → `v4-base-uri.config.json`, then `preflight` → `tx` → vault sign → `broadcast`, exactly as
+   Original instruction: copy `v4-base-uri.config.example.json` (this directory)
+   → `tools/update-token-uri/v4-base-uri.config.json`, then `preflight` → `tx` → vault sign → `broadcast`, exactly as
    `RUNBOOK-crystalline-base-uri.md` (same owner `0x1d05cf6c…`, same tool, ~50k gas).
 5. **DB align — APPLIED 2026-09-08** (896 × UPDATE 1, before the tx landed: a deliberate
    DB-leads-chain window, harmless because the 768 non-filum docs are byte-identical and the
    128 filum docs' only change is masked by the kept overlay). Commands, for the record:
    ```
-   psql "<back-office>" -v ON_ERROR_STOP=1 -f ops/cdn-retirement-phase2/filum/filum-align.sql | sort | uniq -c   # dry-run: expect 896 × "UPDATE 1"
-   { cat ops/cdn-retirement-phase2/filum/filum-align.sql; echo 'COMMIT;'; } | psql "<back-office>" -v ON_ERROR_STOP=1 | sort | uniq -c
+   python3 ops/cdn-retirement-phase2/filum/tools/gen-filum-sql.py --db-export <export.csv> \
+       --cids ops/cdn-retirement-phase2/filum/cids.csv --doc-updates ops/cdn-retirement-phase2/filum/doc_updates.csv > filum-align.sql
+   psql "<back-office>" -v ON_ERROR_STOP=1 -f filum-align.sql | sort | uniq -c   # dry-run: expect 896 × "UPDATE 1"
+   { cat filum-align.sql; echo 'COMMIT;'; } | psql "<back-office>" -v ON_ERROR_STOP=1 | sort | uniq -c
    ```
    Any count other than 896 → ROLLBACK and re-export. After this the DB's `ipfs_cid` matches
    the new on-chain base dir for all 896 Truth tokens; wallets following `tokenURI` get the
@@ -122,7 +126,6 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
 - `art_compare.csv` — per-file IPFS-vs-CDN byte comparison (11 files)
 - `pin-and-verify.sh` — operator step 1
 - `export-truth-db.sql` — operator step 3 (export is gitignored)
-- `filum-align.sql` — operator step 5, generated 2026-09-08 (896 WHERE-pinned `ipfs_cid` UPDATEs; overlay kept)
-- `../../ops/cdn-retirement-phase2/filum/tools/filum-build.py` — the builder (all proofs)
-- `../../ops/cdn-retirement-phase2/filum/tools/gen-filum-sql.py` — operator step 5
-- `../../tools/update-token-uri/v4-base-uri.config.filum.example.json` — operator step 4
+- `v4-base-uri.config.example.json` — operator step 4 (template for `tools/update-token-uri/v4-base-uri.mjs`)
+- `tools/filum-build.py` — the builder (all proofs)
+- `tools/gen-filum-sql.py` — operator step 5 (the generated `filum-align.sql`, applied 2026-09-08, is not kept)

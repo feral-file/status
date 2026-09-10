@@ -1,6 +1,8 @@
 # Special-project contracts — media dependency + OpenSea collection uuid
 
-*Measured 2026-09-08 (Brandon). Track opened by OpenSea's 2026-09-04 audit
+*Measured 2026-09-08 (Brandon). Per-token dumps (indexer / Blockscout / FF API rows)
+were removed in the 2026-09-10 repo cleanup (`ops/repo-cleanup.md`); every number below
+is regenerable with the tools in `tools/` (commands under "Files"). Track opened by OpenSea's 2026-09-04 audit
 (`ops/opensea-metadata-path/ryan_reply_2026-09-04.md`): 57 collections on their side belong
 to contracts we deployed but never published as an exhibition. Two questions, one
 population: (a) does their media depend on the CDN? (b) how does their `collection_uuid`
@@ -62,16 +64,16 @@ tools. The indexer (`indexer-v2.feralfile.com`) holds only 9 of the 40 (see belo
 
 - Indexed contracts: `tools/audit-contracts.py` — every token's raw on-chain doc
   (`metadata.origin_json`) from the indexer, `image`/`animation_url` classified by host
-  (`special_project_tokens.csv` 992 rows, `special_project_summary.csv`; the P2P contract's
-  206 indexed tokens are in `round2_tokens.csv`).
+  (992 rows → `special_project_summary.csv`; the P2P contract's 206 indexed tokens →
+  `round2_summary.csv`; the per-token CSVs are regenerable, see "Files").
 - Un-indexed contracts: Blockscout token instances + metadata
-  (`round2_chain_tokens.csv`, 596 rows incl. P2P's 251), and for the 247 tokens Blockscout
+  (596 rows incl. P2P's 251 → `round2_chain_summary.csv`), and for the 247 tokens Blockscout
   had no metadata for, the FF API's own non-exhibition path
   (`/api/contracts/<c>/tokens/<id>` → chain `tokenURI` → IPFS): **247/247 HTTP 200, all
-  `ipfs://`** (`round2_ffapi_tokens.csv`). Contract facts: `round2_contracts_blockscout.csv`.
+  `ipfs://`**. Contract facts: `round2_contracts_blockscout.csv`.
 - Resolvability + **pin status on prod-02** (the serving node, `Gateway.NoFetch`):
   - indexed 8: 227 distinct media CIDs, un-indexed 30: 141 — **368/368 served by
-    `ipfs.feralfile.com`** (`media_cid_probe.csv`, `round2_media_cid_probe.csv`).
+    `ipfs.feralfile.com`** (HEAD probe 2026-09-08; the CID list is `prod02_pin_status.csv`).
   - **Pin check through the kubo API (2026-09-08, `prod02_pin_status_before.csv`): only 1 of
     the 368 was a recursive pin root; 367 were present as unpinned cache** — the same
     survive-only-because-GC-is-off exposure found for platform tokens on 2026-08-28
@@ -112,22 +114,49 @@ ever matters, the fix above applies to exactly those 47.
 ## Open
 
 - (b) `collection_uuid` pinning for the 38 special-project contracts: per-token uuid5 of
-  `collection_name` → one stored value per collection, server-side. The population and
-  every token's `collection_name` are in this directory (`special_project_tokens.csv`,
-  `round2_chain_tokens.csv`, `round2_ffapi_tokens.csv`). Design + Ryan's 57-row mapping
-  pending (`ops/opensea-metadata-path/README.md` § special-project class).
+  `collection_name` → one stored value per collection, server-side. The population is
+  `population.csv`; every token's `collection_name` comes from the per-token dumps, which
+  are regenerated with the commands under "Files" (removed as recomputable, 2026-09-10).
+  Design + Ryan's 57-row mapping pending (`ops/opensea-metadata-path/README.md`
+  § special-project class).
 - File: ff-indexer-v2 (30 deployer-created ERC-721 contracts not indexed),
   agentic-workflows (census cannot take a contract list).
 - Keep this directory's 368 CIDs in future `tools/pin-referenced` runs (they are in no DB export): `prod02_pin_status.csv` is the list.
 
 ## Files
 
-`population.csv` (the 103-contract table) · `deployer_created_contracts.csv` ·
-`other_deployers_created.csv` · `indexer_contracts_feralfile.csv` ·
-`indexer_releases_feralfile.csv` · `slug_contracts.csv` · `candidate_contracts*.csv` ·
-`round2_contracts_blockscout.csv` · `special_project_tokens.csv` ·
-`special_project_summary.csv` · `round2_tokens.csv` · `round2_summary.csv` ·
-`round2_chain_tokens.csv` · `round2_chain_summary.csv` · `round2_ffapi_tokens.csv` ·
-`media_cid_probe.csv` · `round2_media_cid_probe.csv` · `prod02_pin_status_before.csv` · `prod02_pin_status.csv` · `prod02_unpinned_cids.txt` ·
-`zero_token_contracts_chain.csv` (superseded: its "no code" verdicts were 1rpc rate-limit
-nulls, see `round2_contracts_blockscout.csv`) · `tools/` (walker, auditors, slug scraper).
+Kept (small tables, decision records, registries):
+
+- `population.csv` — the 103-contract table (the authoritative population)
+- `deployer_created_contracts.csv`, `other_deployers_created.csv` — Blockscout contract
+  creations by the FF deployer and by the other creators of platform contracts
+- `indexer_contracts_feralfile.csv` — indexer-v2 coverage: 60 Feral File contracts (derived
+  from the indexer walk; raw walk output not kept)
+- `slug_contracts.csv`, `candidate_contracts.csv`, `candidate_contracts_round2.csv` —
+  the OpenSea-slug → contract scrape and the two candidate lists the audits ran on
+- `round2_contracts_blockscout.csv` — contract facts for the un-indexed 30 + the two
+  exhibition-era extras (supersedes an earlier 1rpc pass whose "no code" verdicts were
+  rate-limit nulls)
+- `special_project_summary.csv`, `round2_summary.csv`, `round2_chain_summary.csv` —
+  per-contract media classification summaries (indexed 8 / P2P / un-indexed 30)
+- `prod02_pin_status_before.csv` — pin state on prod-02 BEFORE the 2026-09-08 fix (1/368
+  pinned); not reproducible, kept as the receipt
+- `prod02_pin_status.csv` — pin state after the fix (368/368 recursive roots) and **the
+  CID list to carry into future `tools/pin-referenced` runs**
+- `tools/indexer-walk.py`, `tools/audit-contracts.py`, `opensea-slug-contracts.py`
+
+Removed 2026-09-10 (recomputable; `ops/repo-cleanup.md`): the per-token dumps
+`special_project_tokens.csv` (992 rows) and `round2_tokens.csv` (206 rows, both from
+`tools/audit-contracts.py`), `round2_chain_tokens.csv` (Blockscout token instances +
+metadata), `round2_ffapi_tokens.csv` (FF API non-exhibition path), the two media-CID HEAD
+probes, `prod02_unpinned_cids.txt` (a filter of `prod02_pin_status_before.csv`),
+`indexer_releases_feralfile.csv` (unused walk derivative) and
+`zero_token_contracts_chain.csv` (superseded). Regenerate:
+
+```
+python3 ops/special-project-contracts/tools/indexer-walk.py ops/special-project-contracts/indexer_universe.csv   # pass 1, hours; gitignored output
+python3 ops/special-project-contracts/tools/audit-contracts.py ops/special-project-contracts/candidate_contracts.csv        tokens.csv summary.csv   # indexed 8 (+ P2P)
+python3 ops/special-project-contracts/tools/audit-contracts.py ops/special-project-contracts/candidate_contracts_round2.csv tokens.csv summary.csv   # round 2
+# un-indexed contracts: Blockscout /api/v2/tokens/<c>/instances, then
+# https://feralfile.com/api/contracts/<c>/tokens/<id> for instances without metadata
+```

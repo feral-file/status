@@ -5,7 +5,7 @@ Plan + history: `ops/cdn-retirement-phase2.md`. OpenSea incident + collection
 freeze (read BEFORE touching anything OpenSea-facing):
 `ops/opensea-metadata-path-incident.md`, `ops/opensea-metadata-path/README.md`.
 Intermediates referenced below were removed in the 2026-09-04 repo cleanup
-(`ops/repo-cleanup-2026-09-04.md`); their conclusions are recorded here, and
+(`ops/repo-cleanup.md`); their conclusions are recorded here, and
 every input is regenerable (chain / IPFS pins / fresh DB export).*
 
 ## Where this stands in one paragraph

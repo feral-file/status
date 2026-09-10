@@ -5,7 +5,7 @@ Two changes, both WHERE-pinned to the exact current values (expect UPDATE 1 each
   A. every Truth artwork (896): artworks.metadata.ipfs_cid -> '<newBase>/<tokenId>'
      — only rows whose current value is '<oldBase>/<tokenId>' (path form, as crystalline);
      rows in any other form are listed on stderr and NOT updated (investigate: the
-     Truth DB may still carry an older doc generation, see truth-db-align.py).
+     Truth DB may still carry an older doc generation — diff old vs chain docs first).
   B. (OFF by default — decision 2026-09-08, Brandon: the display overlay is not part of the
      chain alignment; feralfile.com's display path stays as is) `--drop-overlay` adds:
      the 128 filum rows: remove metadata.alternativePreviewURI (the CDN overlay) —

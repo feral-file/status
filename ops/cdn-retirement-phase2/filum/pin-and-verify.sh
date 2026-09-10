@@ -23,4 +23,4 @@ done
 n=$(curl -s --max-time 60 "https://ipfs.feralfile.com/ipfs/$NEW_ART/index.html" | grep -o 'crossorigin="anonymous"' | wc -l | tr -d ' ')
 [ "$n" = 7 ] || { echo "served index.html has $n crossorigin attrs, expected 7"; exit 1; }
 echo "✓ served index.html carries 7× crossorigin=\"anonymous\""
-echo "done — next: tools/update-token-uri/v4-base-uri.mjs preflight with v4-base-uri.config.filum.json"
+echo "done — next: tools/update-token-uri/v4-base-uri.mjs preflight (config template: ops/cdn-retirement-phase2/filum/v4-base-uri.config.example.json)"
