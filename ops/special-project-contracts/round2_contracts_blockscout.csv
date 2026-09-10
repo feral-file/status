@@ -1,0 +1,51 @@
+contract,created,is_contract,name,is_verified,token_type,token_name,token_symbol,holders,total_supply,tx_count
+0xc764a826285a75715db602108d706f72418586c2,2021-10-26,True,FeralfileExhibition,True,ERC-721,Feral File 007,FF007,,2,18
+0x43e808e2e9dc5ff2f23d6ba15a6abf995b34b737,2021-12-03,True,,False,,,,,,0
+0xf1a843a2fcc17af50c1b0667d7a96273cce37048,2021-12-03,True,,False,,,,,,1
+0x22e130a4ef1effddafdf0b9825dc03d83747664e,2022-11-21,True,Feral File — Peer to Peer,False,ERC-721,Feral File — Peer to Peer,FF024,,251,43
+0x803ddb7184707e2e1b9757987287e9915f645ac9,2023-02-01,True,TokenBatchTransfer,True,,,,,,358
+0x3b49b4b69c85c176f7b94a82ee5812ae068e161f,2023-05-16,True,FeralfileExhibitionV3_2,True,,,,,,2
+0x700d9fd5b66a82b587f2afdd90832b2e1b8bf281,2023-05-18,True,,False,,,,,,280
+0x864acd083aee4af4047c6b541684ef6e0bbb96f6,2023-05-18,True,,False,,,,,,0
+0x455464f0d369dac13002e81e9fab857f6ad21795,2023-07-20,True,FeralfileVault,True,,,,,,0
+0x80104ab2486bfed5ff8de5df930d37d3888e330c,2023-07-20,True,,False,,,,,,0
+0xce85fa385a6d6f6c3b709cd7aa2db116d3e1ac6d,2023-11-15,True,FeralfileEnglishAuction,True,,,,,,103
+0xd99b40c0a6d12463877839e88d7bf43c779ffe2f,2024-01-25,True,AoristArt,True,ERC-721,Aorist Art,AORIST,,1,0
+0x2f4acb48bb2aa86d7b25e9181fa83b68b4cb8368,2024-02-01,True,AoristArt,True,ERC-721,The Smell of Pink by Andrés Reisinger,AORIST,,1,0
+0xb986e7f84f20db1cbf2f96c54f58e7c2dfaac9e5,2024-02-01,True,AoristArt,True,ERC-721,The Wither by Andrés Reisinger,AORIST,,1,0
+0x8ac67db7a4eebd437aef868180521b78a9e08911,2024-02-01,True,AoristArt,True,,,,,,0
+0x9d611547e79653c008f31462780fa2aa8838ce8a,2024-02-01,True,AoristArt,True,ERC-721,Breathing Language by Andrés Reisinger,AORIST,,2,0
+0x98beb1dc755571fd24408170b0cc26ac98137ecc,2024-02-02,True,AoristArt,True,ERC-721,The Smell of Pink by Andrés Reisinger,AORIST,,12,0
+0x86f66c89aab96cc08c5e360974f2a33e8521b88e,2024-03-05,True,"Coral Arena by OMA/Shohei Shigematsu, Charlotte Taylor & Nicholas Preaud",False,ERC-721,"Coral Arena by OMA/Shohei Shigematsu, Charlotte Taylor & Nicholas Preaud",AORIST,,6,0
+0x22fd0c0c719745742ee4c822bf16e03bbb421305,2024-03-05,True,AoristArt,True,ERC-721,Hall of Visions by Pilar Zeta,AORIST,,158,0
+0x1080af531dacedc66a1911651e2b29506becfe33,2024-03-05,True,AoristArt,True,ERC-721,Mushroom Cloud by Nancy Baker Cahill,AORIST,,104,108
+0xcc063e7e05a7fef0fd9fa09e140c7899aa7120fc,2024-03-05,True,Jardins d’Été by Quayola,False,ERC-721,Jardins d’Été by Quayola,AORIST,,3,0
+0x5ca5789de0e9aac2a5de5689064727c4d1cd5e6f,2024-03-06,True,What Lies Beneath: Tipping Point by Carlos Betancourt & Studio Brasch,False,ERC-721,What Lies Beneath: Tipping Point by Carlos Betancourt & Studio Brasch,AORIST,,1,0
+0x3bcca9ea3836456a9a2eb27b051b0fa28614667a,2024-03-06,True,Arcadia by Arcadia,False,ERC-721,Arcadia by Arcadia,AORIST,,1,0
+0x78c08a730d63a14305c1b0cde46a9d6233f4d458,2024-03-06,True,STONE SPEAKS by Nancy Baker Cahill,False,ERC-721,STONE SPEAKS by Nancy Baker Cahill,AORIST,,1,0
+0x2ae96770e163b048eee28e73efb374b1303b207f,2024-03-06,True,Effets de Soir by Quayola,False,ERC-721,Effets de Soir by Quayola,AORIST,,8,0
+0x69a7f2671598102331ccb44240f88f4b5f85e7e3,2024-03-06,True,"MVP (Generation 1, 32 versions) by Jonas Lund",False,ERC-721,"MVP (Generation 1, 32 versions) by Jonas Lund",AORIST,,1,0
+0xe96ae79a97fc839a1ab7c6382cc8f547c43d1d71,2024-03-06,True,Sphere in Open Platonic Solids by Joanie Lemercier,False,ERC-721,Sphere in Open Platonic Solids by Joanie Lemercier,AORIST,,6,0
+0xa507077d630665334cd8dc62a5fa3614000e099e,2024-03-06,True,AoristArt,True,ERC-721,Coral Rd by Leandro Erlich,AORIST,,1,0
+0x30f4d17bab0c815519c5d924ac4735be14eb25ec,2024-03-13,True,OwnerData,True,,,,,,0
+0xfd79fb1749b72f04a5a956d93182cf75c6667dcd,2024-04-23,True,ODYSSEY by Andrés Reisinger,True,ERC-721,ODYSSEY by Andrés Reisinger,AORIST,,7,0
+0x6906f2f1591e22ca320330712af68288efc2426d,2024-04-23,True,Jardins d'Été by Quayola,False,ERC-721,Jardins d'Été by Quayola,AORIST,,3,0
+0xcc08d6a573d05e34b34a0440982798db20b3df98,2024-04-26,True,"CORAL ARENA by OMA/Shohei Shigematsu, Charlotte Taylor & Nicholas Préaud",False,ERC-721,"CORAL ARENA by OMA/Shohei Shigematsu, Charlotte Taylor & Nicholas Préaud",AORIST,,3,0
+0xcbfaf4bde69c9b37835761e5228f9fe9e25b452f,2024-06-18,True,FeralfileVaultV2,True,,,,,,0
+0x3d62d2e75e2ef2a860235e3a46250011db70f988,2024-06-25,True,,False,,,,,,0
+0xfed46f583c3f61a5b48882c5af56a94a5f096f12,2024-10-30,True,Artificial Natural History,False,ERC-721,Artificial Natural History,FERALFILE,,3,0
+0x393f21c615314a346c383cce4d708a8ee270a312,2024-10-30,True,[[chromatophores]],False,ERC-721,[[chromatophores]],FERALFILE,,1,0
+0x96f6ba69671e3cbc2b532727d892efd030548f0f,2024-10-30,True,Temporally Uncaptured,False,ERC-721,Temporally Uncaptured,FERALFILE,,2,0
+0x90a6ca6b6f7c3c1daf738b0780a4be9c6e7893cf,2024-10-30,True,Breathing Language,False,ERC-721,Breathing Language,FERALFILE,,1,0
+0x5cf20fb8a4451f24b2c915f8929b8aff999f1044,2024-10-30,True,Take Over Madrid,False,ERC-721,Take Over Madrid,FERALFILE,,7,0
+0xfa95bf4c4cb0f1cc6e86191218f89b84d03e1a59,2024-10-30,True,Collide,False,ERC-721,Collide,FERALFILE,,3,0
+0x92152733cec744c049ea7629f4cbd7af7c43c9f7,2024-12-19,True,FeralfileExhibitionV4_1,True,ERC-721,Artificial Natural History,FERALFILE,,2,0
+0xe4a36a09ee456aba9de430f0488a782c04f5139d,2024-12-19,True,FeralfileExhibitionV4_1,True,ERC-721,Neural Zoo,FERALFILE,,1,0
+0xa61459a983ee69e25082a2f8d934e89e04d8f158,2024-12-19,True,FeralfileExhibitionV4_1,True,ERC-721,Temporally Uncaptured,FERALFILE,,1,0
+0xb745a2cd00f7983c71134d6f713c4e8c003aff51,2025-01-14,True,Decohering Delineation,False,ERC-721,Decohering Delineation,FERALFILE,,1,0
+0x5310590a5d73f79a564d00bbd38b87c3844eddae,2025-01-14,True,SeriesIndexer,True,,,,,,0
+0x8dae078b56ec37cdf4b71cffac21572cce8873ed,2025-02-10,True,MerkleRegistry,True,,,,,,0
+0xae80f4dab7ee6b2f1d85eccb0de8675720930438,2025-03-11,True,SeriesRegistry,True,,,,,,0
+0xc26220de03166947e9cfc170a03da09ecc5b6465,2025-06-23,True,,False,,,,,,0
+0x8930d48776b7ff4797bf56f3c43f5bed43912aad,2025-06-23,True,LibBytes,True,,,,,,0
+0x10049dcae04c3f4b4afd9bebd96dba8adbaec170,2025-07-21,True,Neural Zoo,False,ERC-721,Neural Zoo,FERALFILE,,1,0

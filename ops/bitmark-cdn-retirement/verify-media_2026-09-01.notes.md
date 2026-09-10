@@ -1,6 +1,6 @@
 # Media verification record — acceptance run 2026-09-01
 
-`tools/v2-metadata-regen/verify-media.py plan.csv` over the 436 distinct media CIDs the
+`tools/metadata-regen/verify-media.py plan.csv` over the 436 distinct media CIDs the
 regenerated metadata points at. Requirement: 200/206 on `ipfs.feralfile.com` AND on ≥1 public
 gateway (ipfs.io / dweb.link / gateway.pinata.cloud).
 

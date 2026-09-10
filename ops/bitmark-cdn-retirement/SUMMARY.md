@@ -3,7 +3,7 @@
 Execution record for goal 2 of `ops/bitmark-cdn-retirement.md` (feral-file/feral-file#3435):
 every already-swapped Ethereum token whose **on-chain** metadata still pointed
 `animation_url` / `image` at `cdn.feralfileassets.com` / `imagedelivery.net` now points at
-`ipfs://` CIDs from `ipfs_reference`. Tools: `tools/v2-metadata-regen/` (+ `tools/update-token-uri`).
+`ipfs://` CIDs from `ipfs_reference`. Tools: `tools/metadata-regen/` (+ `tools/update-token-uri`).
 
 ## Numbers
 
@@ -32,7 +32,7 @@ The 5,880 replacement `metadata.json` dirs are not committed: `gen.py` regenerat
 byte-identically from `audit` + the export (verified via `check-dirs.py`, 5,880/5,880), and the
 bytes are pinned on prod-02 and referenced on chain.
 
-## Decisions & findings (details in `tools/v2-metadata-regen/README.md`)
+## Decisions & findings (details in `tools/metadata-regen/README.md`)
 
 - **Chain is the source of truth**: the census/API overlays `alternativePreviewURI`; the fix list was rebuilt from `tokenURI`. 228 DB≠chain rows differed only in `timestamp`/`prev_provenance` (accepted; SQL keyed on the DB's value).
 - **Byte-preservation**: every rewrite changed only `animation_url`/`image`; all other keys byte-identical (server JSON shape), including the 326 legacy 2021 6-key metadata (kept in their original shape; edition checked via the `name` "#N" suffix, 326/326).

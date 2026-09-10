@@ -58,15 +58,17 @@ function fileRow(f) {
   let where;
   let result;
   if (f.host === "ipfs" && f.verdict) {
-    // Census schema 2: ours + one public gateway + providers -> verdict.
+    // Census schema 2: ours + one gateway we do not operate + providers -> verdict.
     where = "IPFS " + f.cid.slice(0, 10) + "…";
     const pub = f.public || "";
+    // "ok:<host>…" is shown as "ok via <label>"; the raw cell stays in the title.
+    const pubShown = f.public_via && pub.startsWith("ok:") ? "ok via " + f.public_via : pub;
     const prov = f.providers
       ? `providers: ${f.providers.total} (${f.providers.nonff} not Feral File)`
       : "providers: unmeasured";
     result = [
       `ours: ${(f.ours || "unmeasured").replace(/ from media host.*$/, "")}`,
-      `public: ${pub || "unmeasured"}`,
+      `public: ${pubShown || "unmeasured"}`,
       prov,
       `verdict: ${f.verdict.replace("_", " ")}`,
     ].join(" · ");
@@ -87,7 +89,7 @@ function fileRow(f) {
     null,
     el("td", null, f.res),
     el("td", null, where),
-    el("td", { class: "num" }, result)
+    el("td", { class: "num", title: f.public || "" }, result)
   );
 }
 

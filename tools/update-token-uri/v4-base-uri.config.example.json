@@ -1,0 +1,16 @@
+{
+  "$comment": "crystalline setTokenBaseURI config \u2014 fill senderAddress with owner() (rerun tools/phase2-step0/check-base-uri.py to read it) and senderAccount with its vault account. Copy to v4-base-uri.config.json.",
+  "chainId": 1,
+  "contract": "0xBE0A4E26a156B2a60cF515E86b3Df9756DEE1952",
+  "senderAddress": "FILL-owner-address",
+  "senderAccount": "FILL-vault-account",
+  "oldBaseURI": "ipfs://QmY67Gq1514Zj1yWtHxoHeoVj8FpFLM5ZNSNQejjirxKTo/",
+  "newBaseURI": "ipfs://QmNP6RC7Z5DRV8sQsmRgssQS3GP77BUCAK2UV4q94WfiMv/",
+  "gateway": "https://ipfs.feralfile.com/ipfs/",
+  "sampleTokenIds": [
+    "31946296525744824328753280828797417080692251952513183340713878305007073182272",
+    "31946296525744824328753280828797417080692251952513183340713878305007073186796",
+    "31946296525744824328753280828797417080692251952513183340713878305007073191319"
+  ],
+  "maxGasPriceGwei": 1
+}

@@ -1,0 +1,11 @@
+{
+  "$comment": "V3 contract config for update-token-uri.mjs — copy per contract to config.json (or point $UPDATE_CONFIG at it). V3 tokenURI appends the BARE doc CID: docSuffix MUST be empty. updates csv comes from phase2-step3/pin-docs.py.",
+  "chainId": 1,
+  "contract": "0x8f30722dd16BD63cF2665C383c1aEf5e307B0046",
+  "senderAddress": "FILL-trustee-address (v3_audit.contracts.csv)",
+  "senderAccount": "FILL-vault-account",
+  "metadataGateway": "https://ipfs.feralfile.com/ipfs/",
+  "docSuffix": "",
+  "updates": "../../ops/cdn-retirement-phase2/step3/updates_0x8f30722dd16bd63cf2665c383c1aef5e307b0046.csv",
+  "maxGasPriceGwei": 1
+}

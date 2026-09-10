@@ -43,6 +43,11 @@ const SENDER = cfg.senderAddress;      // trustee (or owner) address — tx send
 const SENDER_ACCOUNT = cfg.senderAccount; // vault account identifier for that key
 const GATEWAY = (cfg.metadataGateway ?? 'https://ipfs.bitmark.com/ipfs/').replace(/\/?$/, '/');
 const NEW_BASE = cfg.tokenBaseURI; // optional: target for setTokenBaseURI (e.g. https://ipfs.feralfile.com/ipfs/)
+// Doc path suffix after the on-chain CID. V2 contracts store a DIRECTORY CID
+// (tokenURI appends /metadata.json); V3 contracts store the doc's own file
+// CID with no suffix (phase-2 step 0, 2026-09-02) — set "docSuffix": "" in a
+// V3 config.
+const DOC_SUFFIX = cfg.docSuffix ?? '/metadata.json';
 // Gas price ceiling in gwei (config.maxGasPriceGwei, or $MAX_GAS_GWEI; default 1).
 // Before every sign request the current base fee + tip must be at or below it,
 // otherwise the tool waits (polling every $GAS_POLL_SECONDS, default 60) for as
@@ -147,7 +152,7 @@ const baseUriCalldata = () => iface.encodeFunctionData('setTokenBaseURI', [NEW_B
 // _tokenBaseURI has no getter on V2; derive it from tokenURI() of a known token.
 async function currentBaseURI(c, u) {
   const [uri, { ipfsCID }] = await Promise.all([c.tokenURI(u.tokenId), c.artworkEditions(u.tokenId)]);
-  const suffix = `${ipfsCID}/metadata.json`;
+  const suffix = `${ipfsCID}${DOC_SUFFIX}`;
   if (!uri.endsWith(suffix)) fail(`tokenURI ${uri} does not end with ${suffix} — unexpected contract shape`);
   return uri.slice(0, -suffix.length);
 }
@@ -239,18 +244,27 @@ async function relaySigned(provider, txRespPath, expectedData, label, waitConfs 
 }
 
 async function assertAuthorized(c) {
-  const [owner, trustee] = await Promise.all([c.owner(), c.trustee()]);
   const s = SENDER.toLowerCase();
-  if (s !== owner.toLowerCase() && s !== trustee.toLowerCase())
-    fail(`senderAddress ${SENDER} is neither owner (${owner}) nor trustee (${trustee}) — updateArtworkEditionIPFSCid would revert`);
-  ok(`sender ${SENDER} is authorized (${s === trustee.toLowerCase() ? 'trustee' : 'owner'})`);
+  const owner = await c.owner();
+  let trustee = null;
+  try { trustee = await c.trustee(); }
+  catch { console.error('· trustee() not readable on this contract (V3 has no getter) — authorization is proven by the per-token eth_call dry-runs instead'); }
+  if (trustee !== null) {
+    if (s !== owner.toLowerCase() && s !== trustee.toLowerCase())
+      fail(`senderAddress ${SENDER} is neither owner (${owner}) nor trustee (${trustee}) — updateArtworkEditionIPFSCid would revert`);
+    ok(`sender ${SENDER} is authorized (${s === trustee.toLowerCase() ? 'trustee' : 'owner'})`);
+  } else if (s === owner.toLowerCase()) {
+    ok(`sender ${SENDER} is the owner`);
+  } else {
+    ok(`sender ${SENDER}: authorization deferred to dry-runs (owner is ${owner})`);
+  }
 }
 
 // Fetch the replacement metadata through the gateway the tokenURI actually
 // uses. That gateway is Gateway.NoFetch, so a 404 here means "not pinned on
 // prod-02" — registering the CID on-chain would point wallets at nothing.
 async function gatewayCheck(u) {
-  const url = `${GATEWAY}${u.newCid}/metadata.json`;
+  const url = `${GATEWAY}${u.newCid}${DOC_SUFFIX}`;
   let res;
   try { res = await fetch(url, { signal: AbortSignal.timeout(60_000) }); }
   catch (e) { return { okay: false, why: `fetch failed: ${e.message}` }; }
@@ -284,7 +298,7 @@ if (cmd === 'preflight') {
     if (ipfsCID !== u.oldCid) { blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  on-chain ipfsCID ${ipfsCID} ≠ csv old ${u.oldCid} — csv is stale, regenerate`); continue; }
     if (!uri.includes(ipfsCID)) { blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  tokenURI ${uri} does not embed ipfsCID — unexpected contract shape`); continue; }
     const gw = await gatewayCheck(u);
-    if (!gw.okay) { blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  new metadata not servable: ${gw.why} (${GATEWAY}${u.newCid}/metadata.json)`); continue; }
+    if (!gw.okay) { blocked++; console.log(`ed ${u.edition.padStart(3)} …${u.tokenId.slice(-6)}  BLOCKED  new metadata not servable: ${gw.why} (${GATEWAY}${u.newCid}${DOC_SUFFIX})`); continue; }
     // Dry-run the exact call as the sender — catches "ipfs id has registered" etc.
     try {
       await provider.call({ from: SENDER, to: CONTRACT, data: calldataFor(u), value: 0 });
@@ -333,7 +347,7 @@ if (cmd === 'preflight') {
   if (cur === NEW_BASE) fail(`tokenBaseURI is already ${cur} — nothing to do`);
   // The new gateway must serve the same metadata the current one does, for a
   // token we are NOT touching in this run as well as one we are.
-  const probe = `${NEW_BASE}${(await c.artworkEditions(UPDATES[0].tokenId)).ipfsCID}/metadata.json`;
+  const probe = `${NEW_BASE}${(await c.artworkEditions(UPDATES[0].tokenId)).ipfsCID}${DOC_SUFFIX}`;
   const res = await fetch(probe, { signal: AbortSignal.timeout(60_000) }).catch((e) => ({ ok: false, status: e.message }));
   if (!res.ok) fail(`new gateway does not serve current metadata: HTTP ${res.status} for ${probe} — pin/verify before switching`);
   ok(`new gateway serves current metadata (${probe})`);

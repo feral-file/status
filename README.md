@@ -31,8 +31,9 @@ data/  →  build.py  →  public/
   Optional: until the first census lands, buckets 1 and 2 render as
   "census in progress". Two shapes: schema 2 (2026-09 on; a `verdict`
   column per file — `redundant` / `independent` / `ff_only` /
-  `unreachable` / `unmeasured`, from our own gateway + one public gateway we
-  do not operate + delegated-routing providers) and schema 1 (older; one
+  `unreachable` / `unmeasured`, from our own gateway + one gateway we do not
+  operate — a dedicated Filebase gateway, public gateways as backups; the
+  `public_fetch` cell names the host — + delegated-routing providers) and schema 1 (older; one
   `<gateway>_ok` column per gateway, bucketed on `ipfs_io_ok`). `build.py`
   detects the shape by the `verdict` column; `unmeasured` renders as its
   own state and is never folded into a gap or a pass. Re-probe a schema 2

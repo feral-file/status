@@ -1,0 +1,12 @@
+path,ipfs_cid,ipfs_http,ipfs_bytes,cdn_http,cdn_bytes,verdict
+c0.png,QmPtYcZ3byHMMLCb5pQeJqQBBQWwCGnq1bo6aNCD59xQyh,200,1408,200,1408,identical
+c1.png,QmdbTtT2szSmCHpbRLyhWnXeEsnyZt6FVUVFJ2QodXxtzA,200,1371,200,1371,identical
+c2.png,QmdMMxEK2ccyYNpT77HuqGZ5Xd2S6iLdoFaCw3d4Y3VPJc,200,1342,200,1342,identical
+c3.png,QmP1buaX4t2xT3w8hah8B4V2zchcw7tNmdjLKC45fq1d8D,200,1350,200,1350,identical
+c4.png,QmRpwe9d2JyBZ9dkJT9tRxNN6JG9a1mCuSYjq74MpXNuYT,200,1350,200,1350,identical
+c5.png,QmUxeHFtCi13Jbhu8mXzMskChd8NzjFvLXDrPTPwU6gyE6,200,1333,200,1333,identical
+c6.png,QmaZY2mmiztcgxB4q1eQyu1rHCscKwGbAxpeUwaNed1WJm,200,1305,200,1305,identical
+index.html,QmQBXjL5MAWBeqYkBE62jLTfVo3o2UWy2ybtzKDf2P8q42,200,12010,200,12178,DIFF
+js/base.js,QmP5dDhdEyPdkfCJKpHwwKqHDtN6AiMnaZFX4cFkchiCHP,200,374423,200,374423,identical
+js/manifest.edn,QmXMczkvSLJc3Z3nAMfJ1w7Vzo28bdN4HuwCXEABPuoGFP,200,1899,200,1899,identical
+main.css,QmbL9iSmNfu4qdXEkvbw3tka4aEBYhYibx7KEJgpgmuyvi,200,41,200,41,identical
