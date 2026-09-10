@@ -165,10 +165,10 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
    content only we announce (a real number the page has never shown);
    `unmeasured` small and listed. **Outcome 2026-09-09: CDN-only 0, ff_only
    0, unmeasured 0.**
-6. **#3435 checkpoint comment** — everything since 9/3 is unreported (V3 DB
-   align + reference rows + explicit pins, crystalline tx landed, OpenSea
-   freeze + Ryan's audit, filum-first ordering, the census above). The
-   numbers are now in `data/updates.json` (2026-09-09 entry) — post it.
+6. **#3435 checkpoint comment — POSTED 2026-09-10**
+   (feral-file/feral-file#3435, comment `issuecomment-5611733862`): crystalline
+   + filum landed, special-project class, OpenSea state, checker rebuild, the
+   2026-09-09 census numbers, the four corrections, remaining items.
 7. **Unpin backlog** — only after the census confirms nothing references
    them; re-derive the reference set first. Candidates: superseded HLS dirs,
    old V2 metadata dirs, old V3 doc CIDs (old halves of `step3/updates_0x*.csv`),
