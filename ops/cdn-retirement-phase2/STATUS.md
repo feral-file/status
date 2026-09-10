@@ -233,8 +233,8 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
   live page `archive_registry.version` = 1.
 - **nonipfs-scan (closed)**: status PR #10; the 5 Art of Survival thumbnail
   403s were fixed at origin 2026-09-02 and verified.
-- **Open PRs**: status #10 (nonipfs-scan), #11 (this branch,
-  tools/phase2-step0) — merge.
+- **Open PRs**: status #11 (this branch, tools/phase2-step0) — merge; #10
+  (nonipfs-scan) is merged.
 
 ## goal-2 / V2 rollout receipts (2026-09-01..03)
 
