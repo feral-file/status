@@ -2,10 +2,10 @@
 
 *Prepared 2026-09-08 (Brandon). Part of CDN-retirement phase 2, feral-file/feral-file#3435.
 Decision context: `ops/cdn-retirement-phase2.md` § Pending decisions (option a).
-State 2026-09-08: steps 1–3 DONE (pinned, render-checked, DB measured + align SQL generated);
-Step 5 (896 `ipfs_cid` swaps, overlay kept) APPLIED 2026-09-08; step 4 (the
-owner tx) requested from the key holder the same day and PENDING — until it lands the DB leads
-the chain (chain read 2026-09-08: tokenURI still `ipfs://QmQjzv…/<id>`). Nothing else remains.*
+**CLOSED 2026-09-08**: steps 1–3 done (pinned, render-checked, DB measured), step 5 applied
+(896 `ipfs_cid` swaps, overlay kept), step 4 (the owner tx) landed the same day — `tokenURI`
+on chain returns `ipfs://QmZTed…/<id>` (verified 2026-09-08; re-read 2026-09-10 via
+1rpc.io for token `…869184`). DB and chain agree; nothing remains.*
 
 ## What is wrong, measured
 
@@ -53,7 +53,7 @@ python3 ops/cdn-retirement-phase2/filum/tools/filum-build.py --art-ipfs $S/art-i
 `ipfs --offline block put` the `?format=raw` block, then `ipfs --offline dag get`.)
 `build/` (7.4 MB: `art-new/`, `base-new/` 896 docs) is gitignored and was deleted after pinning (2026-09-08 cleanup) — regenerate with the command above. The DB export was deleted after the align was applied (re-export with `export-truth-db.sql`).
 
-## Gate
+## Gate (closed with the tx, 2026-09-08)
 
 **The artist's sign-off on the patched bytes** (Feral File pinning a modified index.html as
 the permanent version). Sean is asking the artists (#3435, 2026-09-04). Steps 1–3 below
@@ -94,16 +94,18 @@ are reversible prep and can run before it; step 4 (the chain tx) waits for it.
    exists if that is ever wanted. Consequence to keep in mind: the API (and therefore the
    census/status page) will keep seeing the CDN overlay for these 128, so they stay in the
    overlay class on the page — reclassify there rather than counting them as CDN-dependent docs.
-4. **Chain tx — REQUESTED 2026-09-08, PENDING** (request sent to the owner-key holder; the tool
-   waits for gas ≤ 1 gwei, so landing can lag). Verify with a `tokenURI` read: done when it
-   returns `ipfs://QmZTed…/<tokenId>`. If the tx is ever abandoned, revert step 5 by
-   regenerating `filum-align.sql` with the dirs swapped in `cids.csv` (same WHERE-pinned shape).
+4. **Chain tx — LANDED 2026-09-08** (broadcast by the owner-key holder; `tokenURI` reads
+   `ipfs://QmZTed…/<tokenId>`, verified by direct read the same day and again 2026-09-10).
+   The tx hash is not recorded here — the chain is the receipt (the contract's latest owner
+   tx). Rollback, should it ever be wanted: `setTokenBaseURI` back to `ipfs://QmQjzv…/` and
+   regenerate the align SQL with the dirs swapped in `cids.csv` (same WHERE-pinned shape).
    Original instruction: copy `v4-base-uri.config.example.json` (this directory)
    → `tools/update-token-uri/v4-base-uri.config.json`, then `preflight` → `tx` → vault sign → `broadcast`, exactly as
    `RUNBOOK-crystalline-base-uri.md` (same owner `0x1d05cf6c…`, same tool, ~50k gas).
-5. **DB align — APPLIED 2026-09-08** (896 × UPDATE 1, before the tx landed: a deliberate
-   DB-leads-chain window, harmless because the 768 non-filum docs are byte-identical and the
-   128 filum docs' only change is masked by the kept overlay). Commands, for the record:
+5. **DB align — APPLIED 2026-09-08** (896 × UPDATE 1, a few hours before the tx landed: a
+   deliberate, short DB-leads-chain window, harmless because the 768 non-filum docs are
+   byte-identical and the 128 filum docs' only change is masked by the kept overlay; closed
+   when the tx landed). Commands, for the record:
    ```
    python3 ops/cdn-retirement-phase2/filum/tools/gen-filum-sql.py --db-export <export.csv> \
        --cids ops/cdn-retirement-phase2/filum/cids.csv --doc-updates ops/cdn-retirement-phase2/filum/doc_updates.csv > filum-align.sql

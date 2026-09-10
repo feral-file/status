@@ -13,10 +13,12 @@ every input is regenerable (chain / IPFS pins / fresh DB export).*
 Every token minted through the Feral File server whose metadata media pointed
 at the CDN has been repointed on chain and in the DB: V2 (5,880, goal 2), V3
 (2,341) and crystalline (9,048, one `setTokenBaseURI`, **landed** — see
-below). What remains on the platform-minted side is exactly the two
-`alternativePreviewURI` overlays, **filum 128 + Ten Whistlegraphs 39**.
-filum is next; Ten Whistlegraphs is deferred. The census rerun + status page
-rebuild is deliberately held until all of it is done, so it runs once.
+below) and filum / Truth (896, one `setTokenBaseURI`, **landed 2026-09-08**,
+item 1 below). Nothing platform-minted is left to repoint. The two
+`alternativePreviewURI` overlays remain by decision: filum's 128 (kept — chain
+alignment, not feralfile.com display) and Ten Whistlegraphs' 39 (deferred,
+third-party by choice). The close-out census ran once, 2026-09-09, and is
+published (item 5).
 A new track opened on 2026-09-04 from OpenSea's audit: tokens on contracts we
 deployed manually (not through the server) — their media CDN handling and how
 their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).

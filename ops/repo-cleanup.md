@@ -56,7 +56,7 @@ the only basis for the unpin phase); `step3/updates_0x*.csv` (2,341 old→new do
 (182-row repair decision record); `opensea_delist_report.csv` (final scan of an open
 incident); `ops/opensea-metadata-path/*` (incident open); `RUNBOOK-crystalline-base-uri.md`
 (tx was pending); `tools/update-token-uri/v4-base-uri.config.json` (live, gitignored,
-holds a vault account id — never committed, not deleted until the tx lands).
+holds a vault account id — never committed, kept only until the tx landed).
 
 ### 2026-09-10 — branch `tools/phase2-step0` before merge
 
@@ -79,5 +79,6 @@ holds a vault account id — never committed, not deleted until the tx lands).
 - This file: `repo-cleanup-2026-09-04.md` (Chinese, an executed plan) → `repo-cleanup.md`
   (English, policy + log). `.gitignore` comment for the filum build tree pointed at the old
   tool path; fixed.
-- Local only: `.DS_Store`, `__pycache__/`. Left alone: `public/` (CI builds the page),
-  `node_modules/`, the live tx configs.
+- Local only: `.DS_Store`, `__pycache__/`, and the live `v4-base-uri.config.json` (the
+  crystalline tx landed 2026-09-08, filum's the same day — its vault account id has no
+  reason to stay on disk). Left alone: `public/` (CI builds the page), `node_modules/`.
