@@ -1,0 +1,152 @@
+{
+ "as_of": "2026-09-29",
+ "note": "Pins on ff-pin-1 beyond the Bitmark-era series manifest. All byte-verified on add except the Bitmark chain archive and HLS masters, which were pinned recursively from their existing CIDs (integrity guaranteed by the CID itself). 2026-09-29 build: adds the Aorist ng-residual entry (feral-file#3464) and the five Refik Anadol Coral masters recovered from the Aorist archive (byte-verified 2026-08-29). The 2026-08-16 build was never published on-chain and is superseded by this one.",
+ "collections": [
+  {
+   "id": "a2p",
+   "description": "Media of a2p (2019-2020), the artist-to-artist experiment Feral File grew out of. 144 works across two generations; archives at a2p.bitmark.com. Synced from the original storage and byte-verified 2026-08-03.",
+   "items": [
+    {
+     "label": "a2p 1.0 media (art-trading-assets-preview-livenet)",
+     "cid": "bafybeicpzu5662p244agrni3dowebgnnidlcjmt6yxmfk4bp4r2zc5zn2y",
+     "bytes": 3700396877,
+     "files": 170
+    },
+    {
+     "label": "a2p 2.0 media (art-trading-v2-live)",
+     "cid": "bafybeifvvqoomhreylzrkm3f25oymfv4brp4wy2pxiaywm4i2huu6vrrje",
+     "bytes": 4071203627,
+     "files": 149
+    },
+    {
+     "label": "a2p trade originals (trade-art-trading-livenet)",
+     "cid": "bafybeifc7skzcg7ivlsl5g2kusnf5izwgdwg4dbcgly3uhz7ir3t32olgi",
+     "bytes": 7590613247,
+     "files": 161
+    }
+   ]
+  },
+  {
+   "id": "bitmark-blockchain-archive",
+   "description": "The retired Bitmark blockchain (2014-2025), preserved per github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive: chain data on IPFS, Merkle root on Ethereum, timestamp on Bitcoin. Re-pinned on Feral File's archival node 2026-08-03.",
+   "items": [
+    {
+     "label": "chain archive metadata + data",
+     "cid": "QmQeLXYbeB5kzoZQhLwoRhSaXAovc6Kp9didBasVDRuVHe"
+    },
+    {
+     "label": "Merkle proof file",
+     "cid": "QmUTivb8fhJyNF1MvPXU1swyc8Eonf9eTeVm7uxPkiKaxK"
+    }
+   ]
+  },
+  {
+   "id": "hls-master-playlists",
+   "description": "HLS master playlists for 184 video works (FeralVerse, On Screen Presence) whose stream files were never placed on IPFS — the masters are preserved here; full video repackaging as directory CIDs is open remediation.",
+   "items": [
+    {
+     "label": "FeralVerse master A",
+     "cid": "QmRGwoEnB4inboActrRsNAEiJzXL8LUwLrCYcUCgAEBxMQ"
+    },
+    {
+     "label": "FeralVerse master B",
+     "cid": "Qmf8bvobDWMTmauvhgFKWNhZKUe4ufDY16a6qk1KLSgM74"
+    },
+    {
+     "label": "On Screen Presence master",
+     "cid": "QmQJAa9uC5Fc3gFzNnb8CHNMgJq7NgtNF1SHs9x7YvbjM4"
+    }
+   ]
+  },
+  {
+   "id": "aorist",
+   "description": "Rescue archive of Aorist, a digital-art initiative that ceased operating; Feral File migrated its collections in 2024 and stewards the works. Complete contents of the two surviving storage buckets — originals, renditions, video, and the two IPFS blockstores from the 2024 migration — restored from cold storage, synced, and byte-verified 2026-08-15, plus the three ng objects outside that sync (two root files and one image uploaded 2026-09-09), banked 2026-09-29 before the buckets were deleted. One CID per source prefix.",
+   "items": [
+    {
+     "label": "aorist ng-models",
+     "cid": "bafybeiaix5orbepkcgbazsowl6fztmp2ys4djbhr47d2noffq6rndggbkq",
+     "bytes": 378122832,
+     "files": 24
+    },
+    {
+     "label": "aorist ng-images",
+     "cid": "bafybeihgqym3ymlrowvt7dodxozcznijbtrnaowg5ynn246pj4m7x3g67i",
+     "bytes": 4129873434,
+     "files": 9940
+    },
+    {
+     "label": "aorist ng-art-ipfs",
+     "cid": "bafybeicitng5nvk76sj422ankbf7vh4hp5t7w2jzw5r5hjcasqv2i45cwq",
+     "bytes": 17356383572,
+     "files": 66880
+    },
+    {
+     "label": "aorist ng-art-env-02-s3-bucket",
+     "cid": "bafybeigeflcxy7ychcfrdlutspz4xdz7lkfudwrrg5vxz5qemowqdbufl4",
+     "bytes": 67331008441,
+     "files": 6904
+    },
+    {
+     "label": "aorist ng-aor-ipfs",
+     "cid": "bafybeiea554avuft4j65pfo6s4vw24ikzlxwraavqmxtam2qialhb3abfy",
+     "bytes": 92350423623,
+     "files": 278466
+    },
+    {
+     "label": "aorist ng-videos",
+     "cid": "bafybeicmn4vlgjtuuewwrh3vkz3tom6rejykb7inyzbpqphjvjhy4gubjq",
+     "bytes": 239473406656,
+     "files": 24165
+    },
+    {
+     "label": "aorist m-original",
+     "cid": "bafybeidfatg5fydti6ayrbjw2hvt4r76buugzdp4djwgoh53ojl7pd7xqq",
+     "bytes": 189061416,
+     "files": 12
+    },
+    {
+     "label": "aorist ng-residual",
+     "cid": "bafybeibubpkdux2fu3reql3l2vkahqclfvnr2gpljgogu46kgcx5t3ooyu",
+     "bytes": 474814,
+     "files": 3
+    }
+   ]
+  },
+  {
+   "id": "refik-anadol-coral-masters",
+   "description": "Refik Anadol, Machine Hallucinations — Coral — Generative AI Data Painting A–E: the five full-resolution masters (3840×6827) recovered from the Aorist archive. The on-chain tokens reference 640×1138 renditions; these are the originals Feral File stewards and serves for the Refik Anadol Studio channel. Byte-verified on the archival node 2026-08-29 (sha256 in /mnt/ff-pin-data/job/coral_manifest.csv). One CID per file.",
+   "items": [
+    {
+     "label": "Machine Hallucinations — Coral — Generative AI Data Painting A",
+     "cid": "bafybeigknz2wrdlyg64wfunrgieflllkm4nf63iiiae76wvfzhq672je74",
+     "bytes": 5819515,
+     "files": 1
+    },
+    {
+     "label": "Machine Hallucinations — Coral — Generative AI Data Painting B",
+     "cid": "bafybeifpgs2swnnnlrwpdp7eplslu5omud46cv7pbqdsxhxxcdhgc5xibm",
+     "bytes": 6320524,
+     "files": 1
+    },
+    {
+     "label": "Machine Hallucinations — Coral — Generative AI Data Painting C",
+     "cid": "bafybeig5pvia7vloiltcvatqdvvybqjx56433dwrriw7ktb5rngsxoz2oa",
+     "bytes": 6485978,
+     "files": 1
+    },
+    {
+     "label": "Machine Hallucinations — Coral — Generative AI Data Painting D",
+     "cid": "bafybeifgolfnh7kglevbk4ugti6tecidd6d6icolpx52mkrgbkwwygousy",
+     "bytes": 6796545,
+     "files": 1
+    },
+    {
+     "label": "Machine Hallucinations — Coral — Generative AI Data Painting E",
+     "cid": "bafybeiatoahoq34ap6o3uuvo6xm5rgxx6poq224cwiagyddgrjfrvg3bqa",
+     "bytes": 6102858,
+     "files": 1
+    }
+   ]
+  }
+ ]
+}

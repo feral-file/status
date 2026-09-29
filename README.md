@@ -137,9 +137,29 @@ Post-audit additions (2026-08-04, two external adversarial passes folded):
 - Review the Solidity known-bugs list for the exact compiler at deploy time;
   pinned ≠ automatically safe.
 
-Updating later: refresh the data, rebuild, `ipfs add` with the same flags,
-`setManifest` from the Safe. Every prior CID stays readable on-chain via
-`historyAt(i)` — not only in event logs.
+Updating later (a revision):
+
+1. `data/previous-manifest.txt` holds the CID that is ON CHAIN now — read it
+   back with `historyAtVersion(version())`, never assume the last build was
+   published. A build that never got its two signatures is a draft: leave it
+   in git history and chain the next build to the on-chain CID (the
+   2026-08-16 build was superseded this way on 2026-09-29).
+2. Drop the new inputs into `data/` (`archive_pins_<date>.json` for anything
+   beyond the Bitmark-era series; the builder takes the newest by name),
+   rebuild, `ipfs add -Q --cid-version 1` on the archival node and on a
+   second node (Sean's laptop co-pin); the two CIDs must match.
+3. Independent byte check before signing: public gateways (ipfs.io,
+   dweb.link) have refused all fetches since 2026-09 ("service worker
+   gateway only"), so the check is `ipfs cat <cid>` on the node that did NOT
+   do the add, compared byte-for-byte against `data/archive-manifest.json`.
+4. Safe Transaction Builder → `setManifest(<cid>)`, two signatures. A
+   ready-to-load batch file per revision lives beside the contract
+   (`contracts/setManifest-<date>.safe-tx.json`, raw calldata next to it).
+5. After execution: `data/published.json` (version, CID, date), rebuild and
+   deploy the page, close the card.
+
+Every prior CID stays readable on-chain via `historyAt(i)` — not only in
+event logs.
 
 If the Safe is ever lost the contract freezes read-only at the last CID:
 the intended failure mode. Assets force-sent to the contract are stuck by

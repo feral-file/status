@@ -3,7 +3,7 @@
   "description": "Content-addressed, byte-verified copies of works Feral File preserves. Every CID below can be pinned by anyone; each copy held anywhere makes the works more permanent. Published by Feral File; the current CID of this document is recorded in the FeralFileArchiveRegistry contract on Ethereum.",
   "schema_version": 1,
   "site": "https://status.feralfile.com",
-  "data_as_of": "2026-08-16T00:00:00Z",
+  "data_as_of": "2026-09-29T00:00:00Z",
   "registry": {
     "chain": "eip155:1",
     "address": "0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e",
@@ -2225,7 +2225,7 @@
     },
     {
       "id": "aorist",
-      "description": "Rescue archive of Aorist, a digital-art initiative that ceased operating; Feral File migrated its collections in 2024 and stewards the works. Complete contents of the two surviving storage buckets — originals, renditions, video, and the two IPFS blockstores from the 2024 migration — restored from cold storage, synced, and byte-verified 2026-08-15. One CID per source prefix.",
+      "description": "Rescue archive of Aorist, a digital-art initiative that ceased operating; Feral File migrated its collections in 2024 and stewards the works. Complete contents of the two surviving storage buckets — originals, renditions, video, and the two IPFS blockstores from the 2024 migration — restored from cold storage, synced, and byte-verified 2026-08-15, plus the three ng objects outside that sync (two root files and one image uploaded 2026-09-09), banked 2026-09-29 before the buckets were deleted. One CID per source prefix.",
       "items": [
         {
           "label": "aorist ng-models",
@@ -2268,6 +2268,48 @@
           "cid": "bafybeidfatg5fydti6ayrbjw2hvt4r76buugzdp4djwgoh53ojl7pd7xqq",
           "bytes": 189061416,
           "files": 12
+        },
+        {
+          "label": "aorist ng-residual",
+          "cid": "bafybeibubpkdux2fu3reql3l2vkahqclfvnr2gpljgogu46kgcx5t3ooyu",
+          "bytes": 474814,
+          "files": 3
+        }
+      ]
+    },
+    {
+      "id": "refik-anadol-coral-masters",
+      "description": "Refik Anadol, Machine Hallucinations — Coral — Generative AI Data Painting A–E: the five full-resolution masters (3840×6827) recovered from the Aorist archive. The on-chain tokens reference 640×1138 renditions; these are the originals Feral File stewards and serves for the Refik Anadol Studio channel. Byte-verified on the archival node 2026-08-29 (sha256 in /mnt/ff-pin-data/job/coral_manifest.csv). One CID per file.",
+      "items": [
+        {
+          "label": "Machine Hallucinations — Coral — Generative AI Data Painting A",
+          "cid": "bafybeigknz2wrdlyg64wfunrgieflllkm4nf63iiiae76wvfzhq672je74",
+          "bytes": 5819515,
+          "files": 1
+        },
+        {
+          "label": "Machine Hallucinations — Coral — Generative AI Data Painting B",
+          "cid": "bafybeifpgs2swnnnlrwpdp7eplslu5omud46cv7pbqdsxhxxcdhgc5xibm",
+          "bytes": 6320524,
+          "files": 1
+        },
+        {
+          "label": "Machine Hallucinations — Coral — Generative AI Data Painting C",
+          "cid": "bafybeig5pvia7vloiltcvatqdvvybqjx56433dwrriw7ktb5rngsxoz2oa",
+          "bytes": 6485978,
+          "files": 1
+        },
+        {
+          "label": "Machine Hallucinations — Coral — Generative AI Data Painting D",
+          "cid": "bafybeifgolfnh7kglevbk4ugti6tecidd6d6icolpx52mkrgbkwwygousy",
+          "bytes": 6796545,
+          "files": 1
+        },
+        {
+          "label": "Machine Hallucinations — Coral — Generative AI Data Painting E",
+          "cid": "bafybeiatoahoq34ap6o3uuvo6xm5rgxx6poq224cwiagyddgrjfrvg3bqa",
+          "bytes": 6102858,
+          "files": 1
         }
       ]
     }

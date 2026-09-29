@@ -1,0 +1,34 @@
+{
+  "version": "1.0",
+  "chainId": "1",
+  "createdAt": 1790696245170,
+  "meta": {
+    "name": "Feral File Archive manifest \u2014 setManifest (2026-09-29 build)",
+    "description": "FeralFileArchiveRegistry.setManifest(cid) from the custody Safe. cid = archive-manifest.json in feral-file/status, 2026-09-29 build (adds the Aorist rescue collection incl. ng-residual, and the five Refik Anadol Coral masters). Verify before signing: sha256 of data/archive-manifest.json = 00802970538a7028bead36ffdb5cfdc6459e9408ad4133f5d483f9c4395b7a55; ipfs cat of the CID on a second node is byte-identical.",
+    "txBuilderVersion": "1.17.0",
+    "createdFromSafeAddress": "0xA741D850B8B4e684c6F78e9615BD5b33B37AcFcF",
+    "createdFromOwnerAddress": "",
+    "checksum": ""
+  },
+  "transactions": [
+    {
+      "to": "0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e",
+      "value": "0",
+      "data": null,
+      "contractMethod": {
+        "inputs": [
+          {
+            "internalType": "string",
+            "name": "cid",
+            "type": "string"
+          }
+        ],
+        "name": "setManifest",
+        "payable": false
+      },
+      "contractInputsValues": {
+        "cid": "bafkreiaaqauxau4koaul5ljw77nvz7ogiwpjicfniez7lved7hcdsw32ku"
+      }
+    }
+  ]
+}
