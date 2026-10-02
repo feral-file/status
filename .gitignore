@@ -24,3 +24,5 @@ ops/cdn-retirement-phase2/filum/truth_db_export.csv
 ops/special-project-contracts/indexer_universe.csv
 ops/special-project-contracts/indexer_universe.csv.state
 ops/special-project-contracts/indexer_universe.log
+# wrangler scratch (npx wrangler runs)
+.wrangler/

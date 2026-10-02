@@ -1,0 +1,3090 @@
+{
+ "schema": "feral-file/witness-holdings/0.1",
+ "kind": "holdings",
+ "subject": {
+  "chain": "tezos:NetXdQprcVkpaWU",
+  "address": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy",
+  "name": "reas.tez",
+  "name_system": "tezos-domains",
+  "name_source": "https://api.tzkt.io/v1/domains?address={address}&reverse=true"
+ },
+ "observed_at": "2026-10-02T18:40:25Z",
+ "chain_state": {
+  "block": 15201817,
+  "block_hash": "BMH4yHdUCUV5ZweKCKF855dRCvwvRzLbMjuEThDdyiWgJYQiVjc",
+  "block_timestamp": "2026-10-02T18:39:04Z",
+  "rpc": "https://rpc.tzbeta.net"
+ },
+ "readers": [
+  {
+   "name": "tzkt",
+   "operator": "Baking Bad (public TzKT instance)",
+   "endpoint": "https://api.tzkt.io/v1/tokens/balances?account={address}&balance.gt=0",
+   "query": "paged by 10000 with offset",
+   "fetched_at": "2026-10-02T18:39:03Z",
+   "notes": "Lists FA2 and FA1.2 balances above zero.",
+   "count": {
+    "total": 173,
+    "fa2": 172,
+    "fa1.2": 1
+   },
+   "list_sha256": "19a7cdd10a36b7a214dba705502bcbb3e3e48a65f389e864815971a8430a564f"
+  },
+  {
+   "name": "objkt",
+   "operator": "objkt.com (public GraphQL)",
+   "endpoint": "https://data.objkt.com/v3/graphql",
+   "query": "token_holder(where:{holder_address, quantity>0}), paged by 500",
+   "fetched_at": "2026-10-02T18:39:03Z",
+   "notes": "objkt indexes FA2 tokens only; every row is reported as fa2.",
+   "count": {
+    "total": 171,
+    "fa2": 171,
+    "fa1.2": 0
+   },
+   "list_sha256": "5ae097516dee4a75704a8a3c66472368a6b7f6319b28133cc9b3fb6b9bef45d3"
+  }
+ ],
+ "comparison": {
+  "keyed_by": "contract:token_id, per standard",
+  "pairs": [
+   {
+    "standard": "fa2",
+    "both": 170,
+    "only_tzkt": 2,
+    "only_objkt": 1
+   },
+   {
+    "standard": "fa1.2",
+    "both": 0,
+    "only_tzkt": 1,
+    "only_objkt": 0
+   }
+  ]
+ },
+ "chain_check": {
+  "method": "Node RPC at chain_state.block_hash: the contract's %ledger big map, located from its own storage type, read by key hash. Key (address, token_id) -> balance > 0, or key token_id -> owner == address. A missing key is not held. A contract whose ledger cannot be located or whose layout is not one of those two is recorded as unanswerable; FA1.2 tokens are not checked. Reader lists were fetched shortly before the block was pinned (see readers[].fetched_at); a transfer in that window shows up as a disagreement.",
+  "sample_size": 120,
+  "samples": [
+   {
+    "reader": "tzkt",
+    "seed": 15201817,
+    "checked": 120,
+    "held": 117,
+    "not_held": 0,
+    "of_which_reverted": 0,
+    "unanswerable": 3,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "650620",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19rTtzjSczSjfmAx4dESY5BecDHKJwB8Ww",
+      "token_id": "105",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 188040,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Cb3wFNt4StQnyNMQqEdrL1q1e6m7J4FSL",
+      "token_id": "21",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 307591,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XaCf6gkjFnKg3QmPfn6gep53moMvjkj1E",
+      "token_id": "11071",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 738597,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1LnfmagmekN3aZLq2vDvNvD7Esrus6PAH2",
+      "token_id": "3",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 756156,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1CB4MYiAViCuXWBU961x7LjQXGeA8SnQwt",
+      "token_id": "338",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 771405,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97216",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EygsJuDVJghY9Z48rgWDtdmNVvo1M8YLg",
+      "token_id": "53",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769531,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "155726",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EygsJuDVJghY9Z48rgWDtdmNVvo1M8YLg",
+      "token_id": "118",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769531,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1BQK1gsVTXUVqoFsJNYUK1npNLSWnxZWHa",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 763484,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136867",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "558345",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1X5W2akGCxvykmHoqoQzJfEgg1RGNGBCDd",
+      "token_id": "785",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 607431,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "7",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "648880",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "36",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "141967",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Cb3wFNt4StQnyNMQqEdrL1q1e6m7J4FSL",
+      "token_id": "20",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 307591,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19FqQ3V6gtkxNnFBhgXRqmMZ2zhiQz7zWa",
+      "token_id": "79",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 782047,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "651654",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "564567",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "17",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "345502",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS",
+      "token_id": "20216",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "no %ledger big map in storage"
+      },
+      "held": null
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "154277",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666276",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1HNMiL95xZkcj2bHxXpEbV2nvdxK6A56Xa",
+      "token_id": "28",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769458,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XaCf6gkjFnKg3QmPfn6gep53moMvjkj1E",
+      "token_id": "16073",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 738597,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97022",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1HMQxr2kwHK3oyLPiwj9bcouGo6cKuwoTc",
+      "token_id": "1",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 695574,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1PNk2xJKsGHffXAGEJVniwHXkN7XcxxM1D",
+      "token_id": "29",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 407067,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "556562",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1078928",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1QauC1V8jTjmycptDQV6TM4PUh3dnpquZx",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 573584,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1GrPKR5osEnv7EZmf3XFVMtYj24TSChhfD",
+      "token_id": "41",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769538,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1NU4tUF3q5tbpmPpxcprf43eq4YQs3gYCV",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 763465,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "141958",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "65",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1V7k3rUP4tmZy1gfV1eP8pu2Agdk6DibEq",
+      "token_id": "24",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 712018,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136869",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136862",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "4",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1PNk2xJKsGHffXAGEJVniwHXkN7XcxxM1D",
+      "token_id": "14",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 407067,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1237448",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97219",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "871721",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XaCf6gkjFnKg3QmPfn6gep53moMvjkj1E",
+      "token_id": "11218",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 738597,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "476879",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1CB4MYiAViCuXWBU961x7LjQXGeA8SnQwt",
+      "token_id": "337",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 771405,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "107973",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "137410",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XESXnx4PMBkM5pXPXShozZcV5axGLmE7z",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 763715,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "107972",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "730820",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "137296",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1MhSRKsujc4q5b5KsXvmsvkFyht9h4meZs",
+      "token_id": "853",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 346687,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VJwe36At1zvBkFg71yK4KYN7cRGaFdfqA",
+      "token_id": "954",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 805095,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "871421",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EygsJuDVJghY9Z48rgWDtdmNVvo1M8YLg",
+      "token_id": "55",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769531,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666274",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1GBSMC1rH4tGjfpHo6dxQcVLb7r9FDBGnG",
+      "token_id": "4",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 450149,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EygsJuDVJghY9Z48rgWDtdmNVvo1M8YLg",
+      "token_id": "52",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769531,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19rTtzjSczSjfmAx4dESY5BecDHKJwB8Ww",
+      "token_id": "79",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 188040,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "137015",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "358976",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "96016",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1NpTVXHvxH122gxfHs4XSEkhZr5N1TevHB",
+      "token_id": "14",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 737999,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136865",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97020",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "95863",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "68",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "154276",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1212157",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Fd7EGJp9JqCHZ7YuLRk2p1JpZvk1trXgE",
+      "token_id": "1",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 604975,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "558323",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "651651",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "871774",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Fd7EGJp9JqCHZ7YuLRk2p1JpZvk1trXgE",
+      "token_id": "3",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 604975,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1237474",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1MhSRKsujc4q5b5KsXvmsvkFyht9h4meZs",
+      "token_id": "810",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 346687,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136870",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XVTp6NGtKKFpXVardEd3ifmAdKuYiKhMv",
+      "token_id": "5",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 333658,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XaCf6gkjFnKg3QmPfn6gep53moMvjkj1E",
+      "token_id": "15321",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 738597,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "454912",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1003980",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS",
+      "token_id": "31597",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "no %ledger big map in storage"
+      },
+      "held": null
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "96525",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1TjnZYs5CGLbmV6yuW169P8Pnr9BiVwwjz",
+      "token_id": "0",
+      "standard": "fa1.2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "fa1.2 not checked (FA2 ledgers only)"
+      },
+      "held": null
+     },
+     {
+      "contract": "KT1WUuytjdwr5uCzJAvLDQCGwZ6nfZd3qfnE",
+      "token_id": "135",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 427850,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1BoKMQVfVn1YPLQPcGLSiPL6JTLMdBnGNp",
+      "token_id": "15",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 256589,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19FqQ3V6gtkxNnFBhgXRqmMZ2zhiQz7zWa",
+      "token_id": "8",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 782047,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VJwe36At1zvBkFg71yK4KYN7cRGaFdfqA",
+      "token_id": "953",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 805095,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "155835",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666299",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "628178",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "6",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136871",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Q1irsjSZ7EfUN4qHzAB2t7xLBPsAWYwBB",
+      "token_id": "53",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 801535,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "142385",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97018",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1TyfWvUwDxnQJ16u7kvgKLKv4265nm7BTC",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 716026,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "142379",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "54",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1084680",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1MjparbSwntyLhhWL5Av59iaPSP3iCuece",
+      "token_id": "16",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 497413,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136868",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "871694",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "358590",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KQq4AkumBWai8z4owGcfkbRpzGxK5vCMr",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 805045,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1UKukQvnvcKZmkaUJuArgEx6644jFQ8v7g",
+      "token_id": "38",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 356737,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136863",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666278",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "13",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "137070",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1FfjhvJZppBFQuUzNAdFPR1Z2jpD4XiXrF",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 613204,
+       "layout": "multi_asset",
+       "balance": "100000000000"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "24",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1605419",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EygsJuDVJghY9Z48rgWDtdmNVvo1M8YLg",
+      "token_id": "119",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769531,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     }
+    ]
+   },
+   {
+    "reader": "objkt",
+    "seed": 15201817,
+    "checked": 120,
+    "held": 118,
+    "not_held": 0,
+    "of_which_reverted": 0,
+    "unanswerable": 2,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "650620",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "649305",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97019",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136862",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1HUMXUDS4J8auxNZYWooppweNQMdVKLf8x",
+      "token_id": "41",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 752700,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666270",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "556562",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97020",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "345502",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1QauC1V8jTjmycptDQV6TM4PUh3dnpquZx",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 573584,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666274",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1HMQxr2kwHK3oyLPiwj9bcouGo6cKuwoTc",
+      "token_id": "1",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 695574,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "648880",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "36",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1MhSRKsujc4q5b5KsXvmsvkFyht9h4meZs",
+      "token_id": "810",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 346687,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Cb3wFNt4StQnyNMQqEdrL1q1e6m7J4FSL",
+      "token_id": "21",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 307591,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XaCf6gkjFnKg3QmPfn6gep53moMvjkj1E",
+      "token_id": "15321",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 738597,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "103994",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "154276",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "4",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "871774",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "67",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "155667",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1PNk2xJKsGHffXAGEJVniwHXkN7XcxxM1D",
+      "token_id": "6",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 407067,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1078928",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666287",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "141967",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136868",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "141958",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "558345",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "564567",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1V7k3rUP4tmZy1gfV1eP8pu2Agdk6DibEq",
+      "token_id": "24",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 712018,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "142379",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1FfKHiW6bAoaLMT8unjP7ueVz6FtUXRrmJ",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 123484,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT18xYKw3twdWVaWuK3ifdHaVPeWEd5RGnKV",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 747465,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97220",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666301",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "96883",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VJwe36At1zvBkFg71yK4KYN7cRGaFdfqA",
+      "token_id": "954",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 805095,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19FqQ3V6gtkxNnFBhgXRqmMZ2zhiQz7zWa",
+      "token_id": "8",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 782047,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1HnF7G5V71NJKXoyR4qusaFkQF3dmyr1kg",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 785442,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "167111",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136865",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97217",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1PNk2xJKsGHffXAGEJVniwHXkN7XcxxM1D",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 407067,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97219",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "65",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "96112",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136870",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "476879",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "107972",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1186161",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136864",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "155835",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1GBZmSxmnKJXGMdMLbugPfLyUPmuLSMwKS",
+      "token_id": "29094",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "no %ledger big map in storage"
+      },
+      "held": null
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97022",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XESXnx4PMBkM5pXPXShozZcV5axGLmE7z",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 763715,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "871631",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VpZuXp9bNTV6uDL6Ljsphst4L4Tt1beVk",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 764310,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "6",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "71",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1GBSMC1rH4tGjfpHo6dxQcVLb7r9FDBGnG",
+      "token_id": "4",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 450149,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Cb3wFNt4StQnyNMQqEdrL1q1e6m7J4FSL",
+      "token_id": "20",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 307591,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "96016",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "651651",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "95863",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136863",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Q1irsjSZ7EfUN4qHzAB2t7xLBPsAWYwBB",
+      "token_id": "53",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 801535,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136867",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1GrPKR5osEnv7EZmf3XFVMtYj24TSChhfD",
+      "token_id": "41",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769538,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "21802",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Fd7EGJp9JqCHZ7YuLRk2p1JpZvk1trXgE",
+      "token_id": "1",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 604975,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1UKukQvnvcKZmkaUJuArgEx6644jFQ8v7g",
+      "token_id": "38",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 356737,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "96525",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "454912",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136869",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1PNk2xJKsGHffXAGEJVniwHXkN7XcxxM1D",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 407067,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EygsJuDVJghY9Z48rgWDtdmNVvo1M8YLg",
+      "token_id": "118",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769531,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1Fd7EGJp9JqCHZ7YuLRk2p1JpZvk1trXgE",
+      "token_id": "3",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 604975,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1TjnZYs5CGLbmV6yuW169P8Pnr9BiVwwjz",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "unsupported ledger layout key=['address'] value=['map', 'nat']"
+      },
+      "held": null
+     },
+     {
+      "contract": "KT1NpTVXHvxH122gxfHs4XSEkhZr5N1TevHB",
+      "token_id": "14",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 737999,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19FqQ3V6gtkxNnFBhgXRqmMZ2zhiQz7zWa",
+      "token_id": "7",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 782047,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19rTtzjSczSjfmAx4dESY5BecDHKJwB8Ww",
+      "token_id": "79",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 188040,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1J7jm7weHeTCGyb3q2smVgkbpsftyqHXQx",
+      "token_id": "7",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 768398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1PNk2xJKsGHffXAGEJVniwHXkN7XcxxM1D",
+      "token_id": "14",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 407067,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "24",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1605340",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XaCf6gkjFnKg3QmPfn6gep53moMvjkj1E",
+      "token_id": "11071",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 738597,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1MjparbSwntyLhhWL5Av59iaPSP3iCuece",
+      "token_id": "16",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 497413,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "137237",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT19rTtzjSczSjfmAx4dESY5BecDHKJwB8Ww",
+      "token_id": "105",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 188040,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1HNMiL95xZkcj2bHxXpEbV2nvdxK6A56Xa",
+      "token_id": "28",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 769458,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "17",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VJwe36At1zvBkFg71yK4KYN7cRGaFdfqA",
+      "token_id": "953",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 805095,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "107975",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1NXryCaPvxun2NJkjtaFgh9GQcygqd5xpt",
+      "token_id": "7",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 435281,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "137015",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "97023",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "651654",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1X5W2akGCxvykmHoqoQzJfEgg1RGNGBCDd",
+      "token_id": "785",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 607431,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1PNk2xJKsGHffXAGEJVniwHXkN7XcxxM1D",
+      "token_id": "29",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 407067,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "666289",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "142385",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "358976",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1237474",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1VwAH63SHrpoYtTZg8XxBu4hqAJPiXt3EL",
+      "token_id": "13",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 773786,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KEa8z6vWXDJrVqtMrAeDVzsvxat3kHaCE",
+      "token_id": "358590",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 22785,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "871694",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1BoKMQVfVn1YPLQPcGLSiPL6JTLMdBnGNp",
+      "token_id": "15",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 256589,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "628178",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "154277",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1RJ6PbjHpwc3M5rw5s2Nbmefwbuwbdxton",
+      "token_id": "558323",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 511,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "136871",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1CB4MYiAViCuXWBU961x7LjQXGeA8SnQwt",
+      "token_id": "338",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 771405,
+       "layout": "nft",
+       "owner": "tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1EfsNuqwLAWDd3o4pvfUx1CAh5GMdTrRvr",
+      "token_id": "155567",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 411398,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1XaCf6gkjFnKg3QmPfn6gep53moMvjkj1E",
+      "token_id": "16073",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 738597,
+       "layout": "multi_asset",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1KQq4AkumBWai8z4owGcfkbRpzGxK5vCMr",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 805045,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1TyfWvUwDxnQJ16u7kvgKLKv4265nm7BTC",
+      "token_id": "2",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 716026,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "KT1U6EHmNxJTkvaWJ4ThczG4FSDaHC21ssvi",
+      "token_id": "1237448",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 149768,
+       "layout": "multi_asset",
+       "balance": "1"
+      },
+      "held": true
+     }
+    ]
+   }
+  ],
+  "differences": [
+   {
+    "standard": "fa2",
+    "listed_by": "tzkt",
+    "missing_from": "objkt",
+    "checked": 2,
+    "held": 1,
+    "not_held": 0,
+    "of_which_reverted": 0,
+    "unanswerable": 1,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "KT1FfjhvJZppBFQuUzNAdFPR1Z2jpD4XiXrF",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "big_map": 613204,
+       "layout": "multi_asset",
+       "balance": "100000000000"
+      },
+      "held": true,
+      "listed_by": "tzkt",
+      "missing_from": "objkt"
+     },
+     {
+      "contract": "KT1VaEsVNiBoA56eToEK6n6BcPgh1tdx9eXi",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "unsupported ledger layout key=['address'] value=['nat']"
+      },
+      "held": null,
+      "listed_by": "tzkt",
+      "missing_from": "objkt"
+     }
+    ]
+   },
+   {
+    "standard": "fa2",
+    "listed_by": "objkt",
+    "missing_from": "tzkt",
+    "checked": 1,
+    "held": 0,
+    "not_held": 0,
+    "of_which_reverted": 0,
+    "unanswerable": 1,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "KT1TjnZYs5CGLbmV6yuW169P8Pnr9BiVwwjz",
+      "token_id": "0",
+      "standard": "fa2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "unsupported ledger layout key=['address'] value=['map', 'nat']"
+      },
+      "held": null,
+      "listed_by": "objkt",
+      "missing_from": "tzkt"
+     }
+    ]
+   },
+   {
+    "standard": "fa1.2",
+    "listed_by": "tzkt",
+    "missing_from": "objkt",
+    "checked": 1,
+    "held": 0,
+    "not_held": 0,
+    "of_which_reverted": 0,
+    "unanswerable": 1,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "KT1TjnZYs5CGLbmV6yuW169P8Pnr9BiVwwjz",
+      "token_id": "0",
+      "standard": "fa1.2",
+      "chain": {
+       "call": "ledger",
+       "unanswerable": true,
+       "error": "fa1.2 not checked (FA2 ledgers only)"
+      },
+      "held": null,
+      "listed_by": "tzkt",
+      "missing_from": "objkt"
+     }
+    ]
+   }
+  ],
+  "rpc_recheck": {
+   "rpc": "https://prod.tcinfra.net/rpc/mainnet",
+   "rechecked": 0,
+   "confirmed": 0,
+   "secondary_unanswered": 0,
+   "rpc_disagreements": []
+  }
+ },
+ "lists": {
+  "file": "holdings_tezos-NetXdQprcVkpaWU_tz1LBwyJMRkH4tcG19KwYzAW7fLYbjFmWdWy_20261002T184025Z.lists.json",
+  "sha256": "b5c66330f4dd0edb6f2245f146a7cc95f121cdf3e62c54f3c0a73f45dd9ae4c9"
+ },
+ "produced_by": {
+  "tool": "tools/witness/witness.py",
+  "repo": "https://github.com/feral-file/status",
+  "schema_doc": "tools/witness/README.md"
+ },
+ "signatures": [
+  {
+   "alg": "ed25519",
+   "kid": "did:key:z6MkoX8i2dynyvLh4hUHZt8b42q9uAwwCWxM4NSX4YDfMtaC",
+   "ts": "2026-10-02T18:40:42Z",
+   "payload_hash": "sha256:00018dbd67e589b3ffdb77479d9f02c7a767af0e6baa79b9571b68b50df299f3",
+   "role": "witness",
+   "sig": "S8cGAqoQXYIotzdOYn-IyMR3a5W-ezV1Mo-wSLEQISrHEL1DLHSIbukLocxAN9YPjDRbhGc7xLxirCLfNbb3BA"
+  }
+ ]
+}

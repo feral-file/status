@@ -611,6 +611,7 @@ def tezos_chain_check(rpc, block_hash, address, tokens, pause=0.1, retries=3):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--address", required=True, help="Ethereum address (0x…)")
+    ap.add_argument("--name", help="a name (ENS or Tezos Domains) to resolve forward and verify against --address; recorded in the entry")
     ap.add_argument("--sample", type=int, default=120, help="tokens sampled per reader for the chain check")
     ap.add_argument("--seed", type=int, help="random seed for the sample (default: the pinned block number)")
     ap.add_argument("--rpc", action="append", help="JSON-RPC URL; repeatable; first is primary, the rest re-check disagreements")
@@ -626,7 +627,14 @@ def main():
         ix_meta, ix_tokens = read_tzkt(address)
         print("reader: objkt", file=sys.stderr)
         bs_meta, bs_tokens = read_objkt(address)
-        name, name_system, name_source = tezos_domain(address), "tezos-domains", f"{TZKT_URL}/domains?address={{address}}&reverse=true"
+        name, name_system, name_source = tezos_domain(address), "tezos-domains", f"reverse record via {TZKT_URL}/domains?address={{address}}&reverse=true"
+        if a.name:
+            fwd = http_json(f"{TZKT_URL}/domains/{a.name}")
+            fwd_addr = (fwd.get("address") or {}).get("address") if isinstance(fwd, dict) else None
+            if fwd_addr != address:
+                raise SystemExit(f"{a.name} resolves to {fwd_addr}, not {address}")
+            name_source = f"forward record via {TZKT_URL}/domains/{{name}}, verified against the address" + (f"; reverse record: {name}" if name else "; no reverse record")
+            name = a.name
         block = tezos_pin_block(rpcs[0])
         standards = ("fa2", "fa1.2")
 
@@ -637,7 +645,14 @@ def main():
         ix_meta, ix_tokens = read_indexer(address)
         print("reader: blockscout", file=sys.stderr)
         bs_meta, bs_tokens, name = read_blockscout(address)
-        name_system, name_source = "ens", "blockscout /addresses/{address} ens_domain_name"
+        name_system, name_source = "ens", "reverse record via blockscout /addresses/{address} ens_domain_name"
+        if a.name:
+            found = http_json(f"{BLOCKSCOUT_URL}/search?" + urllib.parse.urlencode({"q": a.name}))
+            fwd_addr = next((i.get("address_hash") or i.get("address") for i in found.get("items", []) if i.get("type") == "ens_domain" and (i.get("ens_info") or {}).get("name", i.get("name")) == a.name), None)
+            if (fwd_addr or "").lower() != address.lower():
+                raise SystemExit(f"{a.name} resolves to {fwd_addr}, not {address}")
+            name_source = "forward record via blockscout /search?q={name}, verified against the address" + (f"; reverse record: {name}" if name else "; no reverse record")
+            name = a.name
         block = pin_block(rpcs[0])
         standards = ("erc721", "erc1155")
 

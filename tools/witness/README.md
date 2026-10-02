@@ -16,6 +16,10 @@ node tools/witness/sign.mjs data/witness/holdings_<…>.json --key-file ~/.confi
 node tools/witness/verify.mjs data/witness/holdings_<…>.json
 ```
 
+`--name thefunnyguys.tez` resolves a name forward (ENS through Blockscout,
+Tezos Domains through TzKT), refuses if it does not resolve to `--address`,
+and records it; without it the entry carries the reverse record, if any.
+
 `witness.py` is stdlib Python (>= 3.11); `sign.mjs` and `verify.mjs` are
 zero-dependency Node (>= 18). The signer key is a 32-byte Ed25519 seed (hex),
 PKCS#8 DER (base64), or PEM. `--ff-cli-config` signs with the key
