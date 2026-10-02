@@ -39,6 +39,12 @@ data/  →  build.py  →  public/
   own state and is never folded into a gap or a pass. Re-probe a schema 2
   census's `unmeasured` files with `tools/census-rescan/rescan-cids.py`
   (CID-level, resumable, minutes not hours).
+- `data/witness/holdings_*.json` — witness entries: for one address at one
+  block, what each public reader says it holds, the set differences, and the
+  chain's own answer on a sample and on every disagreement; signed by whoever
+  ran the check. Produced and signed by `tools/witness/` (schema there). The
+  `.lists.json` siblings carry the readers' full lists and are published
+  next to the entries unsummarized.
 - `data/updates.json` — dated changelog entries; rendered on the page and
   as `feed.xml` (RSS).
 
