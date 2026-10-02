@@ -2,23 +2,26 @@
 """Witness check: what each reader says one address holds, and what the chain says.
 
 One run, one address, one block. Two readers are asked for the address's
-holdings (the Feral File indexer and Blockscout; both public, no key). Their
-lists are compared per token standard. Then the chain itself is asked, at one
-pinned block, about (a) a seeded random sample from each reader's list and
-(b) every token the two readers disagree on: `ownerOf(tokenId)` for ERC-721,
-`balanceOf(address, tokenId)` for ERC-1155. The result is one JSON entry a
-second party can reproduce from this file, and sign with their own key
-(tools/witness/sign.mjs), and anyone can verify (tools/witness/verify.mjs).
+holdings (Ethereum: the Feral File indexer and Blockscout; Tezos: TzKT and
+objkt; all public, no key). Their lists are compared per token standard. Then
+the chain itself is asked, at one pinned block, about (a) a seeded random
+sample from each reader's list and (b) every token the two readers disagree
+on. Ethereum: `ownerOf(tokenId)` for ERC-721, `balanceOf(address, tokenId)`
+for ERC-1155, by eth_call. Tezos: the contract's own `%ledger` big map, read
+from a node at the pinned block (key `(address, token_id)` -> balance, or
+`token_id` -> owner). The result is one JSON entry a second party can
+reproduce from this file, sign with their own key (tools/witness/sign.mjs),
+and anyone can verify (tools/witness/verify.mjs).
 
     python3 tools/witness/witness.py --address 0x830cc132dd66F6491cEAA20206f398247143d9CF
+    python3 tools/witness/witness.py --address tz1gMfctX4hBNpkUoE7RcYPBhNc1hpHddqh4
 
 Writes two files to data/witness/:
   holdings_<chain>_<address>_<utc>.json        the entry (sign this)
   holdings_<chain>_<address>_<utc>.lists.json  both readers' full lists, referenced
                                                from the entry by sha256
 
-Stdlib only, Python >= 3.11. Ethereum mainnet only for now; the reader
-functions are the place to add a chain.
+Stdlib only, Python >= 3.11.
 """
 
 import argparse
@@ -27,17 +30,22 @@ import json
 import random
 import sys
 import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 
 SCHEMA = "feral-file/witness-holdings/0.1"
-UA = "feral-file-witness/0.1 (+https://status.feralfile.com)"
-CHAIN = "eip155:1"
+UA = "feral-file-witness/0.1 (+https://witness.feralfile.com)"
 INDEXER_URL = "https://indexer-v2.feralfile.com/graphql"
 BLOCKSCOUT_URL = "https://eth.blockscout.com/api/v2"
-RPC_URLS = ["https://ethereum-rpc.publicnode.com", "https://eth.drpc.org"]
+RPC_URLS = ["https://ethereum-rpc.publicnode.com", "https://eth-mainnet.public.blastapi.io"]
+TZKT_URL = "https://api.tzkt.io/v1"
+OBJKT_URL = "https://data.objkt.com/v3/graphql"
+TEZOS_RPC_URLS = ["https://rpc.tzbeta.net", "https://prod.tcinfra.net/rpc/mainnet"]
+TEZOS_CHAIN = "tezos:NetXdQprcVkpaWU"  # CAIP-2 for Tezos mainnet
+ETH_CHAIN = "eip155:1"
 RPC_BATCH = 40
 SEL_OWNER_OF = "6352211e"  # ownerOf(uint256)
 SEL_BALANCE_OF = "00fdd58e"  # balanceOf(address,uint256)
@@ -273,6 +281,330 @@ def tally(rows):
     return {"checked": len(rows), "held": held, "not_held": not_held, "of_which_reverted": reverted, "unanswerable": unanswerable, "no_reply": no_reply}
 
 
+# --------------------------------------------------------------- tezos readers
+
+
+def read_tzkt(address):
+    fetched_at = utcnow()
+    tokens, off, lim = [], 0, 10000
+    while True:
+        rows = http_json(
+            f"{TZKT_URL}/tokens/balances?"
+            + urllib.parse.urlencode(
+                {"account": address, "balance.gt": 0, "limit": lim, "offset": off,
+                 "select": "balance,token.contract.address,token.tokenId,token.standard,token.id"}
+            )
+        )
+        for r in rows:
+            tokens.append(
+                {
+                    "contract": r["token.contract.address"],
+                    "token_id": str(r["token.tokenId"]),
+                    "standard": r["token.standard"],
+                    "reader_fields": {"balance": r["balance"], "tzkt_token_id": r["token.id"]},
+                }
+            )
+        print(f"  tzkt offset {off}: {len(rows)} (total {len(tokens)})", file=sys.stderr)
+        if len(rows) < lim:
+            break
+        off += lim
+        time.sleep(0.3)
+    return {
+        "name": "tzkt",
+        "operator": "Baking Bad (public TzKT instance)",
+        "endpoint": f"{TZKT_URL}/tokens/balances?account={{address}}&balance.gt=0",
+        "query": "paged by 10000 with offset",
+        "fetched_at": fetched_at,
+        "notes": "Lists FA2 and FA1.2 balances above zero.",
+    }, tokens
+
+
+def read_objkt(address):
+    fetched_at = utcnow()
+    tokens, off, lim = [], 0, 500
+    q = (
+        'query($a:String!,$l:Int!,$o:Int!){ token_holder(where:{holder_address:{_eq:$a}, quantity:{_gt:"0"}},'
+        " limit:$l, offset:$o, order_by:{token_pk:asc}){ quantity token{ token_id fa_contract } } }"
+    )
+    while True:
+        d = http_json(OBJKT_URL, {"query": q, "variables": {"a": address, "l": lim, "o": off}})
+        if "errors" in d:
+            raise SystemExit(f"objkt errors: {d['errors']}")
+        rows = d["data"]["token_holder"]
+        for r in rows:
+            tokens.append(
+                {
+                    "contract": r["token"]["fa_contract"],
+                    "token_id": str(r["token"]["token_id"]),
+                    "standard": "fa2",
+                    "reader_fields": {"quantity": str(r["quantity"])},
+                }
+            )
+        print(f"  objkt offset {off}: {len(rows)} (total {len(tokens)})", file=sys.stderr)
+        if len(rows) < lim:
+            break
+        off += lim
+        time.sleep(0.3)
+    return {
+        "name": "objkt",
+        "operator": "objkt.com (public GraphQL)",
+        "endpoint": OBJKT_URL,
+        "query": "token_holder(where:{holder_address, quantity>0}), paged by 500",
+        "fetched_at": fetched_at,
+        "notes": "objkt indexes FA2 tokens only; every row is reported as fa2.",
+    }, tokens
+
+
+def tezos_domain(address):
+    d = http_json(f"{TZKT_URL}/domains?" + urllib.parse.urlencode({"address": address, "reverse": "true", "select": "name"}))
+    return d[0] if d else None
+
+
+# ------------------------------------------------------------------ tezos chain
+#
+# A node answers "does X hold T" from the contract's own storage: the %ledger
+# big map. Nothing below depends on an indexer; TzKT is only ever a reader.
+
+B58 = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz"
+
+
+def b58decode(s):
+    n = 0
+    for c in s:
+        n = n * 58 + B58.index(c)
+    b = n.to_bytes((n.bit_length() + 7) // 8, "big")
+    return b"\0" * (len(s) - len(s.lstrip("1"))) + b
+
+
+def b58encode(b):
+    n = int.from_bytes(b, "big")
+    out = ""
+    while n:
+        n, r = divmod(n, 58)
+        out = B58[r] + out
+    return "1" * (len(b) - len(b.lstrip(b"\0"))) + out
+
+
+def b58check_decode(s, prefix_len):
+    raw = b58decode(s)
+    payload, chk = raw[:-4], raw[-4:]
+    if hashlib.sha256(hashlib.sha256(payload).digest()).digest()[:4] != chk:
+        raise ValueError(f"bad base58check: {s}")
+    return payload[prefix_len:]
+
+
+def b58check_encode(prefix, payload):
+    raw = prefix + payload
+    return b58encode(raw + hashlib.sha256(hashlib.sha256(raw).digest()).digest()[:4])
+
+
+TZ_PREFIX = {"tz1": b"\x00\x00", "tz2": b"\x00\x01", "tz3": b"\x00\x02", "tz4": b"\x00\x03"}
+TZ_B58_PREFIX = {"tz1": b"\x06\xa1\x9f", "tz2": b"\x06\xa1\xa1", "tz3": b"\x06\xa1\xa4", "tz4": b"\x06\xa1\xa6", "KT1": b"\x02\x5a\x79"}
+
+
+def address_to_bytes(a):
+    """Michelson's packed form of an address."""
+    h = b58check_decode(a, 3)
+    if a[:3] in TZ_PREFIX:
+        return TZ_PREFIX[a[:3]] + h
+    if a.startswith("KT1"):
+        return b"\x01" + h + b"\x00"
+    raise ValueError(f"unsupported address {a}")
+
+
+def bytes_to_address(b):
+    if b[0] == 0 and b[1] in (0, 1, 2, 3):
+        return b58check_encode(TZ_B58_PREFIX[["tz1", "tz2", "tz3", "tz4"][b[1]]], b[2:22])
+    if b[0] == 1:
+        return b58check_encode(TZ_B58_PREFIX["KT1"], b[1:21])
+    raise ValueError(f"unsupported packed address {b.hex()}")
+
+
+def zarith(n):
+    """Micheline integer body for n >= 0 (sign bit clear)."""
+    out = bytearray()
+    byte = n & 0x3F
+    n >>= 6
+    if n:
+        byte |= 0x80
+    out.append(byte)
+    while n:
+        byte = n & 0x7F
+        n >>= 7
+        if n:
+            byte |= 0x80
+        out.append(byte)
+    return bytes(out)
+
+
+def micheline_int(n):
+    return b"\x00" + zarith(n)
+
+
+def micheline_bytes(b):
+    return b"\x0a" + len(b).to_bytes(4, "big") + b
+
+
+def micheline_pair(a, b):
+    return b"\x07\x07" + a + b
+
+
+def expr_hash(micheline):
+    """Big-map key hash: blake2b-256 of the PACKed key, base58check 'expr'."""
+    return b58check_encode(b"\x0d\x2c\x40\x1b", hashlib.blake2b(b"\x05" + micheline, digest_size=32).digest())
+
+
+def find_big_maps(typ, val, out, path=""):
+    """Walk a storage type and value together; collect every big map with its annot, pointer and types."""
+    prim = typ.get("prim")
+    annots = [x[1:] for x in typ.get("annots", []) if x.startswith("%")]
+    name = annots[0] if annots else None
+    here = path + ("." if path and name else "") + (name or "")
+    if prim == "big_map":
+        if isinstance(val, dict) and "int" in val:
+            out.append({"path": here, "annot": name, "ptr": int(val["int"]), "key_type": typ["args"][0], "value_type": typ["args"][1]})
+        return
+    if prim == "pair":
+        ts = typ["args"]
+        t_left, t_right = ts[0], (ts[1] if len(ts) == 2 else {"prim": "pair", "args": ts[1:]})
+        if isinstance(val, list):
+            vs = val
+        elif isinstance(val, dict) and val.get("prim") == "Pair":
+            vs = val["args"]
+        else:
+            return
+        if len(vs) < 2:
+            return
+        v_left, v_right = vs[0], (vs[1] if len(vs) == 2 else {"prim": "Pair", "args": vs[1:]})
+        find_big_maps(t_left, v_left, out, here)
+        find_big_maps(t_right, v_right, out, here)
+        return
+    if prim == "option" and isinstance(val, dict) and val.get("prim") == "Some":
+        find_big_maps(typ["args"][0], val["args"][0], out, here)
+        return
+    if prim == "or" and isinstance(val, dict) and val.get("prim") in ("Left", "Right"):
+        find_big_maps(typ["args"][0 if val["prim"] == "Left" else 1], val["args"][0], out, here)
+        return
+
+
+def leaf_prims(t):
+    """The leaf prims of a (possibly nested) pair type, in order."""
+    if t.get("prim") == "pair":
+        return [p for x in t["args"] for p in leaf_prims(x)]
+    return [t.get("prim")]
+
+
+class TezosLedger:
+    """Per-contract ledger locator with a cache; reads keys from a node at one block."""
+
+    def __init__(self, rpc, block_hash):
+        self.rpc = rpc
+        self.block = block_hash
+        self.cache = {}
+
+    def locate(self, contract):
+        if contract in self.cache:
+            return self.cache[contract]
+        try:
+            script = http_json(f"{self.rpc}/chains/main/blocks/{self.block}/context/contracts/{contract}/script", tries=3)
+        except SystemExit as e:
+            self.cache[contract] = {"error": f"script fetch failed: {e}"}
+            return self.cache[contract]
+        storage_t = next((x for x in script["code"] if x.get("prim") == "storage"), None)
+        found = []
+        if storage_t:
+            find_big_maps(storage_t["args"][0], script["storage"], found)
+        ledger = next((b for b in found if b["annot"] == "ledger"), None) or next((b for b in found if b["path"].endswith("ledger")), None)
+        if not ledger:
+            self.cache[contract] = {"error": "no %ledger big map in storage"}
+            return self.cache[contract]
+        kp = leaf_prims(ledger["key_type"])
+        vp = leaf_prims(ledger["value_type"])
+        if ledger["key_type"].get("prim") == "pair" and sorted(kp) == ["address", "nat"] and vp == ["nat"]:
+            layout = "multi_asset" if kp == ["address", "nat"] else "multi_asset_reversed"
+        elif kp == ["nat"] and vp == ["address"]:
+            layout = "nft"
+        else:
+            self.cache[contract] = {"error": f"unsupported ledger layout key={kp} value={vp}"}
+            return self.cache[contract]
+        self.cache[contract] = {"ptr": ledger["ptr"], "layout": layout}
+        return self.cache[contract]
+
+    def holds(self, address, contract, token_id):
+        """Returns (held: bool|None, chain: dict)."""
+        led = self.locate(contract)
+        if "error" in led:
+            return None, {"call": "ledger", "unanswerable": True, "error": led["error"]}
+        tid = int(token_id)
+        if led["layout"] == "multi_asset":
+            key_bytes = micheline_pair(micheline_bytes(address_to_bytes(address)), micheline_int(tid))
+        elif led["layout"] == "multi_asset_reversed":
+            key_bytes = micheline_pair(micheline_int(tid), micheline_bytes(address_to_bytes(address)))
+        else:
+            key_bytes = micheline_int(tid)
+        url = f"{self.rpc}/chains/main/blocks/{self.block}/context/big_maps/{led['ptr']}/{expr_hash(key_bytes)}"
+        req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": "application/json"})
+        last = None
+        for attempt in range(3):
+            try:
+                with urllib.request.urlopen(req, timeout=60) as r:
+                    v = json.load(r)
+                break
+            except urllib.error.HTTPError as e:
+                if e.code == 404:
+                    v = None  # no such key: balance zero / no owner
+                    break
+                last = e
+                time.sleep(2 * (attempt + 1))
+            except Exception as e:  # noqa: BLE001
+                last = e
+                time.sleep(2 * (attempt + 1))
+        else:
+            return None, {"call": "ledger", "no_reply": True, "error": str(last), "big_map": led["ptr"]}
+        base = {"call": "ledger", "big_map": led["ptr"], "layout": led["layout"]}
+        if led["layout"] == "nft":
+            if v is None:
+                return False, {**base, "owner": None}
+            owner = v.get("string") or (bytes_to_address(bytes.fromhex(v["bytes"])) if "bytes" in v else None)
+            return (owner == address), {**base, "owner": owner}
+        bal = 0 if v is None else int(v.get("int", "0"))
+        return bal > 0, {**base, "balance": str(bal)}
+
+
+def tezos_pin_block(rpc):
+    h = http_json(f"{rpc}/chains/main/blocks/head/header")
+    return {"number": h["level"], "hash": h["hash"], "timestamp": h["timestamp"].replace("+00:00", "Z")}
+
+
+def tezos_chain_check(rpc, block_hash, address, tokens, pause=0.1, retries=3):
+    ledger = TezosLedger(rpc, block_hash)
+    results = []
+    for i, t in enumerate(tokens, 1):
+        row = {"contract": t["contract"], "token_id": t["token_id"], "standard": t["standard"]}
+        if t["standard"] != "fa2":
+            row["chain"] = {"call": "ledger", "unanswerable": True, "error": f"{t['standard']} not checked (FA2 ledgers only)"}
+            row["held"] = None
+        else:
+            held, chain = ledger.holds(address, t["contract"], t["token_id"])
+            row["chain"], row["held"] = chain, held
+        results.append(row)
+        if i % 25 == 0 or i == len(tokens):
+            print(f"  chain {i}/{len(tokens)}", file=sys.stderr)
+        time.sleep(pause)
+    for k in range(retries):
+        todo = [i for i, r in enumerate(results) if r["chain"].get("no_reply")]
+        if not todo:
+            break
+        print(f"  chain: retrying {len(todo)} unanswered reads", file=sys.stderr)
+        time.sleep(5 * (k + 1))
+        for i in todo:
+            t = tokens[i]
+            held, chain = ledger.holds(address, t["contract"], t["token_id"])
+            results[i]["chain"], results[i]["held"] = chain, held
+            time.sleep(pause * 2)
+    return results
+
+
 # --------------------------------------------------------------------- main
 
 
@@ -285,14 +617,34 @@ def main():
     ap.add_argument("--out", default=str(Path(__file__).resolve().parents[2] / "data" / "witness"))
     a = ap.parse_args()
     address = a.address
-    rpcs = a.rpc or RPC_URLS
+    tezos = address.startswith(("tz", "KT1"))
+    chain_id = TEZOS_CHAIN if tezos else ETH_CHAIN
+    rpcs = a.rpc or (TEZOS_RPC_URLS if tezos else RPC_URLS)
 
-    print("reader: feralfile-indexer", file=sys.stderr)
-    ix_meta, ix_tokens = read_indexer(address)
-    print("reader: blockscout", file=sys.stderr)
-    bs_meta, bs_tokens, ens = read_blockscout(address)
+    if tezos:
+        print("reader: tzkt", file=sys.stderr)
+        ix_meta, ix_tokens = read_tzkt(address)
+        print("reader: objkt", file=sys.stderr)
+        bs_meta, bs_tokens = read_objkt(address)
+        name, name_system, name_source = tezos_domain(address), "tezos-domains", f"{TZKT_URL}/domains?address={{address}}&reverse=true"
+        block = tezos_pin_block(rpcs[0])
+        standards = ("fa2", "fa1.2")
 
-    block = pin_block(rpcs[0])
+        def check(url, toks, **kw):
+            return tezos_chain_check(url, block["hash"], address, toks)
+    else:
+        print("reader: feralfile-indexer", file=sys.stderr)
+        ix_meta, ix_tokens = read_indexer(address)
+        print("reader: blockscout", file=sys.stderr)
+        bs_meta, bs_tokens, name = read_blockscout(address)
+        name_system, name_source = "ens", "blockscout /addresses/{address} ens_domain_name"
+        block = pin_block(rpcs[0])
+        standards = ("erc721", "erc1155")
+
+        def check(url, toks, **kw):
+            return chain_check(url, block["number"], address, toks, **kw)
+    reader_a, reader_b = ix_meta["name"], bs_meta["name"]
+
     seed = a.seed if a.seed is not None else block["number"]
     print(f"block {block['number']} seed {seed}", file=sys.stderr)
 
@@ -300,53 +652,49 @@ def main():
     for meta, toks in ((ix_meta, ix_tokens), (bs_meta, bs_tokens)):
         keys = sorted(key(t["contract"], t["token_id"]) + ":" + t["standard"] for t in toks)
         meta = dict(meta)
-        meta["count"] = {
-            "total": len(toks),
-            "erc721": sum(1 for t in toks if t["standard"] == "erc721"),
-            "erc1155": sum(1 for t in toks if t["standard"] == "erc1155"),
-        }
+        meta["count"] = {"total": len(toks), **{std: sum(1 for t in toks if t["standard"] == std) for std in standards}}
         meta["list_sha256"] = hashlib.sha256("\n".join(keys).encode()).hexdigest()
         readers.append(meta)
 
     # Comparison, per standard, keyed contract:token_id.
     by = {}
-    for name, toks in (("feralfile-indexer", ix_tokens), ("blockscout", bs_tokens)):
-        for std in ("erc721", "erc1155"):
-            by[(name, std)] = {key(t["contract"], t["token_id"]): t for t in toks if t["standard"] == std}
+    for rname, toks in ((reader_a, ix_tokens), (reader_b, bs_tokens)):
+        for std in standards:
+            by[(rname, std)] = {key(t["contract"], t["token_id"]): t for t in toks if t["standard"] == std}
     comparison = []
     diff_tokens = []  # (only_in, not_in, token)
-    for std in ("erc721", "erc1155"):
-        A, B = by[("feralfile-indexer", std)], by[("blockscout", std)]
+    for std in standards:
+        A, B = by[(reader_a, std)], by[(reader_b, std)]
         only_a = sorted(set(A) - set(B))
         only_b = sorted(set(B) - set(A))
         comparison.append(
             {
                 "standard": std,
                 "both": len(set(A) & set(B)),
-                "only_feralfile-indexer": len(only_a),
-                "only_blockscout": len(only_b),
+                f"only_{reader_a}": len(only_a),
+                f"only_{reader_b}": len(only_b),
             }
         )
-        diff_tokens += [("feralfile-indexer", "blockscout", A[k]) for k in only_a]
-        diff_tokens += [("blockscout", "feralfile-indexer", B[k]) for k in only_b]
+        diff_tokens += [(reader_a, reader_b, A[k]) for k in only_a]
+        diff_tokens += [(reader_b, reader_a, B[k]) for k in only_b]
 
     # Chain check: a seeded sample per reader, then every disagreement.
     rng = random.Random(seed)
     samples = []
-    for name, toks in (("feralfile-indexer", ix_tokens), ("blockscout", bs_tokens)):
+    for rname, toks in ((reader_a, ix_tokens), (reader_b, bs_tokens)):
         pick = rng.sample(toks, min(a.sample, len(toks)))
-        print(f"chain: sample of {len(pick)} from {name}", file=sys.stderr)
-        rows = chain_check(rpcs[0], block["number"], address, pick)
-        samples.append({"reader": name, "seed": seed, **tally(rows), "tokens": rows})
+        print(f"chain: sample of {len(pick)} from {rname}", file=sys.stderr)
+        rows = check(rpcs[0], pick)
+        samples.append({"reader": rname, "seed": seed, **tally(rows), "tokens": rows})
 
     print(f"chain: {len(diff_tokens)} disagreements", file=sys.stderr)
-    diff_rows = chain_check(rpcs[0], block["number"], address, [t for _, _, t in diff_tokens])
+    diff_rows = check(rpcs[0], [t for _, _, t in diff_tokens])
     for (only_in, not_in, _), row in zip(diff_tokens, diff_rows):
         row["listed_by"] = only_in
         row["missing_from"] = not_in
     differences = []
-    for std in ("erc721", "erc1155"):
-        for only_in, not_in in (("feralfile-indexer", "blockscout"), ("blockscout", "feralfile-indexer")):
+    for std in standards:
+        for only_in, not_in in ((reader_a, reader_b), (reader_b, reader_a)):
             rows = [r for r in diff_rows if r["standard"] == std and r["listed_by"] == only_in]
             if rows:
                 differences.append({"standard": std, "listed_by": only_in, "missing_from": not_in, **tally(rows), "tokens": rows})
@@ -356,7 +704,7 @@ def main():
     if len(rpcs) > 1:
         suspects = [r for r in diff_rows + [t for s in samples for t in s["tokens"]] if r["held"] is False]
         print(f"chain: re-reading {len(suspects)} not-held verdicts on {rpcs[1]}", file=sys.stderr)
-        again = chain_check(rpcs[1], block["number"], address, suspects, batch=10, pause=1.0)
+        again = check(rpcs[1], suspects, batch=10, pause=1.0)
         disagree = [
             {"contract": x["contract"], "token_id": x["token_id"], "primary": x["chain"], "secondary": y["chain"]}
             for x, y in zip(suspects, again)
@@ -372,25 +720,43 @@ def main():
         }
 
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    base = f"holdings_{CHAIN.replace(':', '-')}_{address.lower()}_{stamp}"
-    lists = {"schema": SCHEMA + "/lists", "address": address, "readers": {"feralfile-indexer": ix_tokens, "blockscout": bs_tokens}}
+    base = f"holdings_{chain_id.replace(':', '-')}_{address if tezos else address.lower()}_{stamp}"
+    lists = {"schema": SCHEMA + "/lists", "address": address, "readers": {reader_a: ix_tokens, reader_b: bs_tokens}}
     lists_bytes = json.dumps(lists, separators=(",", ":"), sort_keys=True).encode()
 
     entry = {
         "schema": SCHEMA,
         "kind": "holdings",
-        "subject": {"chain": CHAIN, "address": address, "ens": ens, "ens_source": "blockscout /addresses/{address} ens_domain_name"},
+        "subject": {
+            "chain": chain_id,
+            "address": address,
+            "name": name,
+            "name_system": name_system,
+            "name_source": name_source,
+            **({"ens": name, "ens_source": name_source} if not tezos else {}),
+        },
         "observed_at": utcnow(),
         "chain_state": {"block": block["number"], "block_hash": block["hash"], "block_timestamp": block["timestamp"], "rpc": rpcs[0]},
         "readers": readers,
         "comparison": {"keyed_by": "contract:token_id, per standard", "pairs": comparison},
         "chain_check": {
             "method": (
-                "eth_call at chain_state.block: ownerOf(tokenId) == address for ERC-721; "
-                "balanceOf(address, tokenId) > 0 for ERC-1155. A revert counts as not held; a contract that "
-                "faults on the call (no such selector, e.g. CryptoPunks) is recorded as unanswerable. "
-                "Reader lists were fetched shortly before the block was pinned (see readers[].fetched_at); "
-                "a transfer in that window shows up as a disagreement."
+                (
+                    "Node RPC at chain_state.block_hash: the contract's %ledger big map, located from its own "
+                    "storage type, read by key hash. Key (address, token_id) -> balance > 0, or key token_id -> "
+                    "owner == address. A missing key is not held. A contract whose ledger cannot be located or "
+                    "whose layout is not one of those two is recorded as unanswerable; FA1.2 tokens are not checked. "
+                    "Reader lists were fetched shortly before the block was pinned (see readers[].fetched_at); "
+                    "a transfer in that window shows up as a disagreement."
+                )
+                if tezos
+                else (
+                    "eth_call at chain_state.block: ownerOf(tokenId) == address for ERC-721; "
+                    "balanceOf(address, tokenId) > 0 for ERC-1155. A revert counts as not held; a contract that "
+                    "faults on the call (no such selector, e.g. CryptoPunks) is recorded as unanswerable. "
+                    "Reader lists were fetched shortly before the block was pinned (see readers[].fetched_at); "
+                    "a transfer in that window shows up as a disagreement."
+                )
             ),
             "sample_size": a.sample,
             "samples": samples,

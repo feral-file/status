@@ -275,121 +275,6 @@ def load_census():
     }
 
 
-def load_witness():
-    """Witness entries: signed statements of what each public reader says one
-    address holds, against the chain, at one block (tools/witness/README.md).
-    One summary per entry file in data/witness/ (the .lists.json siblings hold
-    the readers' full lists and are published alongside, not summarized)."""
-    entries = []
-    for path in sorted(glob.glob(str(DATA / "witness" / "holdings_*.json"))):
-        if path.endswith(".lists.json"):
-            continue
-        e = json.loads(Path(path).read_text())
-        check = e.get("chain_check", {})
-        readers = []
-        for r in e.get("readers", []):
-            sample = next((x for x in check.get("samples", []) if x["reader"] == r["name"]), None)
-            only = [d for d in check.get("differences", []) if d["listed_by"] == r["name"]]
-            readers.append(
-                {
-                    "name": r["name"],
-                    "operator": r.get("operator"),
-                    "listed": r["count"]["total"],
-                    "sample_checked": sample["checked"] if sample else 0,
-                    "sample_held": sample["held"] if sample else 0,
-                    "only_listed_here": sum(d["checked"] for d in only),
-                    "only_listed_here_chain_held": sum(d["held"] for d in only),
-                }
-            )
-        entries.append(
-            {
-                "file": "witness/" + Path(path).name,
-                "lists_file": "witness/" + e["lists"]["file"] if e.get("lists") else None,
-                "observed_at": e["observed_at"],
-                "date": e["observed_at"][:10],
-                "chain": e["subject"]["chain"],
-                "address": e["subject"]["address"],
-                "ens": e["subject"].get("ens"),
-                "block": e["chain_state"]["block"],
-                "readers": readers,
-                "rpc_disagreements": len((check.get("rpc_recheck") or {}).get("rpc_disagreements") or []),
-                "signers": [{"kid": sg["kid"], "role": sg.get("role")} for sg in e.get("signatures", [])],
-            }
-        )
-    entries.sort(key=lambda e: e["observed_at"], reverse=True)
-    return entries
-
-
-WITNESS_INTRO = (
-    "The chain of references starts with who holds the token, and every "
-    "reader of a chain, ours included, can be wrong about that. A witness "
-    "entry records, for one address at one block, what each public reader "
-    "returned, where the readers differ, and what the chain itself says "
-    "about a random sample and about every disagreement. The chain decides; "
-    "a reader is right or wrong per token. Each entry is signed by whoever "
-    "ran it. The shape is one anyone can reproduce and append to: a second "
-    "entry from someone who is not Feral File is the test that this is a "
-    "shared record rather than our alert."
-)
-
-
-def witness_html(entries):
-    if not entries:
-        return ""
-    blocks = []
-    for e in entries:
-        who = f" ({esc(e['ens'])})" if e.get("ens") else ""
-        rows = "".join(
-            f"<tr><td>{esc(r['name'])}</td>"
-            f"<td class=\"num\">{n(r['listed'])}</td>"
-            f"<td class=\"num\">{n(r['sample_held'])} / {n(r['sample_checked'])}</td>"
-            f"<td class=\"num\">{n(r['only_listed_here'])}</td>"
-            f"<td class=\"num\">{n(r['only_listed_here_chain_held'])}</td></tr>"
-            for r in e["readers"]
-        )
-        signers = ", ".join(f"<code>{esc(sg['kid'])}</code> ({esc(sg['role'] or '')})" for sg in e["signers"]) or "unsigned"
-        lists = f' &middot; <a href="data/{esc(e["lists_file"])}">full reader lists</a>' if e.get("lists_file") else ""
-        blocks.append(
-            f"""
-    <h3><span class="dated">{esc(e["date"])}</span> {esc(e["address"])}{who} &middot; {esc(e["chain"])} at block {n(e["block"])}</h3>
-    <table>
-      <thead><tr><th>Reader</th><th class="num">Lists</th><th class="num">Sample: chain says held</th><th class="num">Lists that the other omits</th><th class="num">&hellip;of which chain says held</th></tr></thead>
-      <tbody>{rows}</tbody>
-    </table>
-    <p class="dated">Signed by {signers}. <a href="data/{esc(e["file"])}">Entry</a> (JSON, every checked token with the chain&rsquo;s answer){lists}.
-    {"Two RPC providers agreed on every chain read." if e["rpc_disagreements"] == 0 else f"{n(e['rpc_disagreements'])} chain reads differed between RPC providers; listed in the entry."}</p>"""
-        )
-    return f"""
-  <section id="witness">
-    <h2>Who holds what: witness entries</h2>
-    <p>{esc(WITNESS_INTRO)} Method, schema, and how to sign and verify an entry:
-    <a href="https://github.com/feral-file/status/tree/main/tools/witness">tools/witness</a>.</p>
-{"".join(blocks)}
-  </section>
-"""
-
-
-def witness_md(entries):
-    if not entries:
-        return ""
-    out = ["## Who holds what: witness entries", "", WITNESS_INTRO, ""]
-    for e in entries:
-        who = f" ({e['ens']})" if e.get("ens") else ""
-        out.append(f"### {e['date']} — {e['address']}{who}, {e['chain']} at block {e['block']:,}")
-        out.append("")
-        out.append("| Reader | Lists | Sample: chain says held | Lists that the other omits | …of which chain says held |")
-        out.append("| :-- | --: | --: | --: | --: |")
-        for r in e["readers"]:
-            out.append(f"| {r['name']} | {r['listed']:,} | {r['sample_held']:,} / {r['sample_checked']:,} | {r['only_listed_here']:,} | {r['only_listed_here_chain_held']:,} |")
-        out.append("")
-        signers = ", ".join(f"{sg['kid']} ({sg['role']})" for sg in e["signers"]) or "unsigned"
-        out.append(f"Signed by {signers}. Entry: {SITE_URL}/data/{e['file']}")
-        out.append("")
-    out.append(f"Method, schema, signing and verification: https://github.com/feral-file/status/tree/main/tools/witness")
-    out.append("")
-    return "\n".join(out) + "\n"
-
-
 def emit_work_shards(census, bucket3, exhibitions):
     """Per-work lookup data: one JSON shard per exhibition + a token index.
 
@@ -649,9 +534,8 @@ def registry_paragraph(registry):
     )
 
 
-def render(bucket3, census, exhibitions, updates, generated_at, registry=None, witness=None):
+def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     registry_html = registry_paragraph(registry)
-    witness_section = witness_html(witness or [])
     media_probe = census["date"] if census else bucket3["series_probe"]["date"]
     tile5 = ""
     if census and census.get("schema") == 2:
@@ -848,7 +732,6 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None, w
         + ([bucket3["pin_summary"]["file"]] if bucket3.get("pin_summary") else [])
         + ([exhibitions["file"]])
         + (["census/" + census["file"] + ".gz"] if census else [])
-        + [e["file"] for e in (witness or [])]
     )
 
     ps = bucket3.get("pin_summary")
@@ -1053,8 +936,12 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None, w
   <section id="archive">
     <h2>The Feral File Archive</h2>
     <p>{registry_html}</p>
+    <p>Who holds what, checked against the chain, lives on its own site:
+    <a href="https://witness.feralfile.com">witness.feralfile.com</a> &mdash; signed
+    entries, one address at one block, every disagreement between readers settled
+    on chain, open to anyone to append.</p>
   </section>
-{witness_section}
+
   <section id="data">
     <h2>Data</h2>
     <p>Everything above, machine-readable. Agents welcome: start at
@@ -1083,8 +970,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None, w
 """
 
 
-def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry=None, witness=None):
-    witness_section = witness_md(witness or [])
+def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry=None):
     """The whole page as plain Markdown — the cheap read for a model."""
     probe = bucket3["series_probe"]
     b5 = ""
@@ -1270,7 +1156,9 @@ update.
 
 {reg_md}
 
-{witness_section}## Check a work you own
+Who holds what, checked against the chain, lives on its own site: https://witness.feralfile.com (signed entries, one address at one block, every disagreement between readers settled on chain; anyone can append).
+
+## Check a work you own
 
 The page at {SITE_URL} has a per-work lookup: paste a token ID (Ethereum,
 Tezos, or 64-char Bitmark ID) and see that work's file-by-file state and,
@@ -1290,7 +1178,7 @@ in the repo).
 - {SITE_URL}/data/pin_manifest_2026-08-04.csv — archival copies: series → CID
 - {SITE_URL}/data/census/token_census_20260803T182523Z.csv.gz — the full probe, one row per file
 - Bitmark enumeration + per-series probes + exhibition totals: named at {SITE_URL}/#data
-- Witness entries (who holds what, per reader, against the chain): {SITE_URL}/#witness, each entry a signed JSON file under {SITE_URL}/data/witness/
+- Witness entries (who holds what, per reader, against the chain): https://witness.feralfile.com
 - {SITE_URL}/feed.xml (RSS, one entry per update)
 
 ## Updates
@@ -1299,14 +1187,8 @@ in the repo).
 """
 
 
-def build_llms_txt(bucket3, census, witness=None):
+def build_llms_txt(bucket3, census):
     probe_clause = f" (last full media probe {census['date']})" if census else ""
-    witness_lines = "".join(
-        f"- [{e['date']} {e['address']}]({SITE_URL}/data/{e['file']}): {e['chain']} at block {e['block']}, "
-        + "; ".join(f"{r['name']} lists {r['listed']}" for r in e["readers"])
-        + "\n"
-        for e in (witness or [])
-    )
     return f"""# Feral File Status
 
 > Every work Feral File ({SITE_URL.replace("status.", "")}) has published,
@@ -1336,11 +1218,10 @@ def build_llms_txt(bucket3, census, witness=None):
 
 ## Witness entries
 
-Signed JSON, one per address and block: what each public reader (our indexer,
-Blockscout) says the address holds, their set differences, and the chain's own
-answer (ownerOf / balanceOf at that block) on a sample and on every
-disagreement. Schema, signing and verification: tools/witness in the repo.
-{witness_lines}
+Who holds what, checked against the chain, is a separate site:
+https://witness.feralfile.com (llms.txt there). Signed JSON entries, one per
+address and block, open to anyone to append.
+
 ## Updates
 
 - [RSS feed]({SITE_URL}/feed.xml): one entry per update
@@ -1399,7 +1280,6 @@ def main():
     census = load_census()
     exhibitions = load_exhibitions()
     registry = load_registry()
-    witness = load_witness()
     updates = sorted(
         json.loads((DATA / "updates.json").read_text()),
         key=lambda u: u["date"],
@@ -1426,11 +1306,6 @@ def main():
             PUBLIC / "data" / "census" / (census["file"] + ".gz"), "wb", compresslevel=9
         ) as f_out:
             shutil.copyfileobj(f_in, f_out)
-
-    if witness:
-        (PUBLIC / "data" / "witness").mkdir()
-        for f in glob.glob(str(DATA / "witness" / "holdings_*.json")):
-            shutil.copy(f, PUBLIC / "data" / "witness" / Path(f).name)
 
     status = {
         "generated_at": now.isoformat(timespec="seconds"),
@@ -1532,10 +1407,6 @@ def main():
             catalog_rows(exhibitions, census, bucket3) if census else None
         ),
         "archive_registry": registry,
-        "witness_entries": [
-            {k: v for k, v in e.items() if k != "date"} | {"url": f"{SITE_URL}/data/{e['file']}"}
-            for e in witness
-        ],
         "bitmark_exhibitions": bucket3["exhibitions"],
         "updates": updates,
     }
@@ -1543,18 +1414,21 @@ def main():
     shard_works = emit_work_shards(census, bucket3, exhibitions)
     print(f"lookup shards: {shard_works} works indexed")
     (PUBLIC / "index.html").write_text(
-        render(bucket3, census, exhibitions, updates, generated_at, registry, witness)
+        render(bucket3, census, exhibitions, updates, generated_at, registry)
     )
     (PUBLIC / "data" / "status.json").write_text(
         json.dumps(status, indent=2, ensure_ascii=False)
     )
     (PUBLIC / "feed.xml").write_text(build_feed(updates, now))
     (PUBLIC / "status.md").write_text(
-        build_markdown(bucket3, census, exhibitions, updates, generated_at, registry, witness)
+        build_markdown(bucket3, census, exhibitions, updates, generated_at, registry)
     )
-    (PUBLIC / "llms.txt").write_text(build_llms_txt(bucket3, census, witness))
+    (PUBLIC / "llms.txt").write_text(build_llms_txt(bucket3, census))
     (PUBLIC / "robots.txt").write_text(ROBOTS_TXT)
     (PUBLIC / "_headers").write_text(HEADERS_FILE)
+    # Witness entries moved to their own site; the first entry's URLs were
+    # cited on cards before the move.
+    (PUBLIC / "_redirects").write_text("/data/witness/* https://witness.feralfile.com/data/witness/:splat 301\n/witness https://witness.feralfile.com 301\n")
 
     kind = f"census {census['file']}" if census else "census pending"
     print(f"built public/ ({kind}, bucket3 as of {bucket3['as_of']})")

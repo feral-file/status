@@ -43,8 +43,9 @@ data/  →  build.py  →  public/
   block, what each public reader says it holds, the set differences, and the
   chain's own answer on a sample and on every disagreement; signed by whoever
   ran the check. Produced and signed by `tools/witness/` (schema there). The
-  `.lists.json` siblings carry the readers' full lists and are published
-  next to the entries unsummarized.
+  `.lists.json` siblings carry the readers' full lists. These publish on
+  their own site, witness.feralfile.com, built by `build_witness.py` from the
+  same repository (see Deployment); the status page only points there.
 - `data/updates.json` — dated changelog entries; rendered on the page and
   as `feed.xml` (RSS).
 
@@ -76,6 +77,10 @@ make serve    # preview at http://localhost:8321
 Cloudflare Pages (same pattern as docs.feralfile.com): build command
 `python3 build.py`, output directory `public`, custom domain
 `status.feralfile.com`.
+
+witness.feralfile.com is a second Pages project on the same repository:
+build command `python3 build_witness.py`, output directory `public-witness`.
+Both projects rebuild on every push to `main`.
 
 ## Fonts
 

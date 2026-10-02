@@ -1,0 +1,2705 @@
+{
+ "schema": "feral-file/witness-holdings/0.1",
+ "kind": "holdings",
+ "subject": {
+  "chain": "eip155:1",
+  "address": "0x457ee5f723C7606c12a7264b52e285906F91eEA6",
+  "ens": "reas.eth",
+  "ens_source": "blockscout /addresses/{address} ens_domain_name"
+ },
+ "observed_at": "2026-10-02T18:28:46Z",
+ "chain_state": {
+  "block": 26106431,
+  "block_hash": "0xe7481543df093afbefe0892b0a345da4297a013ce2227c1b32c841af3f93c206",
+  "block_timestamp": "2026-10-02T18:28:23Z",
+  "rpc": "https://ethereum-rpc.publicnode.com"
+ },
+ "readers": [
+  {
+   "name": "feralfile-indexer",
+   "operator": "Feral File",
+   "endpoint": "https://indexer-v2.feralfile.com/graphql",
+   "query": "tokens(owners:[address], include_unviewable:true, include_moderated:true), paged by 100",
+   "fetched_at": "2026-10-02T18:28:23Z",
+   "notes": "ERC-1155 rows carry no current_owner in this API; the address is the query, not a field.",
+   "count": {
+    "total": 186,
+    "erc721": 156,
+    "erc1155": 30
+   },
+   "list_sha256": "4742f071fe6c90ad22f4a4c5cf67cb7591538a32cf9ea586874a1c7a948a4168"
+  },
+  {
+   "name": "blockscout",
+   "operator": "Blockscout (public instance)",
+   "endpoint": "https://eth.blockscout.com/api/v2/addresses/{address}/nft?type=ERC-721|ERC-1155",
+   "query": "paged with next_page_params; a User-Agent header is required",
+   "fetched_at": "2026-10-02T18:28:24Z",
+   "notes": "Blockscout lists tokens it believes the address currently holds.",
+   "count": {
+    "total": 192,
+    "erc721": 162,
+    "erc1155": 30
+   },
+   "list_sha256": "1881688d5e3636e6adf61d23b2a0d176288ec097992e850b7073776877cd509e"
+  }
+ ],
+ "comparison": {
+  "keyed_by": "contract:token_id, per standard",
+  "pairs": [
+   {
+    "standard": "erc721",
+    "both": 156,
+    "only_feralfile-indexer": 0,
+    "only_blockscout": 6
+   },
+   {
+    "standard": "erc1155",
+    "both": 27,
+    "only_feralfile-indexer": 3,
+    "only_blockscout": 3
+   }
+  ]
+ },
+ "chain_check": {
+  "method": "eth_call at chain_state.block: ownerOf(tokenId) == address for ERC-721; balanceOf(address, tokenId) > 0 for ERC-1155. A revert counts as not held; a contract that faults on the call (no such selector, e.g. CryptoPunks) is recorded as unanswerable. Reader lists were fetched shortly before the block was pinned (see readers[].fetched_at); a transfer in that window shows up as a disagreement.",
+  "sample_size": 120,
+  "samples": [
+   {
+    "reader": "feralfile-indexer",
+    "seed": 26106431,
+    "checked": 120,
+    "held": 118,
+    "not_held": 2,
+    "of_which_reverted": 0,
+    "unanswerable": 0,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "189000393",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666653869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "70000049",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+      "token_id": "99425259346415110660670433264069038916888983454417981511271408049103000330652",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "2817",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x64ca72AB1887ad7a159B69a5B92BA28EAc4012F0",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc0C5BC9bE52d53F3762f213497E3377b4dd5f62B",
+      "token_id": "476",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "21",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "5000854",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "8937",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "15179800142553936164092493162504657410760508810493056543502133501311501362321",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "16",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "9000220",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0239A6A823CBb789c235a53364D91fAfc6C1b557",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "9359",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "73186562991033452279615156772342934244841460622896083955773930581557463384171",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x466279E153Fe2dBd76519149122937782c587408",
+      "token_id": "4000032",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "4000640",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "8211",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x00C2d197Bc6A99C916b0B6bC405C23186edE7f1B",
+      "token_id": "90",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "85341661276925889095165487281836110093790413991075404215045800075734863118094",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x8f30722dd16BD63cF2665C383c1aEf5e307B0046",
+      "token_id": "64083282194581793942215293811836391478974900789963845024963281200227193839084",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "32591673285275619746773086728306986897072430171202470250203746551365187756145",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "6000510",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x00C2d197Bc6A99C916b0B6bC405C23186edE7f1B",
+      "token_id": "88",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "2652",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+      "token_id": "1299511854520002634015191577671796554131262292261602276056987334175610842711",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAB9C37b6b27BDD610cC251ffcd4279480C100eaE",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "9801",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "6965",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x002bb8De1CA9Ff509fF89b22b2559D170Ad1Dbdc",
+      "token_id": "2",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x8F18e6F4C680998efA92e43a620C18c7799658bC",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "81000032",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+      "token_id": "67571408210486716591439940424663580609879380443817400222855251024765385767734",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "8855",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF35b31bE49f44bf43963337c6493eE043798C27F",
+      "token_id": "74",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x835dF7CC88D8BC51FCbb6a7FDED0BBE1ec020273",
+      "token_id": "2517582246254990625947327841552489136605713489",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x004454c0FfC8cc33bF15458d2ccc329586617A15",
+      "token_id": "30",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+      "token_id": "112719489495599285632573085929086652062667184160985018299870204816731530920414",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x004454c0FfC8cc33bF15458d2ccc329586617A15",
+      "token_id": "68",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAe67017D6578CCF38d79C5a03eE23653A8612286",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x49cE01c7C13EF0D6528C90162DC7005DFd0815e5",
+      "token_id": "728",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x2c7f335460fB9dF460FF7AD6CC64cb7Dd4064862",
+      "token_id": "2092",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "66000055",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "147000065",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A4d6e644abe74269CD30be6D1cBa8B4576541eE",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "23",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666659869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "3855",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x812fDE425e5Dd6961b50f92cDEb76C43df84BC15",
+      "token_id": "2",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x812fDE425e5Dd6961b50f92cDEb76C43df84BC15",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF8C08433DD41eAeE2e424C9E91467aB27772d9ec",
+      "token_id": "5",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x2c7f335460fB9dF460FF7AD6CC64cb7Dd4064862",
+      "token_id": "2093",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x115C9A6118bC7a3EB0aBD30f6BCF1C45Bb198AEd",
+      "token_id": "68133196527112232794835997367314869505960984666033462681082934679485448444140",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "69822369579579992440644516414785738093541892787964403178330236084957086484381",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x000000DAb303a194b3F55d4702B24740ad5a2F00",
+      "token_id": "138",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x875a48b0473CC94a1c786188Ad9c4727091dc08f",
+      "token_id": "76",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF8C08433DD41eAeE2e424C9E91467aB27772d9ec",
+      "token_id": "4",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x942BC2d3e7a589FE5bd4A5C6eF9727DFd82F5C8a",
+      "token_id": "38781",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x2Dafd5E115F7882463E4574125Bf34C58575F537",
+      "token_id": "318",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+      "token_id": "10926095371654028799179391261585010065492858691364314366316581517609086944794",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x909091b4fCCcfcc612Da39Ceb4a2771715613Ff9",
+      "token_id": "154",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x9bC3097d8FcA4C54D2c91FAd0723A0a3B261CA1d",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "17",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x352cC7AC890F45FBD47485985B00D9DFcc35fb54",
+      "token_id": "228",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x00C2d197Bc6A99C916b0B6bC405C23186edE7f1B",
+      "token_id": "89",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "3176",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "86097417832866893814481914419505665823253627313598434259730738896504147347658",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "86097417832866893814481914419505665823253627313598434259730738896504147347731",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xe25ad53c3B51058C3d7Dd6e7574074cbb3fd1EB8",
+      "token_id": "3",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "0"
+      },
+      "held": false
+     },
+     {
+      "contract": "0xc9EfdbDE6ebcEb0cB8a2fF0A7Fcd6ebc305F8621",
+      "token_id": "2",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+      "token_id": "76806164934568814000996932037634869101765680882636630858467980704245994692898",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "9119",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x000000c9572b8a9A638f238510aF4E90a4E365ee",
+      "token_id": "1000008",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "8648",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAdc9Adc3b057Cc1536a706FfEe3C6EB794cb95A3",
+      "token_id": "139",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x909091b4fCCcfcc612Da39Ceb4a2771715613Ff9",
+      "token_id": "515",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xB60F65a3b77715BeC45aF29d83c7F99ffdFd13aa",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x004454c0FfC8cc33bF15458d2ccc329586617A15",
+      "token_id": "29",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF26e8b9479eb2F778A31030eCB4F417337787e10",
+      "token_id": "37",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "24",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x84ec79BB42B0FBc00a79292953b4BD018CF9D906",
+      "token_id": "27",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "69822369579579992440644516414785738093541892787964403178330236084957086484371",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAb0D17a6abB683D50C62164feCed74426B811B4E",
+      "token_id": "61",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+      "token_id": "61290279413051215103140349609225743144899370153480524326005415414721352287640",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666656869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAbaBabABAb20053426aD1C782de9ea8444358070",
+      "token_id": "5000150",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x67F56e7a4a5F071a46f13E67D467f78C34DF3051",
+      "token_id": "63",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAbaBabABAb20053426aD1C782de9ea8444358070",
+      "token_id": "5002091",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "67000047",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xd38609B43dBF231169Aa16FB19AFb8bBd8288537",
+      "token_id": "68",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+      "token_id": "56300052718398774807819020732069961181708481619449133953548486688135112294546",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666654869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "284000408",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xB027168AAa52a9A0fAA9a1Cbf3fa3b576b6CF5e1",
+      "token_id": "76",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x15762db764826c219f1385c028e7e043a27e1891"
+      },
+      "held": false
+     },
+     {
+      "contract": "0xCa55E77EA8a3C671CE330A6c72f0Be604B797eE8",
+      "token_id": "110",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAbaBabABAb20053426aD1C782de9ea8444358070",
+      "token_id": "4000006",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "95000057",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5Fabc6db5481228609A47C0c498deD84D230aca6",
+      "token_id": "98",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xdd8f607E33BD22349728538480AbF0B110d3f111",
+      "token_id": "58",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xCa55E77EA8a3C671CE330A6c72f0Be604B797eE8",
+      "token_id": "117",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "64000038",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "69822369579579992440644516414785738093541892787964403178330236084957086484472",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "19",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x00C2d197Bc6A99C916b0B6bC405C23186edE7f1B",
+      "token_id": "87",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "31000912",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "17000205",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xd5BdB5165FC91165EB3195327fEcc71269470227",
+      "token_id": "138",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xadbBE97A8272C8999080542748bbDe67B260819a",
+      "token_id": "489",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xD16cdf9eaa00cE0B5f67F6DF047be60BB4AF057c",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF35b31bE49f44bf43963337c6493eE043798C27F",
+      "token_id": "75",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "94401727012838060521527140839508302898074639742145136431913302013423051609711",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x73e79Acf45A826957B794A60C76233543fa0aD75",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "7000766",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "22",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "5059",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xC4afDABb3D8C2f6112b832c36F97Aaf4CE90B792",
+      "token_id": "125",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0000002B11eec74c8Bc07f704Af67F53b3d910EF",
+      "token_id": "526",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "901",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x9B9C256d065077C9a1c9247e6eb0D4592824376B",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     }
+    ]
+   },
+   {
+    "reader": "blockscout",
+    "seed": 26106431,
+    "checked": 120,
+    "held": 114,
+    "not_held": 6,
+    "of_which_reverted": 0,
+    "unanswerable": 0,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "0xAc521EA7A83a3Bc3f9f1e09F8300a6301743fB1f",
+      "token_id": "1000219",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "15179800142553936164092493162504657410760508810493056543502133501311501362321",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x909091b4fCCcfcc612Da39Ceb4a2771715613Ff9",
+      "token_id": "515",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "23",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "6965",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "2652",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xC4afDABb3D8C2f6112b832c36F97Aaf4CE90B792",
+      "token_id": "125",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "69822369579579992440644516414785738093541892787964403178330236084957086484381",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF3D307971E0A90a51A2A5182F7E26bBEEE1C5531",
+      "token_id": "266",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "8855",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xb3a87c89ACd407751bB6f4c7708548b17158a16D",
+      "token_id": "1000010",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x000Fb295d38c01051e37e65F3034dD4F02267c96",
+      "token_id": "87",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x4316101555a24079e0749873b0115356e460c77a"
+      },
+      "held": false
+     },
+     {
+      "contract": "0xc0C5BC9bE52d53F3762f213497E3377b4dd5f62B",
+      "token_id": "476",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "901",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF8C08433DD41eAeE2e424C9E91467aB27772d9ec",
+      "token_id": "4",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "369000039",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x5151f4b48cee4f7dcb7714e7b4b836aa847bf4e8"
+      },
+      "held": false
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "17",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5Fabc6db5481228609A47C0c498deD84D230aca6",
+      "token_id": "98",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "20",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "4000640",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "2817",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "3931",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xB60F65a3b77715BeC45aF29d83c7F99ffdFd13aa",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666653869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x8f30722dd16BD63cF2665C383c1aEf5e307B0046",
+      "token_id": "64083282194581793942215293811836391478974900789963845024963281200227193839084",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
+      "token_id": "67704129877851559824900098584749054778018899410374222681218843375198359480390",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAbaBabABAb20053426aD1C782de9ea8444358070",
+      "token_id": "4000006",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+      "token_id": "30037239612693984447538656678974117090855642885738858983649834166958412671350",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xB027168AAa52a9A0fAA9a1Cbf3fa3b576b6CF5e1",
+      "token_id": "76",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x15762db764826c219f1385c028e7e043a27e1891"
+      },
+      "held": false
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "8937",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xA2f67488576c5eCeD478872575A36652BF9A399b",
+      "token_id": "7",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0xcff43a597911a9457071d89d2b2ac3d5b1862b86"
+      },
+      "held": false
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "22",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "81000032",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "65000058",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x942BC2d3e7a589FE5bd4A5C6eF9727DFd82F5C8a",
+      "token_id": "38781",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x812fDE425e5Dd6961b50f92cDEb76C43df84BC15",
+      "token_id": "2",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xd38609B43dBF231169Aa16FB19AFb8bBd8288537",
+      "token_id": "68",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "85341661276925889095165487281836110093790413991075404215045800075734863118094",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x9B9C256d065077C9a1c9247e6eb0D4592824376B",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "9801",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "18",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "69000041",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "284000408",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+      "token_id": "112719489495599285632573085929086652062667184160985018299870204816731530920414",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x495f947276749Ce646f68AC8c248420045cb7b5e",
+      "token_id": "77632720540906351355197959220489819423018271329541070354247864156873568550922",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "5059",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "9119",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "7000766",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "32591673285275619746773086728306986897072430171202470250203746551365187756145",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "14",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+      "token_id": "61290279413051215103140349609225743144899370153480524326005415414721352287640",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0000002B11eec74c8Bc07f704Af67F53b3d910EF",
+      "token_id": "525",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A4d6e644abe74269CD30be6D1cBa8B4576541eE",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAbaBabABAb20053426aD1C782de9ea8444358070",
+      "token_id": "5000150",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "16000370",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "69822369579579992440644516414785738093541892787964403178330236084957086484472",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x495f947276749Ce646f68AC8c248420045cb7b5e",
+      "token_id": "83953848618913315550135434842917048895383924632333171664514552187135402704996",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "6000510",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "20037223796567411119174650871052115731384133719618548188910580245195414385246",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc9EfdbDE6ebcEb0cB8a2fF0A7Fcd6ebc305F8621",
+      "token_id": "2",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAe67017D6578CCF38d79C5a03eE23653A8612286",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "101287797761539844178780320458290755819133386846584060063826966477732301546179",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x115C9A6118bC7a3EB0aBD30f6BCF1C45Bb198AEd",
+      "token_id": "68133196527112232794835997367314869505960984666033462681082934679485448444140",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x002bb8De1CA9Ff509fF89b22b2559D170Ad1Dbdc",
+      "token_id": "2",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "3176",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "68000045",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x84ec79BB42B0FBc00a79292953b4BD018CF9D906",
+      "token_id": "26",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEc81b3FE5AA24De6C05aDDAf23D110B310d58178",
+      "token_id": "4",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0xcff43a597911a9457071d89d2b2ac3d5b1862b86"
+      },
+      "held": false
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666657869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x2c7f335460fB9dF460FF7AD6CC64cb7Dd4064862",
+      "token_id": "2092",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "3855",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+      "token_id": "76806164934568814000996932037634869101765680882636630858467980704245994692898",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc5f18a7bF825c2B0433102DA5bc79C9EDfc3Fa89",
+      "token_id": "3086",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x00C2d197Bc6A99C916b0B6bC405C23186edE7f1B",
+      "token_id": "88",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF26e8b9479eb2F778A31030eCB4F417337787e10",
+      "token_id": "37",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xB4B37BEe5970F5aBdb34390714Af658728C6aB34",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "189000393",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x004454c0FfC8cc33bF15458d2ccc329586617A15",
+      "token_id": "68",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x835dF7CC88D8BC51FCbb6a7FDED0BBE1ec020273",
+      "token_id": "2517582246254990625947327841552489136603713489",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "6020",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "98264980923967358017843757895195576202508743779465403143150915361542785039222",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0A1BBD57033F57E7B6743621b79fCB9Eb2CE3676",
+      "token_id": "67000047",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "9254",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAbaBabABAb20053426aD1C782de9ea8444358070",
+      "token_id": "5002091",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5a0121A0A21232eC0D024dAb9017314509026480",
+      "token_id": "8648",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666654869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "19",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xD16cdf9eaa00cE0B5f67F6DF047be60BB4AF057c",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xAB9C37b6b27BDD610cC251ffcd4279480C100eaE",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0239A6A823CBb789c235a53364D91fAfc6C1b557",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x9bC3097d8FcA4C54D2c91FAd0723A0a3B261CA1d",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x99a9B7c1116f9ceEB1652de04d5969CcE509B069",
+      "token_id": "464000261",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+      "token_id": "1299511854520002634015191577671796554131262292261602276056987334175610842711",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+      "token_id": "99123230400958327983629474283185741672485991312281923612759742373831566403630",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "73186562991033452279615156772342934244841460622896083955773930581557463384171",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x812fDE425e5Dd6961b50f92cDEb76C43df84BC15",
+      "token_id": "1",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "2"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x352cC7AC890F45FBD47485985B00D9DFcc35fb54",
+      "token_id": "228",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x004454c0FfC8cc33bF15458d2ccc329586617A15",
+      "token_id": "29",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "3000784",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x909091b4fCCcfcc612Da39Ceb4a2771715613Ff9",
+      "token_id": "154",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xCa55E77EA8a3C671CE330A6c72f0Be604B797eE8",
+      "token_id": "117",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x64610087E11d21D016355740f5280C21D29B0105",
+      "token_id": "22",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "24",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+      "token_id": "2439046679443273982118864381573244666658869236",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x00C2d197Bc6A99C916b0B6bC405C23186edE7f1B",
+      "token_id": "87",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xB66a603f4cFe17e3D27B87a8BfCaD319856518B8",
+      "token_id": "98653932644530374813726228478403159513475240229053647093266852990301855809540",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x00C2d197Bc6A99C916b0B6bC405C23186edE7f1B",
+      "token_id": "90",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+      "token_id": "86097417832866893814481914419505665823253627313598434259730738896504147347658",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+      "token_id": "36362561848951798446269860957053040500517015065626030790981818062577627166876",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xCa55E77EA8a3C671CE330A6c72f0Be604B797eE8",
+      "token_id": "110",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xbDdE08BD57e5C9fD563eE7aC61618CB2ECdc0ce0",
+      "token_id": "9000220",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x004454c0FfC8cc33bF15458d2ccc329586617A15",
+      "token_id": "30",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x835dF7CC88D8BC51FCbb6a7FDED0BBE1ec020273",
+      "token_id": "2517582246254990625947327841552489136605713489",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x5515C4bF85D9dd3ED0f2d8f1bbc3bD78421544Bd",
+      "token_id": "637",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "16",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xF1B214702BeD6EC64843F55e5d566D8FfB3034Dd",
+      "token_id": "55",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x5151f4b48cee4f7dcb7714e7b4b836aa847bf4e8"
+      },
+      "held": false
+     },
+     {
+      "contract": "0x2c7f335460fB9dF460FF7AD6CC64cb7Dd4064862",
+      "token_id": "2093",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x0000000222D40f1aE80791fdC42fa6eb5dA6f80B",
+      "token_id": "2000634",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0x49bd7FAd523049f6286C2df301C8364c28157c12",
+      "token_id": "554",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     },
+     {
+      "contract": "0xEB810535A0A1d16db1e7b6a859d6B787A1D72EF8",
+      "token_id": "21",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true
+     }
+    ]
+   }
+  ],
+  "differences": [
+   {
+    "standard": "erc721",
+    "listed_by": "blockscout",
+    "missing_from": "feralfile-indexer",
+    "checked": 6,
+    "held": 2,
+    "not_held": 4,
+    "of_which_reverted": 0,
+    "unanswerable": 0,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
+      "token_id": "67704129877851559824900098584749054778018899410374222681218843375198359480390",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     },
+     {
+      "contract": "0x57f1887a8BF19b14fC0dF6Fd9B2acc9Af147eA85",
+      "token_id": "75045689005433978950244986705572158565930370946291427722022479501416863706345",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x457ee5f723c7606c12a7264b52e285906f91eea6"
+      },
+      "held": true,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     },
+     {
+      "contract": "0xA2f67488576c5eCeD478872575A36652BF9A399b",
+      "token_id": "7",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0xcff43a597911a9457071d89d2b2ac3d5b1862b86"
+      },
+      "held": false,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     },
+     {
+      "contract": "0xa7d8d9ef8D8Ce8992Df33D8b8CF4Aebabd5bD270",
+      "token_id": "369000039",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x5151f4b48cee4f7dcb7714e7b4b836aa847bf4e8"
+      },
+      "held": false,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     },
+     {
+      "contract": "0xEc81b3FE5AA24De6C05aDDAf23D110B310d58178",
+      "token_id": "4",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0xcff43a597911a9457071d89d2b2ac3d5b1862b86"
+      },
+      "held": false,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     },
+     {
+      "contract": "0xF1B214702BeD6EC64843F55e5d566D8FfB3034Dd",
+      "token_id": "55",
+      "standard": "erc721",
+      "chain": {
+       "call": "ownerOf",
+       "owner": "0x5151f4b48cee4f7dcb7714e7b4b836aa847bf4e8"
+      },
+      "held": false,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     }
+    ]
+   },
+   {
+    "standard": "erc1155",
+    "listed_by": "feralfile-indexer",
+    "missing_from": "blockscout",
+    "checked": 3,
+    "held": 2,
+    "not_held": 1,
+    "of_which_reverted": 0,
+    "unanswerable": 0,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "0x29539A0109FEc46b916a6125F352C629d9304C73",
+      "token_id": "0",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true,
+      "listed_by": "feralfile-indexer",
+      "missing_from": "blockscout"
+     },
+     {
+      "contract": "0x4584855C09E8A87EFe80C53EB82bEB336d923063",
+      "token_id": "0",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true,
+      "listed_by": "feralfile-indexer",
+      "missing_from": "blockscout"
+     },
+     {
+      "contract": "0xe25ad53c3B51058C3d7Dd6e7574074cbb3fd1EB8",
+      "token_id": "3",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "0"
+      },
+      "held": false,
+      "listed_by": "feralfile-indexer",
+      "missing_from": "blockscout"
+     }
+    ]
+   },
+   {
+    "standard": "erc1155",
+    "listed_by": "blockscout",
+    "missing_from": "feralfile-indexer",
+    "checked": 3,
+    "held": 3,
+    "not_held": 0,
+    "of_which_reverted": 0,
+    "unanswerable": 0,
+    "no_reply": 0,
+    "tokens": [
+     {
+      "contract": "0x495f947276749Ce646f68AC8c248420045cb7b5e",
+      "token_id": "77632720540906351355197959220489819423018271329541070354247864156873568550922",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     },
+     {
+      "contract": "0x495f947276749Ce646f68AC8c248420045cb7b5e",
+      "token_id": "83953848618913315550135434842917048895383924632333171664514552187135402704996",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     },
+     {
+      "contract": "0xB66a603f4cFe17e3D27B87a8BfCaD319856518B8",
+      "token_id": "98653932644530374813726228478403159513475240229053647093266852990301855809540",
+      "standard": "erc1155",
+      "chain": {
+       "call": "balanceOf",
+       "balance": "1"
+      },
+      "held": true,
+      "listed_by": "blockscout",
+      "missing_from": "feralfile-indexer"
+     }
+    ]
+   }
+  ],
+  "rpc_recheck": {
+   "rpc": "https://eth-mainnet.public.blastapi.io",
+   "rechecked": 13,
+   "confirmed": 13,
+   "secondary_unanswered": 0,
+   "rpc_disagreements": []
+  }
+ },
+ "lists": {
+  "file": "holdings_eip155-1_0x457ee5f723c7606c12a7264b52e285906f91eea6_20261002T182846Z.lists.json",
+  "sha256": "4a53e072cbd9694787a79aa99a98355d74878e6d7f755f9d81b93c885b2deeab"
+ },
+ "produced_by": {
+  "tool": "tools/witness/witness.py",
+  "repo": "https://github.com/feral-file/status",
+  "schema_doc": "tools/witness/README.md"
+ },
+ "signatures": [
+  {
+   "alg": "ed25519",
+   "kid": "did:key:z6MkoX8i2dynyvLh4hUHZt8b42q9uAwwCWxM4NSX4YDfMtaC",
+   "ts": "2026-10-02T18:37:26Z",
+   "payload_hash": "sha256:49c15fdd1d675ce887c5c3129bf2da721df31e41f434de2fcaff12b954b44c7b",
+   "role": "witness",
+   "sig": "CzoWIusV0-lEguW4LXEjRE4R89iwVT4vVmKONaWyxGy4GL9Ve39DUk-Zisq3fyrBQ7FxG13Hb3QhhIYKlGXFCw"
+  }
+ ]
+}

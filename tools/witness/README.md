@@ -4,13 +4,14 @@ A **witness entry** is one dated, signed statement about what the public
 readers say an address holds, and what the chain itself says, at one block.
 It is the smallest unit of a public log of who-holds-what: one address, two
 or more readers, their set differences, and a chain check on a sample and on
-every disagreement. Entries are published as files next to the census at
-<https://status.feralfile.com/#witness>. There is no log service; a second
-party produces an entry with this tool (or their own, in the same shape) and
-signs it with their own key.
+every disagreement. Entries are published on their own site, <https://witness.feralfile.com>,
+built by `build_witness.py` in this repository. There is no log service; a
+second party produces an entry with this tool (or their own, in the same
+shape) and signs it with their own key.
 
 ```bash
 python3 tools/witness/witness.py --address 0x830cc132dd66F6491cEAA20206f398247143d9CF
+python3 tools/witness/witness.py --address tz1gMfctX4hBNpkUoE7RcYPBhNc1hpHddqh4
 node tools/witness/sign.mjs data/witness/holdings_<…>.json --key-file ~/.config/witness.key
 node tools/witness/verify.mjs data/witness/holdings_<…>.json
 ```
@@ -23,25 +24,31 @@ same identity appears on both.
 
 ## What one run does
 
-1. **Readers.** Ask each reader for the address's holdings. Today: the Feral
-   File indexer (`indexer-v2.feralfile.com/graphql`, `tokens(owners:)`, with
-   unviewable and moderated tokens included so the list is the whole list) and
-   Blockscout's public API (`/addresses/{address}/nft`, ERC-721 and ERC-1155).
-   Both keyless. Each reader's full list is written to the `.lists.json`
-   sibling and referenced from the entry by SHA-256.
-2. **Pin a block.** `eth_getBlockByNumber latest` on the primary RPC after the
-   reader fetches. Every chain read below is at that block.
+1. **Readers.** Ask each reader for the address's holdings. Ethereum: the
+   Feral File indexer (`indexer-v2.feralfile.com/graphql`, `tokens(owners:)`,
+   with unviewable and moderated tokens included so the list is the whole
+   list) and Blockscout's public API (`/addresses/{address}/nft`, ERC-721 and
+   ERC-1155). Tezos: TzKT (`/tokens/balances?account=&balance.gt=0`) and
+   objkt's GraphQL (`token_holder`, FA2 only). All keyless. Each reader's full
+   list is written to the `.lists.json` sibling and referenced from the entry
+   by SHA-256. The chain is chosen from the address prefix.
+2. **Pin a block.** The head block on the primary node after the reader
+   fetches. Every chain read below is at that block (Tezos: by block hash).
 3. **Compare.** Per standard, keyed `contract:token_id`: in both, only in A,
    only in B.
-4. **Chain check.** `eth_call` at the pinned block. ERC-721: `ownerOf(tokenId)`
-   equals the address. ERC-1155: `balanceOf(address, tokenId) > 0`. A revert
-   counts as not held. Run on a seeded random sample of `--sample` tokens from
-   each reader's list (seed defaults to the block number, so the sample is
-   reproducible), and on every token the readers disagree about. A contract
-   that faults on the call (no such selector) is recorded as unanswerable, and
-   a provider error after retries as no reply; neither counts for or against
-   a reader.
-5. **Second RPC.** Every "not held" verdict is re-read on a second RPC
+4. **Chain check.** Ethereum: `eth_call` at the pinned block, `ownerOf(tokenId)`
+   equals the address for ERC-721, `balanceOf(address, tokenId) > 0` for
+   ERC-1155; a revert counts as not held. Tezos: the contract's `%ledger` big
+   map, located by walking the contract's own storage type from the node,
+   read by key hash (`blake2b` of the packed key): key `(address, token_id)`
+   to balance, or key `token_id` to owner; a missing key is not held. Run on a
+   seeded random sample of `--sample` tokens from each reader's list (seed
+   defaults to the block number, so the sample is reproducible), and on every
+   token the readers disagree about. A contract that cannot be asked this way
+   (no such selector; no `%ledger`; an unsupported ledger layout; FA1.2) is
+   recorded as unanswerable, and a provider error after retries as no reply;
+   neither counts for or against a reader.
+5. **Second node.** Every "not held" verdict is re-read on a second RPC
    provider; any disagreement between providers is recorded under
    `rpc_recheck`.
 
@@ -50,9 +57,9 @@ same identity appears on both.
 | Field | Meaning |
 | :-- | :-- |
 | `schema`, `kind` | `feral-file/witness-holdings/0.1`, `holdings`. |
-| `subject` | `chain` (CAIP-2, `eip155:1`), `address`, `ens` and where the name came from. |
+| `subject` | `chain` (CAIP-2: `eip155:1`, `tezos:NetXdQprcVkpaWU`), `address`, `name` with `name_system` (`ens` or `tezos-domains`) and `name_source`; Ethereum entries also carry `ens` for the first entry's readers. |
 | `observed_at` | When the entry was assembled (UTC). |
-| `chain_state` | `block`, `block_hash`, `block_timestamp`, primary `rpc`. Every chain verdict is at this block. |
+| `chain_state` | `block` (number or level), `block_hash`, `block_timestamp`, primary `rpc`. Every chain verdict is at this block. |
 | `readers[]` | One per reader: `name`, `operator`, `endpoint`, `query`, `fetched_at`, `count` (`total`, `erc721`, `erc1155`), `list_sha256` (over the sorted `contract:token_id:standard` lines), `notes`. |
 | `comparison.pairs[]` | Per standard: `both`, `only_<reader>` counts. |
 | `chain_check.samples[]` | Per reader: `seed`, `checked`, `held`, `not_held`, `of_which_reverted`, `unanswerable` (the contract faults on the call, e.g. CryptoPunks has no `ownerOf`), `no_reply` (the RPC gave no chain answer after retries), and `tokens[]` with the chain's answer per token. |
