@@ -140,6 +140,14 @@ def render(entries, generated_at):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap">
 <link rel="stylesheet" href="static/style.css">
+<style>
+  /* Nothing on this page may be wider than the screen: long commands, keys and
+     addresses wrap, and tables scroll inside their own box. */
+  html, body {{ max-width: 100%; overflow-x: hidden; }}
+  pre {{ white-space: pre-wrap; overflow-wrap: anywhere; max-width: 42rem; margin-bottom: 1rem; }}
+  code, h3 {{ overflow-wrap: anywhere; }}
+  table {{ display: block; max-width: 100%; overflow-x: auto; }}
+</style>
 </head>
 <body>
 <main>
