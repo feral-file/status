@@ -150,6 +150,7 @@ def render(entries, generated_at):
 <body>
 <main>
   <header>
+    <p class="brand"><a href="https://feralfile.com">Feral File</a></p>
     <h1>Witness</h1>
     <p class="lede">Signed observations of who holds what, checked against the chain. One address, one block, two readers, every disagreement settled by the chain itself, signed by whoever looked. {n(count)} entries, {n(people)} people, {esc(" and ".join(chains))}.</p>
   </header>
