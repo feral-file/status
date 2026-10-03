@@ -146,7 +146,6 @@ def render(entries, generated_at):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap">
 <link rel="stylesheet" href="static/style.css">
-<link rel="stylesheet" href="static/witness.css">
 </head>
 <body>
 <main>

@@ -24,15 +24,25 @@ body {
   font-family: "PP Mori", "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-weight: 400;
   font-size: 20px;
-  line-height: 1.3;
+  line-height: 1.45;
   color: var(--ink);
   background: var(--surface);
   max-width: 60rem;
   margin: 0 auto;
-  padding: 2rem 1.25rem 4rem;
+  padding: 2.5rem 1.25rem 4rem;
 }
+html, body { overflow-x: hidden; }
 
-a { color: inherit; }
+a { color: inherit; text-underline-offset: 0.15em; }
+abbr[title] { text-decoration: none; }
+code { font-family: "Space Mono", monospace; font-size: 0.85em; overflow-wrap: anywhere; }
+pre {
+  font-family: "Space Mono", monospace; font-size: 14px; line-height: 1.6;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  max-width: 42rem; padding: 0.9rem 1rem; border: 1px solid var(--hairline);
+  margin: 1.25rem 0;
+}
+pre code { font-size: inherit; }
 a:hover { background: var(--highlight); color: #000; }
 
 header .brand {
@@ -42,13 +52,13 @@ header .brand {
 }
 header .brand a { text-decoration: none; }
 
-h1 { font-size: 48px; line-height: 1.1; font-weight: 400; margin-bottom: 1rem; }
+h1 { font-size: 48px; line-height: 1.1; font-weight: 400; margin-bottom: 1.25rem; }
 h2 { font-size: 28px; line-height: 1.2; font-weight: 400; margin-bottom: 1rem; }
 h3 { font-size: 20px; font-weight: 400; }
 
 .lede { max-width: 42rem; color: var(--ink-secondary); }
 
-section { margin-top: 4rem; }
+section { margin-top: 4.5rem; }
 
 /* Summary tiles */
 .tiles {
@@ -75,10 +85,12 @@ section { margin-top: 4rem; }
 .dated {
   font-family: "Space Mono", monospace;
   font-size: 14px;
+  line-height: 1.6;
   color: var(--ink-secondary);
 }
 
-section p { max-width: 42rem; margin-bottom: 1rem; }
+section p { max-width: 42rem; margin-bottom: 1.1rem; }
+section p:last-child { margin-bottom: 0; }
 
 /* Tables */
 table {
@@ -102,9 +114,11 @@ td.num, th.num { text-align: right; font-family: "Space Mono", monospace; font-s
 #data li {
   font-family: "Space Mono", monospace;
   font-size: 14px;
-  padding: 0.4rem 0;
+  line-height: 1.6;
+  padding: 0.6rem 0;
   border-bottom: 1px solid var(--hairline);
 }
+#data li:first-child { border-top: 1px solid var(--ink); }
 #updates article { margin-bottom: 1.5rem; max-width: 42rem; }
 #updates h3 { margin-bottom: 0.25rem; }
 #updates p { font-size: 16px; color: var(--ink-secondary); }
@@ -115,13 +129,43 @@ footer {
   border-top: 1px solid var(--ink);
   font-family: "Space Mono", monospace;
   font-size: 14px;
+  line-height: 1.6;
   color: var(--ink-secondary);
 }
 
+/* Witness entries (witness.feralfile.com): one person, their entries */
+.person { margin-top: 3.5rem; }
+.person h2 { margin-bottom: 0.25rem; }
+.person .names { font-family: "Space Mono", monospace; font-size: 14px; line-height: 1.6; color: var(--ink-secondary); margin-bottom: 0; }
+.entry { margin-top: 2.5rem; max-width: 42rem; }
+.entry-meta, .entry-address, .entry-foot, .legend {
+  font-family: "Space Mono", monospace; font-size: 14px; line-height: 1.6; color: var(--ink-secondary);
+}
+.entry-meta { color: var(--ink); }
+.entry-address { overflow-wrap: anywhere; }
+.entry-address a { text-decoration: none; }
+.entry-address a:hover { text-decoration: underline; }
+.entry table { margin-top: 1rem; line-height: 1.4; }
+.entry th, .entry td { padding: 0.65rem 0 0.65rem 1rem; vertical-align: top; }
+.entry th:first-child, .entry td:first-child { padding-left: 0; }
+.entry thead th { line-height: 1.35; vertical-align: bottom; padding-bottom: 0.5rem; white-space: nowrap; }
+.entry td.num, .entry th.num { white-space: nowrap; }
+.entry td.num { line-height: 1.6; padding-top: 0.6rem; }
+.operator { display: block; font-family: "Space Mono", monospace; font-size: 13px; line-height: 1.5; color: var(--ink-secondary); margin-top: 0.1rem; }
+.entry-foot { margin-top: 0.9rem; max-width: 42rem; }
+.entry-foot + .entry-foot { margin-top: 0.25rem; }
+.legend { margin-top: 0.75rem; max-width: 42rem; }
+
 @media (max-width: 40rem) {
+  body { font-size: 18px; padding-top: 1.75rem; }
   h1 { font-size: 36px; }
+  h2 { font-size: 24px; }
+  section { margin-top: 3.5rem; }
   .tile-number { font-size: 36px; }
   table { display: block; overflow-x: auto; }
+  .entry table { display: table; font-size: 15px; }
+  .entry th, .entry td { padding-left: 0.75rem; }
+  .entry thead th { white-space: normal; }
 }
 
 /* Lookup */
