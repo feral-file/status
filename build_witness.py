@@ -34,6 +34,37 @@ def n(v):
     return f"{v:,}" if isinstance(v, int) else esc(v)
 
 
+def tally(rows):
+    return {
+        "checked": len(rows),
+        "held": sum(1 for t in rows if t["held"] is True),
+        "not_held": sum(1 for t in rows if t["held"] is False),
+        "unanswerable": sum(1 for t in rows if t["held"] is None),
+    }
+
+
+STANDARD_NAMES = {"erc721": "ERC-721", "erc1155": "ERC-1155", "fa2": "FA2", "fa1.2": "FA1.2"}
+
+
+def plain_sentences(e):
+    """What the entry says, in words, with the counting unit stated."""
+    out = []
+    names = [r["name"] for r in e["readers"]]
+    for r in e["readers"]:
+        other = next(x for x in names if x != r["name"]) if len(names) == 2 else "the other reader"
+        for ps in r["per_standard"]:
+            sn = STANDARD_NAMES.get(ps["standard"], ps["standard"])
+            oh = ps["only_here"]
+            if oh["held"]:
+                out.append(f"{other} omits {oh['held']:,} {sn} token{'s' if oh['held'] != 1 else ''} the chain says the address holds.")
+            if oh["not_held"]:
+                out.append(f"{r['name']} lists {oh['not_held']:,} {sn} token{'s' if oh['not_held'] != 1 else ''} the chain says the address does not hold.")
+    both = {(b["contract"], b["token_id"]) for r in e["readers"] for b in r["both_listed_not_held"]}
+    if both:
+        out.append(f"{len(both)} token{'s' if len(both) != 1 else ''} both readers list {'are' if len(both) != 1 else 'is'} not held at this block: two readers can agree and both be wrong.")
+    return out
+
+
 def load_entries():
     entries = []
     for path in sorted(glob.glob(str(DATA / "holdings_*.json"))):
@@ -41,10 +72,27 @@ def load_entries():
             continue
         e = json.loads(Path(path).read_text())
         check = e.get("chain_check", {})
+        standards = [k for k in e["readers"][0]["count"] if k != "total"] if e.get("readers") else []
+        diff_keys = {(t["contract"].lower(), t["token_id"]) for d in check.get("differences", []) for t in d["tokens"]}
         readers = []
         for r in e.get("readers", []):
             sample = next((x for x in check.get("samples", []) if x["reader"] == r["name"]), None)
             only = [d for d in check.get("differences", []) if d["listed_by"] == r["name"]]
+            per_std = []
+            for std in standards:
+                srows = [t for t in (sample["tokens"] if sample else []) if t["standard"] == std]
+                orows = [t for d in only if d["standard"] == std for t in d["tokens"]]
+                per_std.append(
+                    {
+                        "standard": std,
+                        "listed": r["count"].get(std, 0),
+                        "sample": tally(srows),
+                        "only_here": tally(orows),
+                    }
+                )
+            # Tokens this reader listed that are not held, both from the sample and the differences, as distinct tokens.
+            not_held_distinct = len({(t["contract"].lower(), t["token_id"]) for rows in ([sample["tokens"]] if sample else []) + [d["tokens"] for d in only] for t in rows if t["held"] is False})
+            unans_distinct = len({(t["contract"].lower(), t["token_id"]) for rows in ([sample["tokens"]] if sample else []) + [d["tokens"] for d in only] for t in rows if t["held"] is None})
             readers.append(
                 {
                     "name": r["name"],
@@ -56,9 +104,21 @@ def load_entries():
                     "only_listed_here": sum(d["checked"] for d in only),
                     "only_listed_here_chain_held": sum(d["held"] for d in only),
                     "only_listed_here_unanswerable": sum(d.get("unanswerable", 0) for d in only),
+                    "per_standard": per_std,
+                    "not_held_distinct": not_held_distinct,
+                    "unanswerable_distinct": unans_distinct,
+                    # Tokens in this reader's sample that the other reader also lists and the chain says are not held: both readers wrong.
+                    "both_listed_not_held": [
+                        {"contract": t["contract"], "token_id": t["token_id"], "owner": t["chain"].get("owner")}
+                        for t in (sample["tokens"] if sample else [])
+                        if t["held"] is False and (t["contract"].lower(), t["token_id"]) not in diff_keys
+                    ],
                 }
             )
         rc = check.get("rpc_recheck") or {}
+        # Distinct tokens behind the recheck count: the recheck re-reads every not-held row, and a token can sit in a sample and in the differences.
+        rc_distinct = len({(t["contract"].lower(), t["token_id"]) for x in check.get("samples", []) + check.get("differences", []) for t in x["tokens"] if t["held"] is False})
+        unans_distinct = len({(t["contract"].lower(), t["token_id"]) for x in check.get("samples", []) + check.get("differences", []) for t in x["tokens"] if t["held"] is None})
         subj = e["subject"]
         entries.append(
             {
@@ -72,7 +132,9 @@ def load_entries():
                 "name": subj.get("name") or subj.get("ens"),
                 "block": e["chain_state"]["block"],
                 "readers": readers,
-                "rpc_recheck": {"rechecked": rc.get("rechecked", 0), "confirmed": rc.get("confirmed", rc.get("rechecked", 0)), "disagreements": len(rc.get("rpc_disagreements") or [])},
+                "rpc_recheck": {"rechecked": rc.get("rechecked", 0), "distinct_tokens": rc_distinct, "confirmed": rc.get("confirmed", rc.get("rechecked", 0)), "disagreements": len(rc.get("rpc_disagreements") or [])},
+                "standards": standards,
+                "unanswerable_distinct": unans_distinct,
                 "signers": [{"kid": sg["kid"], "role": sg.get("role")} for sg in e.get("signatures", [])],
             }
         )
@@ -94,33 +156,45 @@ def short_kid(kid):
     return kid if len(kid) <= 28 else kid[:16] + "\u2026" + kid[-8:]
 
 
+def cell3(t):
+    """held / not held / unanswerable, as one mono cell; zeros stay visible."""
+    return f"{n(t['held'])} / {n(t['not_held'])} / {n(t['unanswerable'])}"
+
+
 def entry_html(e):
-    rows = "".join(
-        f"<tr><td>{esc(r['name'])}<span class=\"operator\">{esc(r['operator'] or '')}</span></td>"
-        f"<td class=\"num\">{n(r['listed'])}</td>"
-        f"<td class=\"num\">{n(r['sample_held'])} of {n(r['sample_checked'])}</td>"
-        f"<td class=\"num\">{n(r['only_listed_here'])} &middot; {n(r['only_listed_here_chain_held'])}</td></tr>"
-        for r in e["readers"]
-    )
+    rows = ""
+    for r in e["readers"]:
+        for k, ps in enumerate(r["per_standard"]):
+            if ps["listed"] == 0 and ps["only_here"]["checked"] == 0:
+                continue
+            reader_cell = f"{esc(r['name'])}<span class=\"operator\">{esc(r['operator'] or '')}</span>" if k == 0 else ""
+            rows += (
+                f"<tr><td>{reader_cell}</td><td>{esc(STANDARD_NAMES.get(ps['standard'], ps['standard']))}</td>"
+                f"<td class=\"num\">{n(ps['listed'])}</td>"
+                f"<td class=\"num\">{cell3(ps['sample'])}</td>"
+                f"<td class=\"num\">{cell3(ps['only_here'])}</td></tr>"
+            )
     signers = ", ".join(f'<abbr title="{esc(sg["kid"])}">{esc(short_kid(sg["kid"]))}</abbr>' for sg in e["signers"]) or "unsigned"
     rc = e["rpc_recheck"]
     if rc["rechecked"] == 0:
         rc_line = ""
     elif rc["disagreements"] == 0 and rc["confirmed"] == rc["rechecked"]:
-        rc_line = f" A second node confirmed all {n(rc['rechecked'])} not-held verdicts."
+        rc_line = f" A second node confirmed all {n(rc['rechecked'])} not-held results ({n(rc['distinct_tokens'])} distinct tokens)."
     else:
-        rc_line = f" A second node re-read {n(rc['rechecked'])} not-held verdicts: {n(rc['confirmed'])} confirmed, {n(rc['disagreements'])} differed (in the entry)."
-    unans = sum(r["sample_unanswerable"] + r["only_listed_here_unanswerable"] for r in e["readers"])
-    unans_line = f" {n(unans)} token{'s' if unans != 1 else ''} could not be asked this way and count{'s' if unans == 1 else ''} for neither reader." if unans else ""
+        rc_line = f" A second node re-read {n(rc['rechecked'])} not-held results: {n(rc['confirmed'])} confirmed, {n(rc['disagreements'])} differed (in the entry)."
+    unans = e["unanswerable_distinct"]
+    unans_line = f" {n(unans)} distinct token{'s' if unans != 1 else ''} could not be asked this way (no standard ledger call, or a standard this check does not cover) and count{'s' if unans == 1 else ''} for neither reader." if unans else ""
     lists = f' &middot; <a href="{esc(e["lists_file"])}">Both readers&rsquo; full lists</a>' if e.get("lists_file") else ""
+    plain = "".join(f"<li>{esc(x)}</li>" for x in plain_sentences(e))
+    plain_html = f'\n      <ul class="plain">{plain}</ul>' if plain else ""
     return f"""
     <article class="entry">
       <p class="entry-meta">{esc(e["date"])} &middot; {esc(e["chain_name"])} &middot; block {n(e["block"])}</p>
       <p class="entry-address"><a href="{esc(e["file"])}">{esc(e["address"])}</a></p>
       <table>
-        <thead><tr><th>Reader</th><th class="num">Lists</th><th class="num">Sample held</th><th class="num">Only here &middot; held</th></tr></thead>
+        <thead><tr><th>Reader</th><th>Standard</th><th class="num">Lists</th><th class="num">Sample<br>held / not / unanswered</th><th class="num">Only here<br>held / not / unanswered</th></tr></thead>
         <tbody>{rows}</tbody>
-      </table>
+      </table>{plain_html}
       <p class="entry-foot">Signed by {signers}.{rc_line}{unans_line}</p>
       <p class="entry-foot"><a href="{esc(e["file"])}">Entry</a> (JSON, every checked token with the chain&rsquo;s answer){lists}</p>
     </article>"""
@@ -142,7 +216,7 @@ def render(entries, generated_at):
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Witness</title>
-<meta name="description" content="Signed observations of who holds what, checked against the chain. One address, one block, every disagreement between readers settled on chain, signed by whoever looked.">
+<meta name="description" content="Signed checks of what public indexers say an address holds, against the chain itself at one block. Every disagreement the chain can answer is answered; the rest stays marked unanswered. Anyone can add one.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap">
 <link rel="stylesheet" href="static/style.css">
@@ -152,27 +226,34 @@ def render(entries, generated_at):
   <header>
     <p class="brand"><a href="https://feralfile.com">Feral File</a></p>
     <h1>Witness</h1>
-    <p class="lede">Signed observations of who holds what, checked against the chain. One address, one block, two readers, every disagreement settled by the chain itself, signed by whoever looked. {(f"{n(count)} entries, {n(people)} people, " + esc(" and ".join(chains)) + ".") if entries else ""}</p>
+    <p class="lede">Signed checks of what public indexers say an address holds, against the chain itself at one block. Every disagreement the chain can answer is answered; the rest stays marked unanswered. Signed by whoever looked. {(f"{n(count)} entries, " + esc(" and ".join(chains)) + ".") if entries else ""}</p>
   </header>
+
+  <section id="why">
+    <h2>Why this exists</h2>
+    <p>Every app that shows you your collection, ours included, trusts an indexer to say what your address holds. Indexers disagree, by hundreds of tokens for a large collection, and each company corrects its own in private, so the errors are never visible and never shared. When two apps show you two different collections, you have no way to tell which one is wrong without taking a company&rsquo;s word for it.</p>
+    <p>This page publishes the check instead. Two indexers are asked what an address holds, the chain is asked to settle every disagreement it can, and the result is signed by whoever ran it and published with every checked token. The aim is a record of who holds what that is kept by more than one party, so that a collector never has to trust any one of us for it. Feral File runs an indexer and sells the FF1 Art Computer; the checks here include our own indexer&rsquo;s errors, and the shared record is an aim, not yet a fact.</p>
+  </section>
 
   <section id="what">
     <h2>What an entry is</h2>
-    <p>A published work is a chain of references, and the chain starts with who holds the token. Every reader of a blockchain, ours included, can be wrong about that: an index lags, drops a token standard, or keeps listing a token after it moved. A witness entry records, for one address at one block, what each public reader returned, where the readers differ, and what the chain itself says about a random sample from each list and about every token the readers disagree on. The chain decides. A reader is right or wrong per token, never in general.</p>
+    <p>A published work is a chain of references, and the chain starts with who holds the token. Every reader of a blockchain (an indexer: a service that reads the chain and lists what an address holds) can be wrong about that: an index lags, drops a token standard, or keeps listing a token after it moved. A witness entry records, for one address at one block, what each reader returned, where the readers differ, and what the chain itself says about a random sample from each list and about every token only one reader lists. Each answer is one of three: held, not held, or unanswerable. A reader is right or wrong per token, never in general.</p>
     <p>Each entry is a JSON file signed by whoever ran the check, in the same signature envelope the <a href="https://github.com/display-protocol/dp1">DP-1</a> playlist format uses. The signature covers the content, so an entry stays valid wherever it is served. Anyone can produce one, from their own readers, their own node, and their own key.</p>
+    <p>What an entry does not establish: a token no reader lists is never asked of the chain, so two readers can agree and both be wrong. A token held is a token id, not an artwork or a playable work; unviewable and moderated tokens are counted, so totals differ from what an app shows. A check is a snapshot at one block, and the reader lists were fetched shortly before it, so a transfer in that window appears as a disagreement. One signature is one witness, not a corroboration. A later check does not show that an earlier app problem was fixed.</p>
   </section>
 
   <section id="entries">
     <h2>Entries</h2>
 {(
-    '<p class="legend">Lists: how many tokens the reader says the address holds. Sample held: of a random 120 from that list, how many the chain says are held. Only here &middot; held: tokens this reader lists and the other omits, and how many of those the chain says are held.</p>'
+    '<p class="legend">Lists: how many tokens of that standard the reader says the address holds. Sample: of a random 120 from the reader&rsquo;s whole list, how many of this standard the chain says are held, not held, and could not be asked. Only here: tokens this reader lists and the other omits, with the chain&rsquo;s answer the same three ways. The sentences under each table say the same in words, counting distinct tokens.</p>'
     + "".join(blocks)
-) if entries else '    <p>No entries are published yet.</p>'}
+) if entries else '    <p>No entries are published at the moment.</p>'}
   </section>
 
   <section id="method">
     <h2>How a check runs</h2>
-    <p>Ask each reader for the address&rsquo;s holdings. Pin a block. Compare the two lists per token standard. Then ask the chain, at that block, about a seeded random sample from each list and about every token only one reader lists. On Ethereum the question is <code>ownerOf(tokenId)</code> for ERC-721 and <code>balanceOf(address, tokenId)</code> for ERC-1155, by <code>eth_call</code>; on Tezos it is the contract&rsquo;s own <code>%ledger</code> big map, read from a node by key hash. A token the reader lists that the chain says is held elsewhere, or that no longer exists, is a reader error or lag. A token the chain says is held that a reader omits is an under-count. A contract that cannot be asked this way is recorded as unanswerable and counts for neither side. Every not-held verdict is re-read on a second node.</p>
-    <p>Readers today: Ethereum, the Feral File indexer and Blockscout; Tezos, TzKT and objkt. The readers are the ones we and the apps around us depend on. None of them is treated as the truth.</p>
+    <p>Ask each reader for the address&rsquo;s holdings. Pin a block. Compare the lists per token standard. Then ask the chain, at that block, about a seeded random sample from each list and about every token only one reader lists. On Ethereum the question is <code>ownerOf(tokenId)</code> for ERC-721 and <code>balanceOf(address, tokenId)</code> for ERC-1155, by <code>eth_call</code>; on Tezos it is the contract&rsquo;s own <code>%ledger</code> big map, read from a node by key hash. A listed token the chain says is not held at that block is recorded as not held; the entry alone does not say whether the cause was the index, a standard it does not cover, or a transfer between the fetch and the block. A token the chain says is held that a reader omits is an omission. A contract that cannot be asked this way is recorded as unanswerable and counts for neither side. Every not-held result is re-read on a second node.</p>
+    <p>Readers checked so far: on Ethereum, the Feral File indexer and Blockscout; on Tezos, TzKT and objkt. Our own indexer also depends on other indexes that are not yet readers here. None of the readers is treated as the truth, ours least of all.</p>
   </section>
 
   <section id="verify">
@@ -185,7 +266,7 @@ curl -s {esc(SITE_URL)}/data/witness/&lt;entry&gt;.json | node tools/witness/ver
   <section id="append">
     <h2>Append an entry</h2>
     <p>Run the same check from your own vantage point: your readers, your node, your key. Keep the schema and name your reader and its operator. Publish the file wherever you publish things, or open a pull request that adds it under <code>data/witness/</code> in <a href="{esc(REPO_URL)}">feral-file/status</a>; this page lists every entry it finds there. The method, the schema, and the signing and verifying scripts are in <a href="{esc(TOOL_URL)}">tools/witness</a>.</p>
-    <p>Every entry here so far was written by Feral File. The point of the shape is that the next one need not be.</p>
+{"    <p>Every entry here so far was written by Feral File. The point of the shape is that the next one need not be.</p>" if entries else "    <p>The first entries will be Feral File&rsquo;s. The point of the shape is that the next ones need not be.</p>"}
   </section>
 
   <section id="data">
@@ -209,20 +290,40 @@ curl -s {esc(SITE_URL)}/data/witness/&lt;entry&gt;.json | node tools/witness/ver
 
 
 def render_md(entries, generated_at):
-    out = ["# Witness", "", "Signed observations of who holds what, checked against the chain. One address, one block, two readers, every disagreement settled by the chain itself, signed by whoever looked.", ""]
+    out = [
+        "# Witness",
+        "",
+        "Signed checks of what public indexers say an address holds, against the chain itself at one block. Every disagreement the chain can answer is answered; the rest stays marked unanswered. Signed by whoever looked.",
+        "",
+        "Every app that shows a collection trusts an indexer to say what an address holds. Indexers disagree, and each company corrects its own in private. These entries publish the check instead: two indexers asked, the chain asked to settle every disagreement it can, the result signed by whoever ran it, with every checked token. The aim is a record of who holds what kept by more than one party. Feral File runs an indexer and sells the FF1 Art Computer; the checks include our own indexer's errors, and the shared record is an aim, not yet a fact.",
+        "",
+        "Each chain answer is one of three: held, not held, unanswerable (a contract that cannot be asked this way; counts for neither reader). A token no reader lists is never asked, so two readers can agree and both be wrong. A check is a snapshot at one block; a listed token not held at that block is a discrepancy whose cause the entry alone does not give.",
+        "",
+    ]
     for stem, es in group_by_name(entries).items():
         out.append(f"## {stem}")
         out.append("")
         for e in es:
             out.append(f"### {e['date']} — {e['chain_name']} · {e['address']} at block {e['block']:,}")
             out.append("")
-            out.append("| Reader | Lists | Random sample: chain says held | Lists, other reader omits | …of which chain says held |")
-            out.append("| :-- | --: | --: | --: | --: |")
+            out.append("| Reader | Standard | Lists | Sample: held / not held / unanswerable | Only here: held / not held / unanswerable |")
+            out.append("| :-- | :-- | --: | --: | --: |")
             for r in e["readers"]:
-                out.append(f"| {r['name']} | {r['listed']:,} | {r['sample_held']:,} / {r['sample_checked']:,} | {r['only_listed_here']:,} | {r['only_listed_here_chain_held']:,} |")
+                for ps in r["per_standard"]:
+                    if ps["listed"] == 0 and ps["only_here"]["checked"] == 0:
+                        continue
+                    out.append(f"| {r['name']} | {STANDARD_NAMES.get(ps['standard'], ps['standard'])} | {ps['listed']:,} | {cell3(ps['sample'])} | {cell3(ps['only_here'])} |")
             out.append("")
+            for x in plain_sentences(e):
+                out.append(f"- {x}")
+            if plain_sentences(e):
+                out.append("")
             signers = ", ".join(sg["kid"] for sg in e["signers"]) or "unsigned"
-            out.append(f"Signed by {signers}. Entry: {SITE_URL}/{e['file']}")
+            rc = e["rpc_recheck"]
+            rc_line = f" A second node confirmed all {rc['rechecked']:,} not-held results ({rc['distinct_tokens']:,} distinct tokens)." if rc["rechecked"] and rc["disagreements"] == 0 else ""
+            unans = e["unanswerable_distinct"]
+            unans_line = f" {unans} distinct token{'s' if unans != 1 else ''} could not be asked this way and count for neither reader." if unans else ""
+            out.append(f"Signed by {signers}.{rc_line}{unans_line} Entry: {SITE_URL}/{e['file']}")
             out.append("")
     out += [f"Method, schema, verify and append: {TOOL_URL}", "", f"Generated {generated_at}", ""]
     return "\n".join(out)
@@ -237,11 +338,13 @@ def render_llms(entries):
     )
     return f"""# Witness
 
-> Signed observations of who holds what, checked against the chain. Each entry
-> is one address at one block: what each public reader lists, where the readers
-> differ, and the chain's own answer on a random sample and on every
-> disagreement. Signed by whoever ran it (DP-1 signature envelope, Ed25519,
-> did:key). Anyone can append one. Served with open CORS.
+> Signed checks of what public indexers say an address holds, against the chain
+> itself at one block: what each reader lists, where the readers differ, and the
+> chain's own answer (held / not held / unanswerable) on a random sample and on
+> every disagreement it can answer. Signed by whoever ran it (DP-1 signature
+> envelope, Ed25519, did:key). Feral File runs one of the readers; the aim is a
+> record kept by more than one party, not yet a fact. Anyone can append one.
+> Served with open CORS.
 
 ## Read this first
 

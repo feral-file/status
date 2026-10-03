@@ -155,6 +155,9 @@ footer {
 .entry-foot { margin-top: 0.9rem; max-width: 42rem; }
 .entry-foot + .entry-foot { margin-top: 0.25rem; }
 .legend { margin-top: 0.75rem; max-width: 42rem; }
+.entry .plain { list-style: none; margin-top: 0.9rem; max-width: 42rem; font-size: 16px; line-height: 1.45; }
+.entry .plain li { padding: 0.3rem 0; border-bottom: 1px solid var(--hairline); }
+.entry .plain li:first-child { border-top: 1px solid var(--hairline); }
 
 @media (max-width: 40rem) {
   body { font-size: 18px; padding-top: 1.75rem; }

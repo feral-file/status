@@ -61,10 +61,10 @@ same identity appears on both.
 | Field | Meaning |
 | :-- | :-- |
 | `schema`, `kind` | `feral-file/witness-holdings/0.1`, `holdings`. |
-| `subject` | `chain` (CAIP-2: `eip155:1`, `tezos:NetXdQprcVkpaWU`), `address`, `name` with `name_system` (`ens` or `tezos-domains`) and `name_source`; Ethereum entries also carry `ens` for the first entry's readers. |
+| `subject` | `chain` (CAIP-2: `eip155:1`, `tezos:NetXdQprcVkpaWU`), `address`, `name` with `name_system` (`ens` or `tezos-domains`) and `name_source` (which record the name came from: a reverse record, or a forward record verified against the address). Ethereum entries also carry `ens` and `ens_source` with the same values; entries made by versions of this tool before 2026-10-02 18:00 UTC carry only those two. |
 | `observed_at` | When the entry was assembled (UTC). |
 | `chain_state` | `block` (number or level), `block_hash`, `block_timestamp`, primary `rpc`. Every chain verdict is at this block. |
-| `readers[]` | One per reader: `name`, `operator`, `endpoint`, `query`, `fetched_at`, `count` (`total`, `erc721`, `erc1155`), `list_sha256` (over the sorted `contract:token_id:standard` lines), `notes`. |
+| `readers[]` | One per reader: `name`, `operator`, `endpoint`, `query`, `fetched_at`, `count` (`total` plus one key per standard: `erc721` and `erc1155` on Ethereum, `fa2` and `fa1.2` on Tezos), `list_sha256` (over the sorted `contract:token_id:standard` lines), `notes`. |
 | `comparison.pairs[]` | Per standard: `both`, `only_<reader>` counts. |
 | `chain_check.samples[]` | Per reader: `seed`, `checked`, `held`, `not_held`, `of_which_reverted`, `unanswerable` (the contract faults on the call, e.g. CryptoPunks has no `ownerOf`), `no_reply` (the RPC gave no chain answer after retries), and `tokens[]` with the chain's answer per token. |
 | `chain_check.differences[]` | Per standard and direction (`listed_by`, `missing_from`): the same tally and `tokens[]`, covering every disagreement, not a sample. |
@@ -73,11 +73,27 @@ same identity appears on both.
 | `produced_by` | Tool path, repo, this document. |
 | `signatures[]` | DP-1 v1.1.0 envelopes: `alg` (`ed25519`), `kid` (did:key of the signer), `ts`, `payload_hash`, `role` (`witness`), `sig` (base64url). Appending a signature does not change the payload hash. |
 
-Reading an entry: a token the reader lists that the chain says is held
-elsewhere (or whose `ownerOf` reverts) is a reader error or lag; a token the
-chain says the address holds that a reader omits is an under-count. A
-`held: false` row in a sample is the alert; `differences[]` says which reader
-is right about each disputed token.
+Reading an entry: every chain answer is one of three, `held: true`, `held:
+false`, or `held: null` (unanswerable or no reply; see `chain`). A token the
+reader lists that the chain says is not held at the block is a discrepancy;
+the entry alone does not say whether the cause was the index, a standard the
+check does not cover, or a transfer between the reader fetch and the block.
+A token the chain says the address holds that a reader omits is an omission.
+A `held: false` row in a sample is the alert; `differences[]` says which
+reader the chain agrees with about each disputed token. Counting: the same
+token can appear in a reader's sample and in `differences[]`, and a token
+two readers classify under different standards appears once per standard;
+count distinct `contract:token_id` pairs before saying "tokens". A token no
+reader lists is never asked, so two readers can agree and both be wrong.
+
+Reproducing a published entry is a different act from making a new one.
+Running the tool again fetches the readers now and pins a new block. To
+check a published entry: verify its signature, recompute its tallies from
+its own `tokens[]` rows, and compare `lists.sha256` with the lists file. To
+repeat its chain reads, call the same contracts at `chain_state.block`
+(Ethereum: an archive-capable RPC; Tezos: a node that still serves that
+block). Adding a reader means adding a function that returns the list shape
+in `witness.py` and naming its operator; there is no plugin interface yet.
 
 ## Signing and verifying
 
