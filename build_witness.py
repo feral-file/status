@@ -90,43 +90,49 @@ def group_by_name(entries):
     return groups
 
 
+def short_kid(kid):
+    return kid if len(kid) <= 28 else kid[:16] + "\u2026" + kid[-8:]
+
+
 def entry_html(e):
     rows = "".join(
-        f"<tr><td>{esc(r['name'])}<br><span class=\"dated\">{esc(r['operator'] or '')}</span></td>"
+        f"<tr><td>{esc(r['name'])}<span class=\"operator\">{esc(r['operator'] or '')}</span></td>"
         f"<td class=\"num\">{n(r['listed'])}</td>"
-        f"<td class=\"num\">{n(r['sample_held'])} / {n(r['sample_checked'])}</td>"
-        f"<td class=\"num\">{n(r['only_listed_here'])}</td>"
-        f"<td class=\"num\">{n(r['only_listed_here_chain_held'])}</td></tr>"
+        f"<td class=\"num\">{n(r['sample_held'])} of {n(r['sample_checked'])}</td>"
+        f"<td class=\"num\">{n(r['only_listed_here'])} &middot; {n(r['only_listed_here_chain_held'])}</td></tr>"
         for r in e["readers"]
     )
-    signers = ", ".join(f"<code>{esc(sg['kid'])}</code>" for sg in e["signers"]) or "unsigned"
+    signers = ", ".join(f'<abbr title="{esc(sg["kid"])}">{esc(short_kid(sg["kid"]))}</abbr>' for sg in e["signers"]) or "unsigned"
     rc = e["rpc_recheck"]
     if rc["rechecked"] == 0:
         rc_line = ""
     elif rc["disagreements"] == 0 and rc["confirmed"] == rc["rechecked"]:
         rc_line = f" A second node confirmed all {n(rc['rechecked'])} not-held verdicts."
     else:
-        rc_line = f" A second node re-read {n(rc['rechecked'])} not-held verdicts: {n(rc['confirmed'])} confirmed, {n(rc['disagreements'])} differed (listed in the entry)."
-    lists = f' &middot; <a href="{esc(e["lists_file"])}">both readers&rsquo; full lists</a>' if e.get("lists_file") else ""
+        rc_line = f" A second node re-read {n(rc['rechecked'])} not-held verdicts: {n(rc['confirmed'])} confirmed, {n(rc['disagreements'])} differed (in the entry)."
     unans = sum(r["sample_unanswerable"] + r["only_listed_here_unanswerable"] for r in e["readers"])
-    unans_line = f" {n(unans)} token{'s' if unans != 1 else ''} could not be asked this way (the contract has no standard ledger call) and count for neither reader." if unans else ""
+    unans_line = f" {n(unans)} token{'s' if unans != 1 else ''} could not be asked this way and count{'s' if unans == 1 else ''} for neither reader." if unans else ""
+    lists = f' &middot; <a href="{esc(e["lists_file"])}">Both readers&rsquo; full lists</a>' if e.get("lists_file") else ""
     return f"""
-    <h3><span class="dated">{esc(e["date"])}</span> {esc(e["chain_name"])} &middot; <code>{esc(e["address"])}</code> at block {n(e["block"])}</h3>
-    <table>
-      <thead><tr><th>Reader</th><th class="num">Lists</th><th class="num">Random sample: chain says held</th><th class="num">Lists, other reader omits</th><th class="num">&hellip;of which chain says held</th></tr></thead>
-      <tbody>{rows}</tbody>
-    </table>
-    <p class="dated">Signed by {signers}. <a href="{esc(e["file"])}">Entry</a> (JSON, every checked token with the chain&rsquo;s answer){lists}.{rc_line}{unans_line}</p>"""
+    <article class="entry">
+      <p class="entry-meta">{esc(e["date"])} &middot; {esc(e["chain_name"])} &middot; block {n(e["block"])}</p>
+      <p class="entry-address"><a href="{esc(e["file"])}">{esc(e["address"])}</a></p>
+      <table>
+        <thead><tr><th>Reader</th><th class="num">Lists</th><th class="num">Sample held</th><th class="num">Only here &middot; held</th></tr></thead>
+        <tbody>{rows}</tbody>
+      </table>
+      <p class="entry-foot">Signed by {signers}.{rc_line}{unans_line}</p>
+      <p class="entry-foot"><a href="{esc(e["file"])}">Entry</a> (JSON, every checked token with the chain&rsquo;s answer){lists}</p>
+    </article>"""
 
 
 def render(entries, generated_at):
     groups = group_by_name(entries)
     blocks = []
     for stem, es in groups.items():
-        title = esc(stem)
         names = sorted({e["name"] for e in es if e["name"]})
-        sub = f' <span class="dated">({esc(", ".join(names))})</span>' if names and names != [stem] else ""
-        blocks.append(f'\n    <h2 id="{esc(stem)}">{title}{sub}</h2>' + "".join(entry_html(e) for e in es))
+        sub = f'\n      <p class="names">{esc(" &middot; ".join(names))}</p>'.replace("&amp;middot;", "&middot;") if names and names != [stem] else ""
+        blocks.append(f'\n    <section class="person" id="{esc(stem)}">\n      <h2>{esc(stem)}</h2>{sub}' + "".join(entry_html(e) for e in es) + "\n    </section>")
     count = len(entries)
     people = len(groups)
     chains = sorted({e["chain_name"] for e in entries})
@@ -140,14 +146,7 @@ def render(entries, generated_at):
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono&display=swap">
 <link rel="stylesheet" href="static/style.css">
-<style>
-  /* Nothing on this page may be wider than the screen: long commands, keys and
-     addresses wrap, and tables scroll inside their own box. */
-  html, body {{ max-width: 100%; overflow-x: hidden; }}
-  pre {{ white-space: pre-wrap; overflow-wrap: anywhere; max-width: 42rem; margin-bottom: 1rem; }}
-  code, h3 {{ overflow-wrap: anywhere; }}
-  table {{ display: block; max-width: 100%; overflow-x: auto; }}
-</style>
+<link rel="stylesheet" href="static/witness.css">
 </head>
 <body>
 <main>
@@ -163,6 +162,8 @@ def render(entries, generated_at):
   </section>
 
   <section id="entries">
+    <h2>Entries</h2>
+    <p class="legend">Lists: how many tokens the reader says the address holds. Sample held: of a random 120 from that list, how many the chain says are held. Only here &middot; held: tokens this reader lists and the other omits, and how many of those the chain says are held.</p>
 {"".join(blocks)}
   </section>
 

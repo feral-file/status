@@ -1,0 +1,69 @@
+/* witness.feralfile.com — type system on top of the shared tokens in style.css.
+   Three roles, no more: prose (PP Mori 20/1.45, 18 on phones), headings
+   (PP Mori, one weight), data and meta (Space Mono 14/1.6). Everything that
+   is an identifier (address, key, command) is mono and may break anywhere. */
+
+body { line-height: 1.45; padding: 2.5rem 1.25rem 4rem; }
+html, body { max-width: 100%; overflow-x: hidden; }
+body { max-width: 60rem; }
+
+h1 { margin-bottom: 1.25rem; }
+.lede { line-height: 1.45; }
+section { margin-top: 4.5rem; }
+section p { max-width: 42rem; margin-bottom: 1.1rem; }
+section p:last-child { margin-bottom: 0; }
+code { font-family: "Space Mono", monospace; font-size: 0.85em; overflow-wrap: anywhere; }
+a { text-underline-offset: 0.15em; }
+
+/* People and entries */
+.person { margin-top: 3.5rem; }
+.person h2 { margin-bottom: 0.25rem; }
+.person .names { font-family: "Space Mono", monospace; font-size: 14px; line-height: 1.6; color: var(--ink-secondary); margin-bottom: 0; }
+.entry { margin-top: 2.5rem; max-width: 42rem; }
+.entry-meta, .entry-address, .entry-foot, .legend {
+  font-family: "Space Mono", monospace; font-size: 14px; line-height: 1.6; color: var(--ink-secondary);
+}
+.entry-meta { color: var(--ink); }
+.entry-address { overflow-wrap: anywhere; }
+.entry-address a { text-decoration: none; }
+.entry-address a:hover { text-decoration: underline; }
+
+.entry table { margin-top: 1rem; font-size: 16px; line-height: 1.4; width: 100%; display: table; }
+.entry th, .entry td { padding: 0.65rem 0 0.65rem 1rem; vertical-align: top; }
+.entry th:first-child, .entry td:first-child { padding-left: 0; }
+.entry thead th { line-height: 1.35; vertical-align: bottom; padding-bottom: 0.5rem; white-space: nowrap; }
+.entry td.num, .entry th.num { font-size: 14px; white-space: nowrap; }
+.entry td.num { line-height: 1.6; padding-top: 0.6rem; }
+.operator { display: block; font-family: "Space Mono", monospace; font-size: 13px; line-height: 1.5; color: var(--ink-secondary); margin-top: 0.1rem; }
+.entry-foot { margin-top: 0.9rem; max-width: 42rem; }
+.entry-foot + .entry-foot { margin-top: 0.25rem; }
+.legend { margin-top: 0.75rem; max-width: 42rem; }
+
+/* Commands */
+pre {
+  font-family: "Space Mono", monospace; font-size: 14px; line-height: 1.6;
+  white-space: pre-wrap; overflow-wrap: anywhere;
+  max-width: 42rem; padding: 0.9rem 1rem; border: 1px solid var(--hairline);
+  margin: 1.25rem 0;
+}
+pre code { font-size: inherit; }
+
+/* Data */
+#data ul { list-style: none; max-width: 42rem; }
+#data li { font-size: 14px; line-height: 1.6; padding: 0.6rem 0; }
+#data li:first-child { border-top: 1px solid var(--ink); }
+#data p { margin-top: 1rem; }
+
+footer { line-height: 1.6; }
+
+@media (max-width: 40rem) {
+  body { font-size: 18px; padding-top: 1.75rem; }
+  h1 { font-size: 36px; }
+  h2 { font-size: 24px; }
+  section { margin-top: 3.5rem; }
+  .entry table { font-size: 15px; }
+  .entry th, .entry td { padding-left: 0.75rem; }
+  .entry thead th { white-space: normal; }
+}
+
+abbr[title] { text-decoration: none; }
