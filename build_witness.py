@@ -152,7 +152,7 @@ def render(entries, generated_at):
   <header>
     <p class="brand"><a href="https://feralfile.com">Feral File</a></p>
     <h1>Witness</h1>
-    <p class="lede">Signed observations of who holds what, checked against the chain. One address, one block, two readers, every disagreement settled by the chain itself, signed by whoever looked. {n(count)} entries, {n(people)} people, {esc(" and ".join(chains))}.</p>
+    <p class="lede">Signed observations of who holds what, checked against the chain. One address, one block, two readers, every disagreement settled by the chain itself, signed by whoever looked. {(f"{n(count)} entries, {n(people)} people, " + esc(" and ".join(chains)) + ".") if entries else ""}</p>
   </header>
 
   <section id="what">
@@ -163,8 +163,10 @@ def render(entries, generated_at):
 
   <section id="entries">
     <h2>Entries</h2>
-    <p class="legend">Lists: how many tokens the reader says the address holds. Sample held: of a random 120 from that list, how many the chain says are held. Only here &middot; held: tokens this reader lists and the other omits, and how many of those the chain says are held.</p>
-{"".join(blocks)}
+{(
+    '<p class="legend">Lists: how many tokens the reader says the address holds. Sample held: of a random 120 from that list, how many the chain says are held. Only here &middot; held: tokens this reader lists and the other omits, and how many of those the chain says are held.</p>'
+    + "".join(blocks)
+) if entries else '    <p>No entries are published yet.</p>'}
   </section>
 
   <section id="method">
