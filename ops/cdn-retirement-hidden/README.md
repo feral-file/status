@@ -76,6 +76,25 @@ Signing, proven by simulation on 2026-10-05 (nothing was signed or sent):
 Dry run of the whole regen with placeholder CIDs: 1,420 + 4,603 docs written,
 0 failed, every one byte-reversible to its on-chain original.
 
+## Status 2026-10-05 — steps 0–3 DONE; next is signing (steps 4 and 5)
+
+- **Step 1** 13 units added and pinned on prod-02 (`step1/dir_cids.csv`, 13/13
+  verified); afterwards all 30 files were read back through
+  ipfs.feralfile.com and their full sha256 equals the CDN fetch (548,091,051
+  bytes). Scattered Limbs' thumbnail came out as `QmNNsYCr…` — the CID its 220
+  already-`ipfs://` sibling tokens use.
+- **Step 2** 1,420 V3 docs + 4,603 Tezos docs regenerated, 0 failed.
+- **Step 3** `verify-docs.py`: 6,023 docs byte-reversible to their on-chain
+  originals, 13 media targets served (`step3/verify_docs.csv`). Docs pinned
+  (six staging roots, `step3/staging_roots.csv`); every one of the 6,023 new
+  CIDs is served by the gateway byte-identical to the local file; no duplicate
+  new CID inside a contract. Update lists: `step3/updates_<contract>.csv`.
+- **Preflights (read-only, nothing signed):** Tezos 601/601 and 4,002/4,002
+  TODO, 0 blocked, 100-token batch simulation ✓ on both; ETH MONOPOLY SET 1/1
+  TODO.
+- Not done by a person yet: opening the three software works in a browser
+  (step 3a's last lines). Do it before step 4.
+
 ## Runbook
 
 Everything below runs from the repo root. Steps 1b, 3b, 4, 5, 6 need
