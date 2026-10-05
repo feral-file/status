@@ -537,6 +537,11 @@ def registry_paragraph(registry):
 def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     registry_html = registry_paragraph(registry)
     media_probe = census["date"] if census else bucket3["series_probe"]["date"]
+    probe_age_days = (datetime.fromisoformat(str(generated_at)[:10]).date() - datetime.fromisoformat(media_probe).date()).days
+    probe_age = (
+        f" That measurement is {probe_age_days} days old; anything that changed since is not reflected here."
+        if probe_age_days > 14 else ""
+    )
     tile5 = ""
     if census and census.get("schema") == 2:
         b = census["buckets"]
@@ -800,7 +805,7 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
   depends on &mdash; measured from the outside, file by file, the way a
   collector&rsquo;s wallet or browser fetches art. Today these checks cover
   the artwork files, last probed {esc(media_probe)}; the metadata link and
-  rendering are not yet measured, and the page says so wherever it matters. The raw data lives beside this
+  rendering are not yet measured, and the page says so wherever it matters.{probe_age} The raw data lives beside this
   page, in <a href="data/status.json">JSON</a> and <a href="#data">CSV</a>.</p>
 </header>
 
@@ -874,11 +879,14 @@ def render(bucket3, census, exhibitions, updates, generated_at, registry=None):
     What remains is the migration itself, which only a collector can
     trigger; until then a work&rsquo;s published references resolve only
     through our CDN, and this page counts it not yet migrated rather than
-    permanently ours. The standing depends-on-us work &mdash; the
-    Ethereum/Tezos CDN class above &mdash; has its own retirement plan
-    (ops/cdn-retirement-phase2.md), target 2026-11-01; any exception will
-    name the work, the reason, a responsible person at Feral File, and a
-    review date.</p>{pin_para}
+    permanently ours. The Ethereum/Tezos CDN class above was repointed to
+    content-addressed copies and reached zero at the 2026-09-09 census
+    (ops/cdn-retirement-phase2/STATUS.md). What remains is the link layer,
+    which this page does not measure yet: 14,591 Ethereum tokens whose
+    tokenURI still routes through a Feral File gateway host, and 199 media
+    rows whose on-chain URL names one (ops/cdn-retirement-phase2.md, phase 3,
+    no date set). Any exception will name the work, the reason, a responsible
+    person at Feral File, and a review date.</p>{pin_para}
     <table>
       <thead>
         <tr><th>Exhibition</th><th class="num">Works</th><th class="num">Not yet migrated</th><th class="num">On Ethereum</th><th class="num">On Tezos</th></tr>
@@ -993,8 +1001,9 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
         b3 = (
             f"{b.get('dependent', 0) + b.get('ff_only', 0):,} works on Ethereum and Tezos: "
             f"{b.get('dependent', 0):,} whose media lives only on our CDN (as of "
-            f"{census['date']}; the repointing plan is ops/cdn-retirement-phase2.md in "
-            f"the repo, target 2026-11-01) and {b.get('ff_only', 0):,} whose media is "
+            f"{census['date']}; repointing finished at the 2026-09-09 census, "
+            f"ops/cdn-retirement-phase2/STATUS.md; the metadata link layer is phase 3, "
+            f"not yet measured) and {b.get('ff_only', 0):,} whose media is "
             "content-addressed but was served only by our own node — pinned by us, held "
             f"by no one else yet. A further {b.get('third_party', 0):,} works depend on a "
             "third-party platform instead of us — different dependency, different owner."
@@ -1024,9 +1033,9 @@ def build_markdown(bucket3, census, exhibitions, updates, generated_at, registry
         b2 = f"{b.get('gateway_gap', 0):,} works (at least one content-addressed media file failed the {census['date']} HEAD probe on ipfs.io; listed per file in the census data)"
         b3 = (
             f"{b.get('dependent', 0):,} works on Ethereum and Tezos whose "
-            f"media lives only on our CDN (as of {census['date']}); the "
-            "repointing plan is ops/cdn-retirement-phase2.md in the repo, "
-            "target 2026-11-01. A further "
+            f"media lives only on our CDN (as of {census['date']}); repointing "
+            "finished at the 2026-09-09 census, ops/cdn-retirement-phase2/STATUS.md; "
+            "the metadata link layer is phase 3, not yet measured. A further "
             f"{b.get('third_party', 0):,} works depend on a third-party "
             "platform instead of us — different dependency, different owner."
         )
@@ -1365,14 +1374,14 @@ def main():
                     "ipfs_only_our_node": census["buckets"].get("ff_only", 0),
                     "as_of": census["date"],
                     "host": "cdn.feralfileassets.com",
-                    "remediation": "media repointing to content-addressed copies; plan: ops/cdn-retirement-phase2.md (repo), target 2026-11-01; ipfs_only_our_node works need a second pinner",
+                    "remediation": "media repointing to content-addressed copies finished at the 2026-09-09 census (ops/cdn-retirement-phase2/STATUS.md); remaining: phase 3, the metadata link layer (tokenURI routed through a Feral File gateway host on V2/V3 contracts; media URLs naming one), not yet measured, no date set; ipfs_only_our_node works need a second pinner",
                 }
                 if census and census.get("schema") == 2
                 else {
                     "works": census["buckets"].get("dependent", 0),
                     "as_of": census["date"],
                     "host": "cdn.feralfileassets.com",
-                    "remediation": "media repointing to content-addressed copies; plan: ops/cdn-retirement-phase2.md (repo), target 2026-11-01",
+                    "remediation": "media repointing to content-addressed copies finished at the 2026-09-09 census (ops/cdn-retirement-phase2/STATUS.md); remaining: phase 3, the metadata link layer, not yet measured, no date set",
                 }
                 if census
                 else {"status": "census_in_progress", "started": "2026-08-03"}
