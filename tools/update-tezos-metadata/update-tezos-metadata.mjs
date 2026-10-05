@@ -39,7 +39,6 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const configPath = process.env.UPDATE_CONFIG ?? path.join(scriptDir, 'config.json');
-const progressFile = path.join(scriptDir, 'progress.json');
 
 function fail(msg) { console.error('✗', msg); process.exit(1); }
 function ok(msg)   { console.error('✓', msg); }
@@ -56,13 +55,30 @@ if (!/^KT1[1-9A-HJ-NP-Za-km-z]{33}$/.test(CONTRACT ?? '')) fail('config: contrac
 if (!/^tz[123][1-9A-HJ-NP-Za-km-z]{33}$/.test(SENDER ?? '')) fail('config: senderAddress must be the trustee tz address');
 if (!SENDER_ACCOUNT || SENDER_ACCOUNT.startsWith('FILL')) fail('config: senderAccount must be the vault account identifier');
 if (!(BATCH >= 1 && BATCH <= 100)) fail('config: batchSize must be 1..100');
+// workDir: where progress.json lives. Defaults to this directory; give each
+// contract its own (relative paths resolve against the config file) so runs
+// never share a progress file.
+const workDir = cfg.workDir ? path.resolve(path.dirname(configPath), cfg.workDir) : scriptDir;
+fs.mkdirSync(workDir, { recursive: true });
+const progressFile = path.join(workDir, 'progress.json');
+// expectArtifactMime: optional — when set, formats[0].mimeType of every new
+// doc must equal it (the 3435 HLS fix used "video/mp4").
+const EXPECT_MIME = cfg.expectArtifactMime ?? null;
+const CONCURRENCY = Number(cfg.readConcurrency ?? 8);
 
-// updates csv: token_id,old_metadata_cid,new_metadata_cid  (feralverse-metadata-fix/pin.sh output)
-const updatesPath = path.resolve(scriptDir, cfg.updates ?? 'updates.csv');
+// updates csv, columns located by header: token_id,old_metadata_cid,new_metadata_cid
+// (feralverse-metadata-fix/pin.sh output; metadata-regen/pin-docs.py output,
+// which carries an extra leading `edition` column)
+const updatesPath = path.resolve(path.dirname(configPath), cfg.updates ?? 'updates.csv');
 if (!fs.existsSync(updatesPath)) fail(`updates csv not found: ${updatesPath}`);
 const CID_RE = /^(Qm[1-9A-HJ-NP-Za-km-z]{44}|bafy[a-z2-7]{55,})$/;
-const UPDATES = fs.readFileSync(updatesPath, 'utf8').trim().split('\n').slice(1).filter(Boolean).map((line) => {
-  const [tokenId, oldCid, newCid] = line.split(',').map((s) => s.trim());
+const updateLines = fs.readFileSync(updatesPath, 'utf8').trim().split('\n').filter(Boolean);
+const header = updateLines[0].split(',').map((s) => s.trim());
+const COL = Object.fromEntries(['token_id', 'old_metadata_cid', 'new_metadata_cid'].map((n) => [n, header.indexOf(n)]));
+for (const [n, i] of Object.entries(COL)) if (i < 0) fail(`updates csv: no "${n}" column in header (${header.join(',')})`);
+const UPDATES = updateLines.slice(1).map((line) => {
+  const cells = line.split(',').map((s) => s.trim());
+  const [tokenId, oldCid, newCid] = [cells[COL.token_id], cells[COL.old_metadata_cid], cells[COL.new_metadata_cid]];
   if (!/^\d+$/.test(tokenId)) fail(`bad token_id in updates csv: ${line}`);
   if (!CID_RE.test(oldCid) || !CID_RE.test(newCid)) fail(`bad cid in updates csv: ${line}`);
   return { tokenId, oldCid, newCid, oldUri: `ipfs://${oldCid}`, newUri: `ipfs://${newCid}` };
@@ -107,12 +123,19 @@ async function gatewayCheck(u) {
   try { res = await fetch(url, { signal: AbortSignal.timeout(60_000) }); }
   catch (e) { return { okay: false, why: `fetch failed: ${e.message}` }; }
   if (!res.ok) return { okay: false, why: `HTTP ${res.status}` };
+  const text = await res.text();
   let m;
-  try { m = await res.json(); } catch { return { okay: false, why: 'not JSON' }; }
+  try { m = JSON.parse(text); } catch { return { okay: false, why: 'not JSON' }; }
   if (typeof m.artifactUri !== 'string' || !m.artifactUri.startsWith('ipfs://')) return { okay: false, why: `artifactUri is ${JSON.stringify(m.artifactUri)}` };
   const f0 = Array.isArray(m.formats) ? m.formats[0] : null;
-  if (!f0 || f0.uri !== m.artifactUri || f0.mimeType !== 'video/mp4') return { okay: false, why: `formats[0] is ${JSON.stringify(f0)}` };
-  return { okay: true, why: `artifactUri=${m.artifactUri.slice(7, 19)}… ${f0.mimeType}` };
+  if (!f0 || f0.uri !== m.artifactUri) return { okay: false, why: `formats[0] is not the artifact: ${JSON.stringify(f0)}` };
+  if (EXPECT_MIME && f0.mimeType !== EXPECT_MIME) return { okay: false, why: `formats[0].mimeType ${f0.mimeType} ≠ ${EXPECT_MIME}` };
+  // No media field may still be an http(s) URL — the point of the update.
+  const uris = [m.displayUri, m.thumbnailUri, m.image, ...(Array.isArray(m.formats) ? m.formats.map((f) => f?.uri) : [])].filter((x) => typeof x === 'string');
+  const notIpfs = uris.filter((x) => !x.startsWith('ipfs://'));
+  if (notIpfs.length) return { okay: false, why: `media not on ipfs://: ${notIpfs[0].slice(0, 80)}` };
+  if (text.includes('feralfileassets.com')) return { okay: false, why: 'CDN host still present in the doc' };
+  return { okay: true, why: `artifactUri=${m.artifactUri.slice(7, 19)}… ${f0.mimeType}, ${uris.length + 1} media uris all ipfs://` };
 }
 
 // ---------------------------------------------------------------------------
@@ -187,6 +210,15 @@ async function managerKey() {
   return key;
 }
 
+// Ordered parallel map for read-only work (chain reads, gateway fetches).
+async function pmap(items, fn) {
+  const out = new Array(items.length); let next = 0;
+  await Promise.all(Array.from({ length: Math.min(CONCURRENCY, items.length) }, async () => {
+    for (let i = next++; i < items.length; i = next++) out[i] = await fn(items[i], i);
+  }));
+  return out;
+}
+
 const paramFor = (batch) => batch.map((u) => ({ token_id: u.tokenId, token_info: MichelsonMap.fromLiteral({ '': utf8Hex(u.newUri) }) }));
 
 // ---------------------------------------------------------------------------
@@ -194,21 +226,26 @@ const paramFor = (batch) => batch.map((u) => ({ token_id: u.tokenId, token_info:
 if (cmd === 'preflight') {
   const { st } = await loadContract();
   let todo = 0, done = 0, blocked = 0;
-  for (const u of UPDATES) {
+  const todoRows = [];
+  const lines = await pmap(UPDATES, async (u) => {
     const cur = await currentUri(st, u.tokenId);
-    if (cur === null) { blocked++; console.log(`…${u.tokenId.slice(-8)}  BLOCKED  no token_metadata row`); continue; }
-    if (cur === u.newUri) { done++; console.log(`…${u.tokenId.slice(-8)}  DONE     already ${u.newUri}`); continue; }
-    if (cur !== u.oldUri) { blocked++; console.log(`…${u.tokenId.slice(-8)}  BLOCKED  on-chain ${cur} ≠ csv old ${u.oldUri} — csv is stale`); continue; }
+    if (cur === null) return ['blocked', `…${u.tokenId.slice(-8)}  BLOCKED  no token_metadata row`];
+    if (cur === u.newUri) return ['done', `…${u.tokenId.slice(-8)}  DONE     already ${u.newUri}`];
+    if (cur !== u.oldUri) return ['blocked', `…${u.tokenId.slice(-8)}  BLOCKED  on-chain ${cur} ≠ csv old ${u.oldUri} — csv is stale`];
     const gw = await gatewayCheck(u);
-    if (!gw.okay) { blocked++; console.log(`…${u.tokenId.slice(-8)}  BLOCKED  new metadata not servable: ${gw.why} (${GATEWAY}${u.newCid})`); continue; }
-    todo++; console.log(`…${u.tokenId.slice(-8)}  TODO     ${u.oldCid} → ${u.newCid}  (${gw.why})`);
-  }
+    if (!gw.okay) return ['blocked', `…${u.tokenId.slice(-8)}  BLOCKED  new metadata not servable: ${gw.why} (${GATEWAY}${u.newCid})`];
+    return ['todo', `…${u.tokenId.slice(-8)}  TODO     ${u.oldCid} → ${u.newCid}  (${gw.why})`];
+  });
+  lines.forEach(([state, line], i) => {
+    console.log(line);
+    if (state === 'todo') { todo++; todoRows.push(UPDATES[i]); } else if (state === 'done') done++; else blocked++;
+  });
   if (todo) {
-    // Simulate the first batch as the trustee (no signature needed).
+    // Simulate the first pending batch as the trustee (no signature needed).
     const pk = await managerKey();
     Tezos.setSignerProvider(new ReadOnlySigner(SENDER, pk));
     const { c } = await loadContract();
-    const first = UPDATES.filter((u) => true).slice(0, BATCH);
+    const first = todoRows.slice(0, BATCH);
     const est = await Tezos.estimate.transfer(c.methodsObject.update_edition_metadata(paramFor(first)).toTransferParams());
     ok(`simulation of a ${first.length}-token batch: gas ${est.gasLimit}, storage ${est.storageLimit}, fee ${est.suggestedFeeMutez} mutez`);
   }
@@ -229,14 +266,14 @@ if (cmd === 'preflight') {
   ok(`vault account ${SENDER_ACCOUNT} = ${SENDER} (public key matches chain)`);
   const { c, st } = await loadContract();
   const progress = fs.existsSync(progressFile) ? JSON.parse(fs.readFileSync(progressFile, 'utf8')) : {};
-  const pending = [];
-  for (const u of UPDATES) {
-    if (progress[u.tokenId]?.opHash) continue;
+  const states = await pmap(UPDATES, async (u) => {
+    if (progress[u.tokenId]?.opHash) return 'skip';
     const cur = await currentUri(st, u.tokenId);
-    if (cur === u.newUri) continue;
+    if (cur === u.newUri) return 'skip';
     if (cur !== u.oldUri) fail(`…${u.tokenId.slice(-8)}: on-chain ${cur} ≠ csv old ${u.oldUri} — run preflight`);
-    pending.push(u);
-  }
+    return 'pending';
+  });
+  const pending = UPDATES.filter((_, i) => states[i] === 'pending');
   const todo = pending.slice(0, limit);
   if (!todo.length) { console.log('nothing to do'); process.exit(0); }
   const batches = [];
@@ -249,7 +286,8 @@ if (cmd === 'preflight') {
   }
   for (const [bi, batch] of batches.entries()) {
     console.log(`\n=== batch ${bi + 1}/${batches.length}: ${batch.length} tokens (…${batch[0].tokenId.slice(-6)} … …${batch[batch.length - 1].tokenId.slice(-6)})`);
-    for (const u of batch) { const gw = await gatewayCheck(u); if (!gw.okay) fail(`…${u.tokenId.slice(-8)}: new metadata not servable: ${gw.why}`); }
+    const gws = await pmap(batch, gatewayCheck);
+    gws.forEach((gw, i) => { if (!gw.okay) fail(`…${batch[i].tokenId.slice(-8)}: new metadata not servable: ${gw.why}`); });
     Tezos.setSignerProvider(new VaultSigner(SENDER, pk, batch));
     const op = await c.methodsObject.update_edition_metadata(paramFor(batch)).send();
     console.log('op hash:', op.hash);
@@ -260,11 +298,11 @@ if (cmd === 'preflight') {
     ok(`applied in block ${op.includedInBlock}, consumed gas ${result?.consumed_milligas ?? '?'} milligas`);
     // Post-check every token in the batch against fresh storage.
     const st2 = await c.storage();
-    for (const u of batch) {
-      const cur = await currentUri(st2, u.tokenId);
-      if (cur !== u.newUri) fail(`post-check: …${u.tokenId.slice(-8)} is ${cur}, expected ${u.newUri}`);
+    const after = await pmap(batch, (u) => currentUri(st2, u.tokenId));
+    batch.forEach((u, i) => {
+      if (after[i] !== u.newUri) fail(`post-check: …${u.tokenId.slice(-8)} is ${after[i]}, expected ${u.newUri}`);
       progress[u.tokenId] = { opHash: op.hash, at: new Date().toISOString() };
-    }
+    });
     fs.writeFileSync(progressFile, JSON.stringify(progress, null, 2));
     ok(`post-check: ${batch.length}/${batch.length} tokens now point at their new metadata`);
   }
@@ -274,8 +312,9 @@ if (cmd === 'preflight') {
   const c = await Tezos.contract.at(CONTRACT);
   const st = await c.storage();
   let good = 0;
-  for (const u of UPDATES) {
-    const cur = await currentUri(st, u.tokenId);
+  const curs = await pmap(UPDATES, (u) => currentUri(st, u.tokenId));
+  for (const [i, u] of UPDATES.entries()) {
+    const cur = curs[i];
     const mark = cur === u.newUri ? 'UPDATED ✓' : cur === u.oldUri ? 'old' : 'OTHER ⚠';
     if (cur === u.newUri) good++;
     console.log(`…${u.tokenId.slice(-8)}  ${cur}  ${mark}`);

@@ -1,0 +1,11 @@
+{
+  "$comment": "Copy to tezos-memento1.config.json (gitignored), fill senderAccount. Paths resolve against this file. See README.md step 5.",
+  "rpcUrl": "https://rpc.tzkt.io/mainnet",
+  "contract": "KT1CPeE8YGVG16xkpoE9sviUYoEzS7hWfu39",
+  "senderAddress": "tz1fcVFFVujFmnDsWEV1nhGukJTkgXtDKZmm",
+  "senderAccount": "FILL_ME_vault_account_number_of_the_trustee",
+  "metadataGateway": "https://ipfs.feralfile.com/ipfs/",
+  "updates": "step3/updates_KT1CPeE8YGVG16xkpoE9sviUYoEzS7hWfu39.csv",
+  "workDir": "runs/KT1CPeE8YGVG16xkpoE9sviUYoEzS7hWfu39",
+  "batchSize": 100
+}
