@@ -7,3 +7,4 @@ runs/
 *.config.json
 !*.config.example.json
 *.log
+mirror/

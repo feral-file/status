@@ -39,13 +39,14 @@ Two corrections to the scan:
   and all three `formats[].uri` are CDN URLs — the artwork itself, not just
   the thumbnail.
 
-**The CDN hostname no longer resolves** (2026-10-05: `cdn.feralfileassets.com`
-is a CNAME to `ddsm7s9hd8znk.cloudfront.net`, which has no A/AAAA record on
-the local resolver, Cloudflare DoH or Google DoH; a control CloudFront host
-resolves). So these 6,023 tokens show no media anywhere outside feralfile.com
-right now, the bytes can only come from the origin bucket, and
-`verify-regen.py`'s CDN-vs-IPFS media proof cannot run — `verify-docs.py`
-replaces it (step 3).
+**The on-chain hostname is dead; the bytes are not.** On 2026-10-05
+`cdn.feralfileassets.com` — the host written into all 6,023 docs — no longer
+resolved (CNAME to `ddsm7s9hd8znk.cloudfront.net`, no A/AAAA record on the
+local resolver, Cloudflare DoH or Google DoH; a control CloudFront host
+resolves). The CDN was migrated to `cdn.artworks.feralfile.io` (Brandon,
+2026-10-05): same keys, new host, and all 13 units answer there. So wallets
+and marketplaces reading the chain see no media for these tokens today, while
+the source bytes are intact — step 1 pulls them from the new host.
 
 Why the census missed them: it walks exhibitions the API lists; hidden
 exhibitions are not listed. The token lists here come from the contracts.
@@ -77,8 +78,8 @@ Dry run of the whole regen with placeholder CIDs: 1,420 + 4,603 docs written,
 
 ## Runbook
 
-Everything below runs from the repo root. Steps 1, 3b, 4, 5, 6 need
-credentials only the operator has. Nothing here refreshes OpenSea (STATUS.md
+Everything below runs from the repo root. Steps 1b, 3b, 4, 5, 6 need
+access only the operator has (prod-02 tunnel, vault, DB). Nothing here refreshes OpenSea (STATUS.md
 item 3 stands).
 
 ```bash
@@ -105,25 +106,31 @@ python3 tools/contract-audit/cdn-units.py $O/step0/eth_audit.csv $O/step0/tezos_
 `git diff --stat $O/step0` should show nothing after these three commands; any
 change means the chain moved since 2026-10-05 — read it before going on.
 
-### 1 · mirror the 13 units from the origin bucket onto prod-02
+### 1 · mirror the 13 units onto prod-02
 
-Precondition to check first: **the origin bucket still holds these keys** (the
-CDN in front of it is gone). `size-dirs.py` answers that — an empty prefix is
-flagged.
+**1a · fetch — DONE 2026-10-05** from `https://cdn.artworks.feralfile.io/`
+(same keys as the old host): 13 units, 30 files, 548,091,051 bytes, recorded
+with sha256s in `step1/mirror_manifest.csv`. Sizes equal the ones the on-chain
+docs declare (Memento 1 video 455,180,505 · thumbnails 428,303 / 68,499; Sheer
+Delight index 297 · thumbnails 450,840 / 57,059). The three software works
+were crawled from `index.html`; their code was read afterwards — no run-time
+loads, no external URLs, every reference fetched (Launch Party 13 files incl.
+six fonts, Scattered Limbs 3, Sheer Delight 4). The local tree `mirror/` is
+gitignored; rebuild it with:
 
 ```bash
-mkdir -p $O/step1
-BUCKET=<origin-bucket> python3 tools/ipfs-mirror/size-dirs.py --dirs $O/step0/cdn_dirs.csv \
-    --out $O/step1/dir_sizes.csv --repo-used-gb <now> --storage-max-gb <now>
-#   expect: 13 units, none empty. Known sizes from the docs: Memento 1 preview.mp4 455 MB.
-# in ff-deploy: make ipfs-port-forward ENV=prod HOST=prod-02
-BUCKET=<origin-bucket> KEEP=1 ./tools/ipfs-mirror/mirror-add-pin.sh $O/step0/cdn_dirs.csv $O/step1/dir_cids.csv
-#   expect: 13 rows in dir_cids.csv, verified=yes, no empty_at_origin
+python3 tools/ipfs-mirror/fetch-units-http.py --dirs $O/step0/cdn_dirs.csv \
+    --base https://cdn.artworks.feralfile.io/ --work $O/mirror
+diff <(cut -d, -f1-4 $O/mirror/manifest.csv) <(cut -d, -f1-4 $O/step1/mirror_manifest.csv) && echo same bytes
 ```
 
-If a unit is empty at the origin, stop: that series has no source bytes and
-needs the artist's file or the `artworks/<series>/<version>/origin.*` object
-(the API's `originalFile`), not this runbook.
+**1b · add + pin on prod-02** (tunnel; no bucket needed):
+
+```bash
+# in ff-deploy: make ipfs-port-forward ENV=prod HOST=prod-02
+LOCAL=1 WORK=$O/mirror ./tools/ipfs-mirror/mirror-add-pin.sh $O/step0/cdn_dirs.csv $O/step1/dir_cids.csv
+#   expect: self-test ok, then 13 rows in dir_cids.csv, all gw_ff=ok verified=yes   (0.55 GB — headroom is not a question)
+```
 
 ### 2 · regenerate the docs (local, no credentials)
 
@@ -234,11 +241,9 @@ Update `ops/cdn-retirement-phase2/STATUS.md` (new closed item) and
 numbers do not move. Decide separately whether hidden exhibitions belong in
 the census universe.
 
-## Open questions (not blocking steps 0–3)
+## Open questions
 
-1. Is the origin bucket intact for these 13 units? (step 1 answers it)
-2. Was the CDN switched off on purpose? If yes, every remaining CDN reference
-   anywhere (DB display URLs, feralfile.com thumbnails, the old P2P contract's
-   47 outside-held tokens) is already dark.
-3. Memento 1 is 4,002 airdropped tokens of one 455 MB video: one pinned copy
-   serves all of them.
+1. The old P2P contract's 47 outside-held tokens (phase-2 STATUS item 4,
+   decided out of scope) name the same dead hostname; that decision was taken
+   while the old host still answered.
+2. Hidden exhibitions are still outside the census universe.

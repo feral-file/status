@@ -27,7 +27,10 @@
 #       ops/cdn-retirement-phase2/step0/cdn_dirs.csv \
 #       ops/cdn-retirement-phase2/step1/dir_cids.csv
 #
-# Env: BUCKET (required)   origin bucket name
+# Env: BUCKET (required unless LOCAL=1)   origin bucket name
+#      LOCAL=1   skip step 1: the units are already under $WORK in this
+#                script's layout (fetch-units-http.py — units pulled over
+#                HTTP when the bucket is not at hand); mirrors are kept
 #      A     (default http://127.0.0.1:5001/api/v0)  kubo API base (tunnel)
 #      WORK  (default ./phase2-mirror)               local mirror scratch
 #      KEEP=1                                        keep local mirrors
@@ -40,13 +43,15 @@ trap 'rc=$?; [[ $rc -ne 0 ]] && echo "[trap] EXIT code=$rc last-command: $BASH_C
 for sig in HUP INT TERM PIPE; do trap "echo \"[trap] received SIG$sig — last-command: \$BASH_COMMAND\" >&2; exit 1" $sig; done
 DIRS_CSV=${1:?cdn_dirs.csv from step 0}
 RECORD=${2:?output record csv (dir_cids.csv)}
-: "${BUCKET:?BUCKET env required}"
+LOCAL=${LOCAL:-}
+[[ -n "$LOCAL" ]] || : "${BUCKET:?BUCKET env required (or LOCAL=1 with a pre-fetched WORK tree)}"
+[[ -z "$LOCAL" ]] || KEEP=1
 A=${A:-http://127.0.0.1:5001/api/v0}
 WORK=${WORK:-./phase2-mirror}
 CDN_PREFIX='https://cdn.feralfileassets.com/'
 HEADROOM_STOP=${HEADROOM_STOP:-90}
 
-command -v aws >/dev/null || { echo "aws CLI not installed" >&2; exit 1; }
+[[ -n "$LOCAL" ]] || command -v aws >/dev/null || { echo "aws CLI not installed" >&2; exit 1; }
 curl -sf -X POST "$A/id" >/dev/null || { echo "no kubo API at $A — open the tunnel first (make ipfs-port-forward ENV=prod HOST=prod-02)" >&2; exit 1; }
 mkdir -p "$WORK" "$(dirname "$RECORD")"
 [[ -f "$RECORD" ]] || echo "dir_or_file,s3_prefix,cid,n_files,bytes,gw_ff,gw_public,verified" > "$RECORD"
@@ -142,7 +147,9 @@ while IFS=, read -r -u3 unit _rest; do
   [[ "$key" != "$unit" ]] || { echo "[$i/$total] non-CDN host, manual: $unit" >&2; continue; }
   dst="$WORK/${key%/}"
   mkdir -p "$dst"
-  if [[ "$unit" == */ ]]; then
+  if [[ -n "$LOCAL" ]]; then
+    echo "[$i/$total] local $dst"
+  elif [[ "$unit" == */ ]]; then
     echo "[$i/$total] sync s3://$BUCKET/$key"
     aws s3 sync --only-show-errors "s3://$BUCKET/$key" "$dst/"
   else
