@@ -1,0 +1,12 @@
+src-eth/
+src-tezos/
+step3/v3-docs/
+step3/tezos-docs/
+step2/tokens_export.csv
+runs/
+*.config.json
+!*.config.example.json
+*.log
+mirror/
+step2/01-precheck.sql
+step2/02-align.sql

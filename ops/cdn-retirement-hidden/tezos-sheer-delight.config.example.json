@@ -1,0 +1,11 @@
+{
+  "$comment": "Copy to tezos-sheer-delight.config.json (gitignored), fill senderAccount. Paths resolve against this file. See README.md step 5.",
+  "rpcUrl": "https://rpc.tzkt.io/mainnet",
+  "contract": "KT1F6EKvGq8CKJhgsBy3GUJMSS9KPKn1UD5D",
+  "senderAddress": "tz1fcVFFVujFmnDsWEV1nhGukJTkgXtDKZmm",
+  "senderAccount": "FILL_ME_vault_account_number_of_the_trustee",
+  "metadataGateway": "https://ipfs.feralfile.com/ipfs/",
+  "updates": "step3/updates_KT1F6EKvGq8CKJhgsBy3GUJMSS9KPKn1UD5D.csv",
+  "workDir": "runs/KT1F6EKvGq8CKJhgsBy3GUJMSS9KPKn1UD5D",
+  "batchSize": 100
+}

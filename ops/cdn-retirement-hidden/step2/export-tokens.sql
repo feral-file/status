@@ -1,0 +1,12 @@
+-- Hidden-exhibition CDN retirement, DB export: every artwork on the six
+-- contracts, with the DB's metadata doc CID and the ipfs_reference state of its
+-- preview/thumbnail URIs — the db_cid cross-check before the chain updates and
+-- the input of tools/db-align-sql/gen-v3-sql.py (and gen-reference-sql.py)
+-- after them. Read-only. Same shape as
+-- ops/cdn-retirement-phase2/step2/export-v3-tokens.sql (artworks.id = on-chain
+-- decimal token id, on Tezos too). Tezos addresses are case-sensitive, so both
+-- sides are lowered. Run from the repo root:
+--   psql … -f ops/cdn-retirement-hidden/step2/export-tokens.sql
+-- Expected: ≥ 6,243 rows (1,640 ETH + 4,603 Tezos; more if an exhibition has
+-- artworks on another contract — harmless, the generators key by token id).
+\copy (SELECT ec.address AS contract, ec.name AS contract_version, e.title AS exhibition, a.id AS token_id, a.id AS artwork_id, a.index AS edition, a.series_id, se.title AS series_title, se.medium, a.metadata->>'ipfs_cid' AS ipfs_cid, a.preview_uri, p.ipfs_uri AS preview_ipfs_uri, a.thumbnail_uri, t.ipfs_uri AS thumbnail_ipfs_uri FROM exhibition_contract ec JOIN exhibition e ON e.id = ec.exhibition_id JOIN artworks a ON a.exhibition_id = ec.exhibition_id JOIN series se ON se.id = a.series_id LEFT JOIN ipfs_reference p ON p.uri = a.preview_uri LEFT JOIN ipfs_reference t ON t.uri = a.thumbnail_uri WHERE lower(ec.address) IN (lower('0xD74745721E3b9c3D784F15bfBA2802fa2e9955d9'), lower('0xB14b42814895FC1B0A528a475f8A5b070eB4c671'), lower('0x7E6c132B8cb00899d17750E0fD982EA122C6b0f2'), lower('0x14a62abFEC0e09159fBE9c050F3B03044fC7ea52'), lower('KT1CPeE8YGVG16xkpoE9sviUYoEzS7hWfu39'), lower('KT1F6EKvGq8CKJhgsBy3GUJMSS9KPKn1UD5D')) ORDER BY ec.address, a.series_id, a.index) TO 'ops/cdn-retirement-hidden/step2/tokens_export.csv' CSV HEADER

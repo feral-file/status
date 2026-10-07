@@ -46,9 +46,11 @@ different key.
 `preflight` reads every token's current `token_info` (must equal the csv's
 old CID — else the csv is stale), fetches every **new** JSON through the
 gateway `token_info` will point at (`ipfs.feralfile.com`, `Gateway.NoFetch`,
-so a 404 means "not pinned on prod-02"), requires `artifactUri` to be `ipfs://`
-and `formats[0]` to be `video/mp4` for the same URI, then simulates a full
-batch as the trustee (`run_operation`; no signature needed).
+so a 404 means "not pinned on prod-02"), requires `artifactUri` to be `ipfs://`,
+`formats[0]` to carry the same URI (and `expectArtifactMime` when set), every
+other media field (`displayUri`, `thumbnailUri`, `image`, `formats[].uri`) to
+be `ipfs://` and no CDN host anywhere in the doc, then simulates the first
+pending batch as the trustee (`run_operation`; no signature needed).
 
 Every batch is post-checked against fresh storage before the next one is
 signed; `progress.json` records the op hash per token, so a rerun skips what
@@ -95,7 +97,14 @@ cp config.example.json config.json  # fill in senderAccount
 | `senderAccount` | the vault account identifier whose derived Tezos key is that trustee |
 | `metadataGateway` | `https://ipfs.feralfile.com/ipfs/` |
 | `updates` | csv `token_id,old_metadata_cid,new_metadata_cid` (output of `feralverse-metadata-fix/pin.sh`) |
-| `batchSize` | tokens per operation (20 → ~1 kmutez fee/op; 142 tokens = 8 ops) |
+| `batchSize` | tokens per operation, 1–100 (20 → ~1 kmutez fee/op; 142 tokens = 8 ops; a 100-token batch simulated at 54k gas / ~17 kmutez on 2026-10-05) |
+| `workDir` | optional — where `progress.json` lives (relative to the config file); give each contract its own |
+| `expectArtifactMime` | optional — require `formats[0].mimeType` to equal this (the HLS fix: `video/mp4`). Unset = any type, e.g. `application/x-directory` for software |
+| `readConcurrency` | optional, default 8 — parallel read-only checks in preflight / check |
+
+`updates` is located by header (`token_id`, `old_metadata_cid`,
+`new_metadata_cid`), so `metadata-regen/pin-docs.py` output (leading `edition`
+column) works as-is; a relative path resolves against the config file.
 
 Env: `VAULT_URL`, `VAULT_API_KEY` (the feralfile `X-API-KEY`, not the admin
 key) — `run` only.

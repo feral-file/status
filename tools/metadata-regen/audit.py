@@ -14,6 +14,8 @@ list.
 
 Input csv: any file with `contract` and `token_id` columns (e.g. the DB export
 from db/export-v2-cdn-tokens.sql, or ops/…/migrated_bitmark_works_media_hosting_*.csv).
+A `token_uri` column, when present (tools/contract-audit/enumerate-tokens.py
+output), is used as the on-chain tokenURI and the per-token eth_call is skipped.
 --db-export: csv with contract,token_id,old_metadata_cid — the on-chain cid is
 compared against it (column db_cid_match).
 
@@ -114,6 +116,8 @@ def fetch_metadata(base, cid, suffix='/metadata.json'):
 
 rows = [r for r in csv.DictReader(open(a.tokens))]
 if not rows or 'contract' not in rows[0] or 'token_id' not in rows[0]: sys.exit('input needs contract,token_id columns')
+n_all = len(rows); rows = [r for r in rows if r['contract'].lower().startswith('0x')]   # a mixed list (enumerate-tokens.py) may carry Tezos KT1 rows — those are tezos-doc-regen.py's
+if len(rows) != n_all: print(f'{n_all - len(rows)} non-Ethereum rows ignored', file=sys.stderr)
 def norm_id(t):
     """swaps.token is decimal in most rows but some older swaps stored the same
     uint256 as 64-char hex (verified on chain 2026-08-28: identical token). Chain
@@ -144,20 +148,28 @@ for i, c in enumerate(contracts):
     t, o = res[i], res[len(contracts) + i]
     meta_c[c] = {'trustee': '0x' + t[-40:] if t and not t.startswith('ERR') else '', 'owner': '0x' + o[-40:] if o and not o.startswith('ERR') else ''}
 
-# tokenURI, batched
+# tokenURI: taken from the input when it carries a `token_uri` column
+# (tools/contract-audit/enumerate-tokens.py output, read through Multicall3 the
+# same day) — otherwise read here, batched
+given = {(r['contract'].lower(), norm_id(r['token_id'])): r['token_uri'] for r in rows if r.get('token_uri') and norm_id(r['token_id'])}
 uris = {}
-for i in range(0, len(toks), a.batch):
-    chunk = toks[i:i+a.batch]
+need = [k for k in toks if k not in given]
+for i in range(0, len(need), a.batch):
+    chunk = need[i:i+a.batch]
     for (c, t), r in zip(chunk, rpc_batch([(c, SEL_TOKEN_URI + int(t).to_bytes(32, 'big').hex()) for c, t in chunk])):
         uris[(c, t)] = r
-    print(f'  tokenURI {min(i+a.batch, len(toks))}/{len(toks)}  ({pacer.rps:.0f} calls/s)', file=sys.stderr, end='\r')
+    print(f'  tokenURI {min(i+a.batch, len(need))}/{len(need)}  ({pacer.rps:.0f} calls/s)', file=sys.stderr, end='\r')
 print(file=sys.stderr)
 
 def work(key):
-    c, t = key; raw = uris[key]
-    if raw is None or raw.startswith('ERR'): return dict(contract=c, token_id=t, token_id_db=dbform[key], error=raw or 'no result')
-    uri = abi_string(raw); cid, suffix = cid_from_uri(uri or '')
-    if not cid: return dict(contract=c, token_id=t, error=f'unexpected tokenURI {uri!r}')
+    c, t = key
+    if key in given: uri = given[key]
+    else:
+        raw = uris[key]
+        if raw is None or raw.startswith('ERR'): return dict(contract=c, token_id=t, token_id_db=dbform[key], error=raw or 'no result')
+        uri = abi_string(raw)
+    cid, suffix = cid_from_uri(uri or '')
+    if not cid: return dict(contract=c, token_id=t, token_id_db=dbform[key], error=f'unexpected tokenURI {(uri or "")[:80]!r}')
     base = uri[:uri.index(cid)]
     m, err = fetch_metadata(base if base.startswith('http') else None, cid, suffix)
     row = dict(contract=c, token_id=t, token_id_db=dbform[key], onchain_cid=cid, token_base_uri=base, error=err or '')

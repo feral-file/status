@@ -170,6 +170,16 @@ retirement phase 2; the extra tools live in this directory:
 | `verify-regen.py` | independent verification: reverse-substitution byte proof per doc, media correspondence |
 | `pin-docs.py` | uploads regenerated docs to prod-02 via the tunnel (MFS batch, resumable), pins, emits `updates_<contract>.csv` for `../update-token-uri` |
 
+Added 2026-10-05 for the hidden-exhibition run (`ops/cdn-retirement-hidden/`):
+
+| tool | does |
+|---|---|
+| `tezos-doc-regen.py` | Tezos TZIP-21 docs: audit (`--audit-only`) and byte-preserving rewrite of `artifactUri` / `displayUri` / `thumbnailUri` / `image` / `formats[].uri` from CDN URLs to `ipfs://<unit>/…`; emits the same `plan.csv` as `v3-doc-regen.py`, so `pin-docs.py` pins it and its `updates_<KT1…>.csv` drives `../update-tezos-metadata` |
+| `verify-docs.py` | verification that works with the CDN down: reverse-substitution byte proof per doc from the registry alone, then every new `ipfs://` media URI served by the gateway (software dirs: index.html scanned for CDN / root-absolute references). `verify-regen.py`'s media proof needs the CDN to answer |
+
+`audit.py` accepts a `token_uri` column (from `../contract-audit/enumerate-tokens.py`)
+and then skips the per-token `eth_call`; non-0x rows are ignored.
+
 Downstream after regen+pin: per-token txs via `../update-token-uri` (V2/V3),
 or ONE `setTokenBaseURI` owner tx via `../update-token-uri/v4-base-uri.mjs`
 (V4), then DB align via `../db-align-sql/`. Dir upload for V4 goes through

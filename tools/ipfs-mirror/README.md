@@ -51,3 +51,23 @@ prod-02's `Gateway.NoFetch=true` (ff-deploy#28).
 
 After 1b completes: rerun `tools/pin-referenced` is NOT yet needed (these
 CIDs aren't referenced by the DB until step 2 writes the reference rows).
+
+## No bucket at hand: fetch-units-http.py + `LOCAL=1` (2026-10-05)
+
+```
+python3 tools/ipfs-mirror/fetch-units-http.py --dirs cdn_dirs.csv \
+    --base https://cdn.artworks.feralfile.io/ --work ./mirror
+LOCAL=1 WORK=./mirror ./tools/ipfs-mirror/mirror-add-pin.sh cdn_dirs.csv dir_cids.csv
+```
+
+The CDN moved hosts in 2026 (`cdn.feralfileassets.com` no longer resolves;
+`cdn.artworks.feralfile.io` serves the same keys). HTTP cannot list a
+directory, so directory units are built by crawling from the file the tokens
+name (or `index.html`) through every relative reference — the file list is
+printed and written to `manifest.csv` with sha256s; read it. Two host
+behaviours the tool handles: requests without an `Accept` header get HTML
+rewritten at the edge (Cloudflare analytics beacon appended — refused if seen),
+and `Python-urllib` as User-Agent is blocked. `LOCAL=1` makes the add/pin
+script use that tree instead of syncing from the bucket; everything after the
+fetch (add, pin, gateway byte-compare, record) is unchanged.
+

@@ -82,3 +82,29 @@ holds a vault account id — never committed, kept only until the tx landed).
 - Local only: `.DS_Store`, `__pycache__/`, and the live `v4-base-uri.config.json` (the
   crystalline tx landed 2026-09-08, filum's the same day — its vault account id has no
   reason to stay on disk). Left alone: `public/` (CI builds the page), `node_modules/`.
+
+### 2026-10-07 — branch `tools/cdn-retirement-hidden` (hidden-exhibition CDN retirement), ~600 MB removed
+
+- Untracked: the local mirror of the 13 units (523 M; pinned on prod-02 and sha256-verified
+  through the gateway, `step1/dir_cids.csv` + `mirror_manifest.csv` are the registry), the
+  fetched originals (`src-eth`, `src-tezos`, 42 M; the old CIDs are in `step3/updates_*.csv`
+  and still on ipfs.bitmark.com), the regenerated doc trees (26 M; pinned under
+  `step3/staging_roots.csv`), the generated align SQL (3 M; `gen-map-sql.py`), the Tezos run
+  state and the filled configs (vault account id), the V3 run data in `tools/metadata-regen/`
+  (`updates/ runs/ src/`, 15 M; the chain is the receipt), the mirror log.
+- Tracked, deleted: `step0/tokens.csv`, `eth_audit.csv`, `tezos_audit.csv`,
+  `p2p_decentraland_check.csv` (chain reads of a state that has since changed on purpose; the
+  before state per token is the `old_metadata_cid` column of `updates_*.csv`),
+  `step3/verify_docs.csv` (the docs are pinned; `verify-docs.py` reproduces it), the six
+  OpenSea refresh payloads (derivable from `updates_*.csv`, shape in the README).
+- `step7` → `step8` (matches the README's step numbering).
+
+Explicitly kept, with the reason: `step0/cdn_dirs.csv` + `eth_audit.contracts.csv` (unit list,
+contract facts); `step1/dir_cids.csv` + `mirror_manifest.csv` (pin-unit registry + sha256 of
+what was fetched); `step3/updates_*.csv` (6,023 old→new mappings) + `staging_roots.csv`;
+`step2/export-tokens.sql` (a query); `step8/opensea_delist_scattered_limbs.csv` (OpenSea's
+before/after for 335 tokens — not re-measurable); the two Tezos config templates. New generic
+tools kept in `tools/`: `contract-audit/enumerate-tokens.py`, `cdn-units.py`,
+`metadata-regen/tezos-doc-regen.py`, `verify-docs.py`, `ipfs-mirror/fetch-units-http.py`,
+`db-align-sql/gen-map-sql.py`.
+
