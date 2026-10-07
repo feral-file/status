@@ -76,7 +76,7 @@ Signing, proven by simulation on 2026-10-05 (nothing was signed or sent):
 Dry run of the whole regen with placeholder CIDs: 1,420 + 4,603 docs written,
 0 failed, every one byte-reversible to its on-chain original.
 
-## Status 2026-10-05 — steps 0–3 DONE; next is signing (steps 4 and 5)
+## Status 2026-10-07 — steps 0–5 DONE (chain repointed, 6,023/6,023 verified); next is step 6, the DB
 
 - **Step 1** 13 units added and pinned on prod-02 (`step1/dir_cids.csv`, 13/13
   verified); afterwards all 30 files were read back through
@@ -251,6 +251,9 @@ python3 tools/contract-audit/enumerate-tokens.py KT1CPeE8YGVG16xkpoE9sviUYoEzS7h
 python3 tools/metadata-regen/tezos-doc-regen.py --tokens /tmp/tz_tokens_after.csv --src $O/src-tezos --audit-only --audit-out /tmp/tezos_after.csv
 #   expect: audit: 4603 tokens, needs_fix 0
 ```
+**Outcome 2026-10-07: both contracts complete (`check`: 601/601, 4002/4002);
+re-audit from the chain: 4,603 tokens, needs_fix 0, and every on-chain
+`token_info` equals the planned new CID (4,603/4,603).**
 
 ### 6 · DB follows the chain
 
