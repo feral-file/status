@@ -266,7 +266,10 @@ if (cmd === 'preflight') {
   ok(`vault account ${SENDER_ACCOUNT} = ${SENDER} (public key matches chain)`);
   const { c, st } = await loadContract();
   const progress = fs.existsSync(progressFile) ? JSON.parse(fs.readFileSync(progressFile, 'utf8')) : {};
+  console.error(`reading token_info of ${UPDATES.length} tokens from chain (${CONCURRENCY} in parallel) …`);
+  let scanned = 0;
   const states = await pmap(UPDATES, async (u) => {
+    if (++scanned % 250 === 0) console.error(`  ${scanned}/${UPDATES.length}`);
     if (progress[u.tokenId]?.opHash) return 'skip';
     const cur = await currentUri(st, u.tokenId);
     if (cur === u.newUri) return 'skip';
