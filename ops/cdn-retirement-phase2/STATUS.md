@@ -1,6 +1,6 @@
 # Phase-2 status — pipeline CLOSED for every platform-minted token; close-out census PUBLISHED 2026-09-09 (CDN-dependent works 11,389 → 0)
 
-*Updated 2026-09-10 (supersedes the 2026-09-08 version). Owner: Brandon.
+*Updated 2026-10-07 (item 11 added; otherwise the 2026-09-10 state). Owner: Brandon.
 Plan + history: `ops/cdn-retirement-phase2.md`. OpenSea incident + collection
 freeze (read BEFORE touching anything OpenSea-facing):
 `ops/opensea-metadata-path-incident.md`, `ops/opensea-metadata-path/README.md`.
@@ -215,6 +215,23 @@ their OpenSea `collection_uuid` gets pinned (57 collections on OpenSea's side).
     indexer and status stop guessing. Also seen: ipfs.io answered its only
     request of the run with 429 `Retry-After: 900` — from prod-02 Shipyard is
     effectively closed, Pinata answers.
+
+11. **Hidden exhibitions — CLOSED 2026-10-07** (`ops/cdn-retirement-hidden/`).
+    A DB scan (2026-10-05) found 6,158 tokens still naming the CDN, 6,023 of
+    them real on chain and all on exhibitions the census never walks (hidden
+    = not listed by the API): four V3 contracts (Study for Unsupervised 1,002,
+    Launch Party 302, Scattered Limbs 115, MONOPOLY SET 1) and two Tezos FA2
+    contracts (Memento 1 4,002, A Look of Sheer Delight 601). The 135
+    Decentraland Parcel tokens were a false positive (inline metadata naming
+    ipfs.bitmark.com — phase-3 class). The CDN hostname on chain had stopped
+    resolving; bytes came from the migrated host `cdn.artworks.feralfile.io`
+    (13 units, 548 MB, byte-verified on prod-02). Docs regenerated and proven
+    byte-reversible, 1,420 trustee txs (`0xbeb9f810…`) + 48 Tezos trustee ops
+    (`tz1fcVFF…`) landed 2026-10-06/07, every token re-read from chain
+    (needs_fix 0), DB aligned (UPDATE 6023). New tools: chain enumeration
+    (`tools/contract-audit/enumerate-tokens.py`), Tezos doc regen, HTTP unit
+    fetch, export-free DB align. Known gap left open: hidden exhibitions are
+    outside the census universe, so the page's numbers never counted them.
 
 ## Parallel / pending (not blocking)
 

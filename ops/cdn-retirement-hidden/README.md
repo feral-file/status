@@ -76,7 +76,7 @@ Signing, proven by simulation on 2026-10-05 (nothing was signed or sent):
 Dry run of the whole regen with placeholder CIDs: 1,420 + 4,603 docs written,
 0 failed, every one byte-reversible to its on-chain original.
 
-## Status 2026-10-07 — steps 0–5 DONE (chain repointed, 6,023/6,023 verified); next is step 6, the DB
+## Status 2026-10-07 — CLOSED. Chain repointed (6,023/6,023 re-read from chain), DB aligned (UPDATE 6023, committed), recorded
 
 - **Step 1** 13 units added and pinned on prod-02 (`step1/dir_cids.csv`, 13/13
   verified); afterwards all 30 files were read back through
@@ -279,6 +279,12 @@ chains (spot-checked against the API 2026-10-05). Reference rows
 `step2/export-tokens.sql` (psql only); they will report unmapped rows because
 the DB's display thumbnails for the Tezos series are a later version than the
 one on chain.
+
+**Outcome 2026-10-07 (DBeaver):** pre-check every series `found = in_map =
+holds_old`, `holds_new 0`, `holds_other 0`, TOTAL 6023; `UPDATE 6023`;
+post-check every series `holds_new = in_map`, `holds_old 0`, `holds_other 0`;
+committed. API spot-check after commit: MONOPOLY SET and Memento 1 AE serve
+the planned new CIDs.
 
 ### 7 · record
 
