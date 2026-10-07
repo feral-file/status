@@ -255,24 +255,30 @@ python3 tools/metadata-regen/tezos-doc-regen.py --tokens /tmp/tz_tokens_after.cs
 re-audit from the chain: 4,603 tokens, needs_fix 0, and every on-chain
 `token_info` equals the planned new CID (4,603/4,603).**
 
-### 6 · DB follows the chain
+### 6 · DB follows the chain (DBeaver or psql)
+
+No export needed: the old→new mapping rides inside the SQL.
 
 ```bash
-psql … -f $O/step2/export-tokens.sql
-python3 tools/db-align-sql/gen-v3-sql.py --db-export $O/step2/tokens_export.csv \
-    --updates $O/step3/updates_*.csv > $O/step2/align.sql
-#   expect header: 6023 artworks rows (0 already aligned, 0 skipped, 0 missing); value forms: {'<bare>': 6023}
-psql … -f $O/step2/align.sql                 # dry run (no COMMIT in the file): UPDATE 1 × 6023
-# append COMMIT; and rerun to apply
+python3 tools/db-align-sql/gen-map-sql.py --updates $O/step3/updates_*.csv --out-dir $O/step2
+#   → step2/01-precheck.sql (read-only), step2/02-align.sql (BEGIN … UPDATE … counts; no COMMIT)
 ```
 
-`artworks.id` = token id and `metadata.ipfs_cid` = bare doc CID on both chains
-(spot-checked against the API 2026-10-05: 2 ETH + 2 Tezos tokens equal the
-chain). Reference rows (`gen-reference-sql.py` with the same export and
-`step1/dir_cids.csv`) are optional and will report unmapped rows: the DB's
-display thumbnails for the Tezos series are a later version
-(`thumbnails/a132e00e…/1669855186`) than the one on chain (`…/1668650827`),
-which is not one of the 13 units.
+1. Run `01-precheck.sql`. Expect, per series and in the TOTAL row:
+   `found = in_map = holds_old`, `holds_new = 0`, `holds_other = 0`
+   (TOTAL in_map 6023). Anything else: stop.
+2. In DBeaver switch the connection to **manual commit** (toolbar
+   Auto-commit toggle off), run `02-align.sql` as a script (Alt+X). It prints
+   `UPDATE 6023` and the counts again: every series `holds_new = in_map`,
+   `holds_old = 0`, `holds_other = 0`.
+3. Only then `COMMIT;` — or `ROLLBACK;` if a number is off.
+
+`artworks.id` = token id and `metadata.ipfs_cid` = bare doc CID on both
+chains (spot-checked against the API 2026-10-05). Reference rows
+(`gen-reference-sql.py`) are optional and need the export in
+`step2/export-tokens.sql` (psql only); they will report unmapped rows because
+the DB's display thumbnails for the Tezos series are a later version than the
+one on chain.
 
 ### 7 · record
 
