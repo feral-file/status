@@ -206,7 +206,20 @@ cfg                                                    # 4 configs
 (cd tools/metadata-regen && ./run-contracts.sh --dry-run && BATCH=100 ./run-contracts.sh)
 ```
 
-Final check: rerun step 0's `enumerate-tokens.py` + `audit.py` → `needs_fix 0`.
+Final check — **re-enumerate first**: `audit.py` reuses the `token_uri` column
+of its input and does not read the chain for it, so auditing the step-0
+`tokens.csv` again just re-reads the pre-rollout docs (needs_fix 1,420).
+
+```bash
+RPC_URL=<infura> python3 tools/contract-audit/enumerate-tokens.py 0xD74745721E3b9c3D784F15bfBA2802fa2e9955d9 \
+    0xB14b42814895FC1B0A528a475f8A5b070eB4c671 0x7E6c132B8cb00899d17750E0fD982EA122C6b0f2 \
+    0x14a62abFEC0e09159fBE9c050F3B03044fC7ea52 --out /tmp/eth_tokens_after.csv
+RPC_URL=<infura> python3 tools/metadata-regen/audit.py /tmp/eth_tokens_after.csv --out /tmp/eth_after.csv --batch 4 --rps 4
+#   expect: 1640 tokens: needs_fix 0
+```
+**Outcome 2026-10-06: all four contracts complete (`run-contracts.sh`: 4/4);
+re-audit from the chain 2026-10-07: 1,640 tokens, needs_fix 0, and every one
+of the 1,420 on-chain doc CIDs equals the planned new CID.**
 
 ### 5 · Tezos — 48 trustee operations (vault key)
 
@@ -231,8 +244,13 @@ node update-tezos-metadata.mjs check 2>&1 | tail -1     # expect: 4002/4002 upda
 cd ../..
 ```
 
-Final check: rerun step 0's `tezos-doc-regen.py --audit-only` on a fresh
-`tokens.csv` → `needs_fix 0`.
+Final check — re-enumerate first (same reason as step 4):
+
+```bash
+python3 tools/contract-audit/enumerate-tokens.py KT1CPeE8YGVG16xkpoE9sviUYoEzS7hWfu39 KT1F6EKvGq8CKJhgsBy3GUJMSS9KPKn1UD5D --out /tmp/tz_tokens_after.csv
+python3 tools/metadata-regen/tezos-doc-regen.py --tokens /tmp/tz_tokens_after.csv --src $O/src-tezos --audit-only --audit-out /tmp/tezos_after.csv
+#   expect: audit: 4603 tokens, needs_fix 0
+```
 
 ### 6 · DB follows the chain
 
