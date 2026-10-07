@@ -293,6 +293,22 @@ Update `ops/cdn-retirement-phase2/STATUS.md` (new closed item) and
 numbers do not move. Decide separately whether hidden exhibitions belong in
 the census universe.
 
+### 8 · OpenSea refresh (back-office task `refreshOpenSeaTokensMetadata`)
+
+Payloads in `step7/opensea-refresh-*.json`, one per contract, input shape
+`{"contractToTokenIDs": {"<contract>": ["<decimal token id>", …]}}`
+(feral-file-server `internal/tasks/opensea.go`), only the repointed tokens
+(1 / 115 / 302 / 1,002; 1 s pacing per token, task timeout 5 h). Why it is
+safe (`ops/opensea-metadata-path/README.md`): none of the four is among the 17
+paused special-project collections; Study for Unsupervised, MONOPOLY SET and
+Launch Party are *Decentralized* (OpenSea reads tokenURI) but bound to our
+uuid since 2026-09-04, so the grouping no longer depends on the doc (the new
+docs, like the old, carry no collection fields); Scattered Limbs is
+*Centralized* (FF API path, which now serves the new CID with the fields
+injected). Dispatch 1 (MONOPOLY SET) first and look at the token on OpenSea —
+image shows, still in the verified collection — before 2–4. Afterwards:
+`tools/opensea/collection-metadata-scan.py` on the four series.
+
 ## Open questions
 
 1. The old P2P contract's 47 outside-held tokens (phase-2 STATUS item 4,
