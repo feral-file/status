@@ -162,8 +162,11 @@ Updating later (a revision):
    (Sean's laptop co-pin); the two CIDs must match.
 3. Independent byte check before signing: public gateways (ipfs.io,
    dweb.link) have refused all fetches since 2026-09 ("service worker
-   gateway only"), so the check is `ipfs cat <cid>` on the node that did NOT
-   do the add, compared byte-for-byte against `data/archive-manifest.json`.
+   gateway only"), and with ff-pin-1 retired there is no third node, so the
+   check is a fetch of `https://ipfs.feralfile.com/ipfs/<cid>` (prod-02's
+   public gateway, not the tunnel that did the add; under `Gateway.NoFetch`
+   a 200 also proves the pin) from a second machine, compared byte-for-byte
+   against `data/archive-manifest.json`.
 4. Safe Transaction Builder → `setManifest(<cid>)`, two signatures. A
    ready-to-load batch file per revision lives beside the contract
    (`contracts/setManifest-<date>.safe-tx.json`, raw calldata next to it).

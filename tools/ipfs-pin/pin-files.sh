@@ -35,8 +35,8 @@ for f in "$@"; do
   fi
   [[ -f "$f" ]] || { echo "[$name] ERROR: not a file" >&2; exit 1; }
 
-  bytes=$(stat -c%s "$f")
-  sha=$(sha256sum "$f" | cut -d' ' -f1)
+  bytes=$(wc -c < "$f" | tr -d ' ')
+  sha=$( (command -v sha256sum >/dev/null && sha256sum "$f" || shasum -a 256 "$f") | cut -d' ' -f1)
   echo "[$name] add ($bytes bytes)"
   cid=$("$IPFS_BIN" add -Q --hidden --cid-version 1 "$f")
 

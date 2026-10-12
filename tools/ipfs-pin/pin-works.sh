@@ -45,8 +45,9 @@ for sid in $(tail -n +2 "$CSV" | cut -d, -f2 | sort -u); do
   echo "[$sid] sync"
   aws s3 sync "$BUCKET/artworks/$sid/" "$src/artworks/" --only-show-errors
   aws s3 sync "$BUCKET/previews/$sid/" "$src/previews/" --only-show-errors
-  files=$(find "$src" -type f | wc -l)
-  bytes=$(du -sb "$src" | cut -f1)
+  files=$(find "$src" -type f | wc -l | tr -d ' ')
+  # file bytes only; portable (GNU du -sb is not on macOS)
+  bytes=$(python3 -c 'import os,sys; print(sum(os.path.getsize(os.path.join(r, f)) for r, _, fs in os.walk(sys.argv[1]) for f in fs))' "$src")
   if [[ "$files" -eq 0 ]]; then
     echo "[$sid] ERROR: nothing synced" >&2
     exit 1

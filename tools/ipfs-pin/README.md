@@ -19,6 +19,9 @@ export IPFS_PATH=~/.ipfs-prod02
 ./tools/ipfs-pin/verify.sh [pin_manifest.csv]                   # pinned recursively + 200 from the gateway
 ```
 
-`add` uploads the bytes over the tunnel, so large series take as long as your uplink.
+`pin-works.sh` also needs AWS credentials that can read the origin bucket
+(`s3://feralfile-assets-livenet`, `aws s3 sync`), and local disk for two copies of a series:
+`add` uploads it over the tunnel and the round-trip check `get`s it back, so each series
+crosses the link twice. Scripts are portable bash (macOS or Linux) plus `python3`.
 New content is in the Deep Archive after the next weekly `ipfs_archive` export (Saturday).
 Then run `tools/archive-probe` and `tools/db-align-sql`.
