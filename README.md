@@ -157,8 +157,9 @@ Updating later (a revision):
    2026-08-16 build was superseded this way on 2026-09-29).
 2. Drop the new inputs into `data/` (`archive_pins_<date>.json` for anything
    beyond the Bitmark-era series; the builder takes the newest by name),
-   rebuild, `ipfs add -Q --cid-version 1` on the archival node and on a
-   second node (Sean's laptop co-pin); the two CIDs must match.
+   rebuild, `ipfs add -Q --cid-version 1` on the archival node (prod-02,
+   through the tunnel; `tools/ipfs-pin/README.md`) and on a second node
+   (Sean's laptop co-pin); the two CIDs must match.
 3. Independent byte check before signing: public gateways (ipfs.io,
    dweb.link) have refused all fetches since 2026-09 ("service worker
    gateway only"), so the check is `ipfs cat <cid>` on the node that did NOT

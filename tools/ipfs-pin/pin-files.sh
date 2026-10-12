@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Pin individual files to the archival node, byte-verified.
+# Pin individual files to the archival node (prod-02), byte-verified.
 #
 # The directory-oriented sibling is pin-works.sh; this one is for the case that
 # recurs under "hosting follows stewardship": a handful of loose files for work
@@ -10,13 +10,15 @@
 #      not a copy)
 #   3. append to a manifest; leave the bytes in the blockstore
 #
-# Run this ON the pinning node, with the files already copied there.
+# Run it with IPFS_PATH pointing at prod-02's API through the tunnel (see
+# README.md); the files are read locally and uploaded by `add`.
 #
 # Usage:
 #   ./pin-files.sh <manifest_out.csv> <file> [file ...]
 # Env:
 #   IPFS_BIN   (default ipfs)
-#   IPFS_PATH  respected by ipfs as usual (ff-pin-1: /mnt/ff-pin-data/ipfs)
+#   IPFS_PATH  respected by ipfs as usual (prod-02: a dir whose `api` file
+#              holds /ip4/127.0.0.1/tcp/5001)
 
 set -euo pipefail
 

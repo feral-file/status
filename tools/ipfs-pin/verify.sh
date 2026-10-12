@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# After pin-on-prod02.sh: confirm every series CID is (a) pinned recursively
+# Confirm every series CID is (a) pinned recursively
 # on prod-02 and (b) served by the public gateway. Read-only.
 #   ./verify.sh [pin_manifest.csv]
 set -euo pipefail

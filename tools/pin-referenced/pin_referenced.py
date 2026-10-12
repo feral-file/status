@@ -59,4 +59,4 @@ present = sum(1 for r in rows if r[1] == 'yes'); pinned_n = sum(1 for r in rows 
 print(f'\npresent locally: {present}/{len(rows)}; pinned: {pinned_n}; missing locally: {len(missing)} (listed in {out})', file=sys.stderr)
 if missing:
     with open(a.list + '.missing.txt', 'w') as f: f.write('\n'.join(r[0] for r in missing) + '\n')
-    print(f'missing list: {a.list}.missing.txt — fetch these from ff-pin-1 / public gateways / origin before pinning', file=sys.stderr)
+    print(f'missing list: {a.list}.missing.txt — fetch these from public gateways / origin before pinning', file=sys.stderr)

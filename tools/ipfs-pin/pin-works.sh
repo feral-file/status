@@ -12,8 +12,8 @@
 #      the bytes)
 #
 # Resumable: series already in the manifest with a CID are skipped, so rerun
-# after any interruption. Run this ON the pinning node (the ipfs repo that
-# should hold the data long-term).
+# after any interruption. Run it with IPFS_PATH pointing at prod-02's API
+# through the tunnel (see README.md).
 #
 # Usage:
 #   ./pin-works.sh <series_csv> <manifest_out.csv> [workdir]
