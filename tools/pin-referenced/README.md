@@ -10,7 +10,8 @@ python3 tools/pin-referenced/pin_referenced.py referenced_cids.txt --pin      # 
 
 Tunnel required (`make ipfs-port-forward ENV=prod HOST=prod-02`). Writes `<list>.pinstatus.csv` and
 `<list>.missing.txt`. Missing CIDs are the real gaps (the 2026-08-25 "44 thumbnails" class): fetch them
-from ff-pin-1, a public gateway or the origin, then rerun.
+from a public gateway or the origin, then rerun. (Archived CIDs can also come back from
+prod-02's S3 Deep Archive backup, ff-deploy OPERATION.md "IPFS Archive".)
 
 Why: on 2026-08-27 prod-02 served ~73k referenced CIDs with ~950 recursive pins; the rest were
 gateway-era cache surviving only because the container runs kubo without `--enable-gc`.

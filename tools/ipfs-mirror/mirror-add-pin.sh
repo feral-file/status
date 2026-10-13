@@ -3,7 +3,7 @@
 # to prod-02 (pinned), recording unit -> CID for step 2's reference rows.
 #
 # curl-only against the kubo HTTP API through the tunnel (same convention as
-# tools/ipfs-pin/pin-on-prod02.sh) — no local ipfs binary needed.
+# tools/ipfs-pin/verify.sh) — no local ipfs binary needed.
 # Directory units are built file-by-file in MFS (each file its own small
 # POST /add?to-files=…, resumable — a dropped connection costs one file, not
 # the unit; see add_dir below). A built-in self-test exercises the exact
