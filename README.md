@@ -164,9 +164,12 @@ Updating later (a revision):
    dweb.link) have refused all fetches since 2026-09 ("service worker
    gateway only"), and with ff-pin-1 retired there is no third node, so the
    check is a fetch of `https://ipfs.feralfile.com/ipfs/<cid>` (prod-02's
-   public gateway, not the tunnel that did the add; under `Gateway.NoFetch`
-   a 200 also proves the pin) from a second machine, compared byte-for-byte
-   against `data/archive-manifest.json`.
+   public gateway, not the tunnel that did the add) from a second machine,
+   compared byte-for-byte against `data/archive-manifest.json`. A 200 proves
+   the blocks are on the node, not that they are pinned: the gateway serves
+   anything in the blockstore, and prod-02 runs without automatic GC, so an
+   unpinned block keeps answering 200. The pin check is
+   `ipfs pin ls --type=recursive <cid>` through the tunnel.
 4. Safe Transaction Builder → `setManifest(<cid>)`, two signatures. A
    ready-to-load batch file per revision lives beside the contract
    (`contracts/setManifest-<date>.safe-tx.json`, raw calldata next to it).
