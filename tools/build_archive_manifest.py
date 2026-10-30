@@ -86,14 +86,16 @@ def main():
     manifest = {
         "name": "Feral File Archive",
         "description": (
-            "Content-addressed, byte-verified copies of works Feral File "
-            "preserves. Every CID below can be pinned by anyone; each copy "
-            "held anywhere makes the works more permanent. Published by "
-            "Feral File; the current CID of this document is recorded in the "
-            "FeralFileArchiveRegistry contract on Ethereum."
+            "Copies of the artworks and records Feral File preserves. Each "
+            "entry has a content identifier (CID), an address made from its "
+            "files' contents, so whoever fetches it gets exactly these bytes. "
+            "Anyone can keep a copy by pinning a CID, and every independent "
+            "copy helps preserve the works. Published by Feral File; the "
+            "Feral File Archive Registry on Ethereum records which version of "
+            "this document is current."
         ),
         "schema_version": 1,
-        "site": "https://status.feralfile.com",
+        "site": "https://feralfile.com/archive",
         "data_as_of": data_as_of,
         "registry": registry,
         "previous_manifest": previous,
@@ -101,11 +103,9 @@ def main():
             {
                 "id": "bitmark-era-series",
                 "description": (
-                    "Complete media of the 215 series from Feral File's "
-                    "Bitmark-era exhibitions (4,959 never-migrated works plus "
-                    "the migrated editions that share these files), synced "
-                    "from the origin store and verified byte-for-byte. One "
-                    "CID per series, wrapping artworks/ and previews/."
+                    "The artwork files and previews of the 215 series from "
+                    "Feral File's Bitmark-era exhibitions, checked byte for "
+                    "byte against the originals. Each CID holds one series."
                 ),
                 "items": series_items,
             }

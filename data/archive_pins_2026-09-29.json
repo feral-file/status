@@ -4,22 +4,22 @@
  "collections": [
   {
    "id": "a2p",
-   "description": "Media of a2p (2019-2020), the artist-to-artist experiment Feral File grew out of. 144 works across two generations; archives at a2p.feralfile.com. Synced from the original storage and byte-verified 2026-08-03.",
+   "description": "Files from a2p (2019–2020), the artist-to-artist experiment Feral File grew out of: the media of its 144 works across its two versions and its trade originals, checked byte for byte against the source. Its own archive is at https://a2p.feralfile.com.",
    "items": [
     {
-     "label": "a2p 1.0 media (art-trading-assets-preview-livenet)",
+     "label": "a2p 1.0 media",
      "cid": "bafybeicpzu5662p244agrni3dowebgnnidlcjmt6yxmfk4bp4r2zc5zn2y",
      "bytes": 3700396877,
      "files": 170
     },
     {
-     "label": "a2p 2.0 media (art-trading-v2-live)",
+     "label": "a2p 2.0 media",
      "cid": "bafybeifvvqoomhreylzrkm3f25oymfv4brp4wy2pxiaywm4i2huu6vrrje",
      "bytes": 4071203627,
      "files": 149
     },
     {
-     "label": "a2p trade originals (trade-art-trading-livenet)",
+     "label": "a2p trade originals",
      "cid": "bafybeifc7skzcg7ivlsl5g2kusnf5izwgdwg4dbcgly3uhz7ir3t32olgi",
      "bytes": 7590613247,
      "files": 161
@@ -28,84 +28,87 @@
   },
   {
    "id": "bitmark-blockchain-archive",
-   "description": "The retired Bitmark blockchain (2014-2025), preserved per github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive: chain data on IPFS, Merkle root on Ethereum, timestamp on Bitcoin. Re-pinned on Feral File's archival node 2026-08-03.",
+   "description": "The retired Bitmark blockchain (2014–2025), kept the way its maintainers documented: the chain's data, and the proof file that checks it against a root recorded on Ethereum and timestamped on Bitcoin. How to check it: https://github.com/bitmark-inc/bitmarkd/wiki/bitmark-archive",
    "items": [
     {
-     "label": "chain archive metadata + data",
+     "label": "Bitmark chain data and metadata",
      "cid": "QmQeLXYbeB5kzoZQhLwoRhSaXAovc6Kp9didBasVDRuVHe"
     },
     {
-     "label": "Merkle proof file",
+     "label": "Bitmark proof file",
      "cid": "QmUTivb8fhJyNF1MvPXU1swyc8Eonf9eTeVm7uxPkiKaxK"
     }
    ]
   },
   {
    "id": "hls-master-playlists",
-   "description": "HLS master playlists for 184 video works (FeralVerse, On Screen Presence) whose stream files were never placed on IPFS — the masters are preserved here; full video repackaging as directory CIDs is open remediation.",
+   "description": "The streaming playlists three video works first pointed to: FERAL FONT and Some Last Questions in FeralVerse, and Rewilded Topography #1 in On Screen Presence. The video segments they list were never on IPFS, so the works' tokens now point to complete video files instead; the playlists are kept as the works' original references.",
    "items": [
     {
-     "label": "FeralVerse master A",
+     "series_id": "506e46e1-fe84-41eb-b72c-11420b3fda23",
+     "label": "FERAL FONT: Neural Network Font Type (NNFT), streaming playlist",
      "cid": "QmRGwoEnB4inboActrRsNAEiJzXL8LUwLrCYcUCgAEBxMQ"
     },
     {
-     "label": "FeralVerse master B",
+     "series_id": "45c0f2cc-eef6-43db-87a3-f9a51275e0ec",
+     "label": "Some Last Questions, streaming playlist",
      "cid": "Qmf8bvobDWMTmauvhgFKWNhZKUe4ufDY16a6qk1KLSgM74"
     },
     {
-     "label": "On Screen Presence master",
+     "series_id": "7b77f5d5-fefc-4a77-a40c-e9e8e5f8f9cb",
+     "label": "Rewilded Topography #1, streaming playlist",
      "cid": "QmQJAa9uC5Fc3gFzNnb8CHNMgJq7NgtNF1SHs9x7YvbjM4"
     }
    ]
   },
   {
    "id": "aorist",
-   "description": "Rescue archive of Aorist, a digital-art initiative that ceased operating; Feral File migrated its collections in 2024 and stewards the works. Complete contents of the two surviving storage buckets — originals, renditions, video, and the two IPFS blockstores from the 2024 migration — restored from cold storage, synced, and byte-verified 2026-08-15, plus the three ng objects outside that sync (two root files and one image uploaded 2026-09-09), banked 2026-09-29 before the buckets were deleted. One CID per source prefix.",
+   "description": "Files recovered from Aorist, a digital-art initiative that stopped operating; Feral File migrated its collections and stewards the works. Everything that survived in Aorist's file storage: originals, display copies, videos and its two IPFS stores, checked byte for byte against the source. Each CID holds one storage folder, named in parentheses.",
    "items": [
     {
-     "label": "aorist ng-models",
+     "label": "Aorist models (ng-models)",
      "cid": "bafybeiaix5orbepkcgbazsowl6fztmp2ys4djbhr47d2noffq6rndggbkq",
      "bytes": 378122832,
      "files": 24
     },
     {
-     "label": "aorist ng-images",
+     "label": "Aorist images (ng-images)",
      "cid": "bafybeihgqym3ymlrowvt7dodxozcznijbtrnaowg5ynn246pj4m7x3g67i",
      "bytes": 4129873434,
      "files": 9940
     },
     {
-     "label": "aorist ng-art-ipfs",
+     "label": "Aorist IPFS store (ng-art-ipfs)",
      "cid": "bafybeicitng5nvk76sj422ankbf7vh4hp5t7w2jzw5r5hjcasqv2i45cwq",
      "bytes": 17356383572,
      "files": 66880
     },
     {
-     "label": "aorist ng-art-env-02-s3-bucket",
+     "label": "Aorist art files (ng-art-env-02-s3-bucket)",
      "cid": "bafybeigeflcxy7ychcfrdlutspz4xdz7lkfudwrrg5vxz5qemowqdbufl4",
      "bytes": 67331008441,
      "files": 6904
     },
     {
-     "label": "aorist ng-aor-ipfs",
+     "label": "Aorist IPFS store (ng-aor-ipfs)",
      "cid": "bafybeiea554avuft4j65pfo6s4vw24ikzlxwraavqmxtam2qialhb3abfy",
      "bytes": 92350423623,
      "files": 278466
     },
     {
-     "label": "aorist ng-videos",
+     "label": "Aorist videos (ng-videos)",
      "cid": "bafybeicmn4vlgjtuuewwrh3vkz3tom6rejykb7inyzbpqphjvjhy4gubjq",
      "bytes": 239473406656,
      "files": 24165
     },
     {
-     "label": "aorist m-original",
+     "label": "Aorist originals (m-original)",
      "cid": "bafybeidfatg5fydti6ayrbjw2hvt4r76buugzdp4djwgoh53ojl7pd7xqq",
      "bytes": 189061416,
      "files": 12
     },
     {
-     "label": "aorist ng-residual",
+     "label": "Aorist remaining files (ng-residual)",
      "cid": "bafybeibubpkdux2fu3reql3l2vkahqclfvnr2gpljgogu46kgcx5t3ooyu",
      "bytes": 474814,
      "files": 3
@@ -114,7 +117,7 @@
   },
   {
    "id": "refik-anadol-coral-masters",
-   "description": "Refik Anadol, Machine Hallucinations — Coral — Generative AI Data Painting A–E: the five full-resolution masters (3840×6827) recovered from the Aorist archive. The on-chain tokens reference 640×1138 renditions; these are the originals Feral File stewards and serves for the Refik Anadol Studio channel. Byte-verified on the archival node 2026-08-29 (sha256 in /mnt/ff-pin-data/job/coral_manifest.csv). One CID per file.",
+   "description": "The five full-resolution originals (3840 × 6827 pixels) of Refik Anadol's Machine Hallucinations — Coral — Generative AI Data Painting A–E, recovered from the Aorist archive and checked byte for byte. The tokens reference 640 × 1138 versions; these are the originals Feral File stewards. Each CID holds one file.",
    "items": [
     {
      "label": "Machine Hallucinations — Coral — Generative AI Data Painting A",

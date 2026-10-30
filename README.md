@@ -174,7 +174,11 @@ Updating later (a revision):
    ready-to-load batch file per revision lives beside the contract
    (`contracts/setManifest-<date>.safe-tx.json`, raw calldata next to it).
 5. After execution: `data/published.json` (version, CID, date), rebuild and
-   deploy the page, close the card.
+   deploy the page, close the card. Then feralfile.com/archive: in
+   feral-file/ff3, `node scripts/archive.mjs`, commit `data/archive.json`,
+   release and deploy (ff-deploy `scripts/ff3/ship.sh`). Until then every ff3
+   release fails its archive check, by design: the page names the version it
+   lists and never ships one the registry has moved past.
 
 Every prior CID stays readable on-chain via `historyAt(i)` — not only in
 event logs.
