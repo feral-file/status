@@ -1,6 +1,6 @@
 {
   "name": "Feral File Archive",
-  "description": "Copies of the artworks and records Feral File preserves. Each entry has a content identifier (CID), an address made from its files' contents, so whoever fetches it gets exactly these bytes. Anyone can keep a copy by pinning a CID, and every independent copy helps preserve the works. Published by Feral File; the Feral File Archive Registry on Ethereum records which version of this document is current.",
+  "description": "Copies of the artworks and records Feral File preserves. Each entry has a content identifier (CID), an address made from its files' contents, which IPFS software uses to check that what it downloads matches. Anyone can keep a copy by pinning a CID, and every independent copy helps preserve the works. Published by Feral File; the Feral File Archive Registry on Ethereum records which version of this document is current.",
   "schema_version": 1,
   "site": "https://feralfile.com/archive",
   "data_as_of": "2026-09-29T00:00:00Z",
@@ -2207,7 +2207,7 @@
     },
     {
       "id": "hls-master-playlists",
-      "description": "The streaming playlists three video works first pointed to: FERAL FONT and Some Last Questions in FeralVerse, and Rewilded Topography #1 in On Screen Presence. The video segments they list were never on IPFS, so the works' tokens now point to complete video files instead; the playlists are kept as the works' original references.",
+      "description": "The streaming playlists three video works first pointed to: FERAL FONT and Some Last Questions in FeralVerse, and Rewilded Topography #1 in On Screen Presence. Each CID holds the playlist file alone, without the video it lists, so the works could not play from it; their token metadata was updated to point to complete video files. The playlists are kept as the works' original references.",
       "items": [
         {
           "series_id": "506e46e1-fe84-41eb-b72c-11420b3fda23",
@@ -2282,7 +2282,7 @@
     },
     {
       "id": "refik-anadol-coral-masters",
-      "description": "The five full-resolution originals (3840 × 6827 pixels) of Refik Anadol's Machine Hallucinations — Coral — Generative AI Data Painting A–E, recovered from the Aorist archive and checked byte for byte. The tokens reference 640 × 1138 versions; these are the originals Feral File stewards. Each CID holds one file.",
+      "description": "The five full-resolution originals (3840 × 6827 pixels) of Refik Anadol's Machine Hallucinations — Coral — Generative AI Data Painting A–E, recovered from the Aorist archive and checked byte for byte; Feral File stewards them. Each CID holds one file.",
       "items": [
         {
           "label": "Machine Hallucinations — Coral — Generative AI Data Painting A",

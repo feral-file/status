@@ -42,7 +42,7 @@
   },
   {
    "id": "hls-master-playlists",
-   "description": "The streaming playlists three video works first pointed to: FERAL FONT and Some Last Questions in FeralVerse, and Rewilded Topography #1 in On Screen Presence. The video segments they list were never on IPFS, so the works' tokens now point to complete video files instead; the playlists are kept as the works' original references.",
+   "description": "The streaming playlists three video works first pointed to: FERAL FONT and Some Last Questions in FeralVerse, and Rewilded Topography #1 in On Screen Presence. Each CID holds the playlist file alone, without the video it lists, so the works could not play from it; their token metadata was updated to point to complete video files. The playlists are kept as the works' original references.",
    "items": [
     {
      "series_id": "506e46e1-fe84-41eb-b72c-11420b3fda23",
@@ -117,7 +117,7 @@
   },
   {
    "id": "refik-anadol-coral-masters",
-   "description": "The five full-resolution originals (3840 × 6827 pixels) of Refik Anadol's Machine Hallucinations — Coral — Generative AI Data Painting A–E, recovered from the Aorist archive and checked byte for byte. The tokens reference 640 × 1138 versions; these are the originals Feral File stewards. Each CID holds one file.",
+   "description": "The five full-resolution originals (3840 × 6827 pixels) of Refik Anadol's Machine Hallucinations — Coral — Generative AI Data Painting A–E, recovered from the Aorist archive and checked byte for byte; Feral File stewards them. Each CID holds one file.",
    "items": [
     {
      "label": "Machine Hallucinations — Coral — Generative AI Data Painting A",

@@ -88,9 +88,10 @@ def main():
         "description": (
             "Copies of the artworks and records Feral File preserves. Each "
             "entry has a content identifier (CID), an address made from its "
-            "files' contents, so whoever fetches it gets exactly these bytes. "
-            "Anyone can keep a copy by pinning a CID, and every independent "
-            "copy helps preserve the works. Published by Feral File; the "
+            "files' contents, which IPFS software uses to check that what it "
+            "downloads matches. Anyone can keep a copy by pinning a CID, and "
+            "every independent copy helps preserve the works. Published by "
+            "Feral File; the "
             "Feral File Archive Registry on Ethereum records which version of "
             "this document is current."
         ),
