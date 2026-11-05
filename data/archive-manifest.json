@@ -2228,7 +2228,7 @@
     },
     {
       "id": "aorist",
-      "description": "Files recovered from Aorist, a digital-art initiative that stopped operating; Feral File migrated its collections and stewards the works. Everything that survived in Aorist's file storage: originals, display copies, videos and its two IPFS stores, checked byte for byte against the source. Each CID holds one storage folder, named in parentheses.",
+      "description": "Files recovered from Aorist, a digital-art initiative that stopped operating; Feral File migrated its collections and stewards the works. Everything that survived in Aorist's file storage: originals, display copies, videos and its two IPFS stores, checked byte for byte against the source. Each CID holds one storage folder, named in parentheses, except the last, which holds the three files found outside them.",
       "items": [
         {
           "label": "Aorist models (ng-models)",
