@@ -3,13 +3,13 @@
   "description": "Copies of the artworks and records Feral File preserves. Each entry has a content identifier (CID), an address made from its files' contents, which IPFS software uses to check that what it downloads matches. Anyone can keep a copy by pinning a CID, and every independent copy helps preserve the works. Published by Feral File; the Feral File Archive Registry on Ethereum records which version of this document is current.",
   "schema_version": 1,
   "site": "https://feralfile.com/archive",
-  "data_as_of": "2026-09-29T00:00:00Z",
+  "data_as_of": "2026-11-15T00:00:00Z",
   "registry": {
     "chain": "eip155:1",
     "address": "0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e",
     "runtime_code_hash": "0x34c949097393ef69b6cdea3452634b9b0953f15c93cc71bab6ffe6dde5e87d28"
   },
-  "previous_manifest": "bafkreig3snqvmcpvfu3amq4xjv55r77dtmbsv4cbrcewh46uqk3xqpfb4i",
+  "previous_manifest": "bafkreihf3f3noournpkzz2ngnrb6hqg35pbm66dtofzmpktswhtvikbjqm",
   "collections": [
     {
       "id": "bitmark-era-series",
@@ -2312,6 +2312,18 @@
           "label": "Machine Hallucinations — Coral — Generative AI Data Painting E",
           "cid": "bafybeiatoahoq34ap6o3uuvo6xm5rgxx6poq224cwiagyddgrjfrvg3bqa",
           "bytes": 6102858,
+          "files": 1
+        }
+      ]
+    },
+    {
+      "id": "the-feral-file-retrospective",
+      "description": "The conversation artists and collectors had in the chat beside The Feral File Retrospective, Feral File's second-anniversary exhibitions The Experiment and Feral File 1.0 (June 28 to July 12, 2023): its pinned question and the 100 messages the retrospective's site kept, each with its time, its sender's address and the name the chat showed. The page is at https://feralfile.com/retrospective. The CID holds one JSON file.",
+      "items": [
+        {
+          "label": "The retrospective's conversation",
+          "cid": "bafkreiead723dm3tli2mjz3nojazhjqte5lfczazxyjhdmbf3i62bq7czy",
+          "bytes": 23472,
           "files": 1
         }
       ]

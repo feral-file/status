@@ -1,0 +1,627 @@
+{
+  "name": "The Feral File Retrospective: The conversation",
+  "dates": "June 28 – July 12, 2023",
+  "question": "How has web3 changed art over the past few years? Has it been a net positive or negative change?",
+  "note": "Each speaker is the ENS name the site showed, or else their wallet address, shortened. Times are as the site showed them; it recorded no time zone.",
+  "page": "https://feralfile.com/retrospective",
+  "origin": {
+    "repo": "feral-file/ff-exhibition",
+    "commit": "8aa3d7982fecc8a049c5f7d317f09c464b620a6a",
+    "messages": {
+      "path": "feralfile-restropective/src/data/chat-archive.html",
+      "sha256": "3a8548fdd77ceb6933268ee127c449e6ff7e9a614c4711ba7322b79fc688b6dc",
+      "note": "100 messages as rendered HTML (MM-DD HH:mm, sender address, text); the year is the retrospective's, 2023."
+    },
+    "names": {
+      "path": "feralfile-restropective/src/data/chat-names.ts",
+      "sha256": "eab619b4ac948759847ccf9e60f01bc416ab0d81b0b6ae98e7b1884d8b269938"
+    },
+    "question": {
+      "path": "feralfile-restropective/src/data/index.ts",
+      "export": "pinnedMessage",
+      "sha256": "69826520fe46689268afb7c2464e6f0e485f78b216c0f3a617be313e173e5896"
+    }
+  },
+  "messages": [
+    {
+      "at": "2023-06-29T00:40",
+      "from": "tz1hhG3vN2NCoPZepvEbKHBFQ5denwNJwHXP",
+      "speaker": "tz1hhG…wHXP",
+      "text": "(Chris Coleman - digitalcoleman)"
+    },
+    {
+      "at": "2023-06-29T02:28",
+      "from": "0x457ee5f723C7606c12a7264b52e285906F91eEA6",
+      "speaker": "reas.eth",
+      "text": "Thank you Chris and Aaron! <3 Casey"
+    },
+    {
+      "at": "2023-06-29T02:28",
+      "from": "0x457ee5f723C7606c12a7264b52e285906F91eEA6",
+      "speaker": "reas.eth",
+      "text": "*playful*"
+    },
+    {
+      "at": "2023-06-29T05:06",
+      "from": "0x0C8aF9d85325c6A44e8d40C491c4B2213DaA9ed8",
+      "speaker": "0x0C8a…9ed8",
+      "text": "Through a discord group i got the tip about Instructions Follows. Loved several works and bought a set, number 26. Then got hooked because of the constant quality"
+    },
+    {
+      "at": "2023-06-29T05:07",
+      "from": "0x0C8aF9d85325c6A44e8d40C491c4B2213DaA9ed8",
+      "speaker": "0x0C8a…9ed8",
+      "text": "Best ones: Mario Klingeman and Refik Anadol. Very meaningful works"
+    },
+    {
+      "at": "2023-06-29T07:29",
+      "from": "0x457ee5f723C7606c12a7264b52e285906F91eEA6",
+      "speaker": "reas.eth",
+      "text": "thank you 0x0C....9ed8! —casey"
+    },
+    {
+      "at": "2023-06-29T08:05",
+      "from": "0x48aa71836bc3ec2BA97c61D7ef744B4240E0ed8a",
+      "speaker": "zobele.eth",
+      "text": "hi"
+    },
+    {
+      "at": "2023-06-29T08:28",
+      "from": "tz1QgcWNdDf8YZqYgqTXZvdc55TkBSchDJSN",
+      "speaker": "tz1Qgc…DJSN",
+      "text": "Thank you to the artist, curators and feral file for putting on some amazing exhibitions. I learned about feral files after discovering Casey Reas work in 2021.  "
+    },
+    {
+      "at": "2023-06-29T22:03",
+      "from": "0xAbc9B3AF7ba302c60049Dc826fb2532b37504196",
+      "speaker": "0xAbc9…4196",
+      "text": "Hi everyone!"
+    },
+    {
+      "at": "2023-06-29T22:04",
+      "from": "0xAbc9B3AF7ba302c60049Dc826fb2532b37504196",
+      "speaker": "0xAbc9…4196",
+      "text": "大家好"
+    },
+    {
+      "at": "2023-06-30T00:25",
+      "from": "0x6853a596D6d7264D3622546dA3B891B6fe17eb82",
+      "speaker": "zaphodok.eth",
+      "text": "gm"
+    },
+    {
+      "at": "2023-06-30T00:44",
+      "from": "tz1Let211RoZTN9Qji7aU9oZYqT335SmZf4p",
+      "speaker": "tz1Let…Zf4p",
+      "text": "GM everyone!"
+    },
+    {
+      "at": "2023-06-30T00:53",
+      "from": "tz1Let211RoZTN9Qji7aU9oZYqT335SmZf4p",
+      "speaker": "tz1Let…Zf4p",
+      "text": "How did you first hear about Feral File? / through my friends and my art collector guru CryptyNifty who can spot the trends and grails early on in this space. Thanks to her John Gerrhard's amazing work of Smoky hands ended up in the collection of our foundation"
+    },
+    {
+      "at": "2023-06-30T16:02",
+      "from": "tz1a1L6vroYFXEwLn6A23woo8ae2EgA5QfSy",
+      "speaker": "tz1a1L…QfSy",
+      "text": "hey"
+    },
+    {
+      "at": "2023-06-30T19:02",
+      "from": "0x02D78c75532A490daE2596E6b07A75857815Cd70",
+      "speaker": "0x02D7…Cd70",
+      "text": "Salutations to my fellow feral file folk. I first heard about Feral File in connection w/ Refik Anadol"
+    },
+    {
+      "at": "2023-06-30T19:06",
+      "from": "0x5BAFFeF47798482Fbd71D183423B272eBf648091",
+      "speaker": "daylatebuckshort.eth",
+      "text": "Hello "
+    },
+    {
+      "at": "2023-06-30T23:14",
+      "from": "0xB92254F2f516b88EE9f28F29DF3EFaf1b4B798F3",
+      "speaker": "0xB922…98F3",
+      "text": "Really thinking back and appreciating how much a2p was a lego connector to so many other artists for me. Even more importantly was this chance to hear from people in the chat and recognize that we all mostly shared a sense of uncertainty and wonder about having this chance to swap work on a new platform. Big community vibes! Very special project and I'm so glad we get to hear folks talk in more depth this week! Cyborg hugs....lee"
+    },
+    {
+      "at": "2023-07-01T01:12",
+      "from": "0x9Bb39C8e80E32273FAAA1bBe74eBC6eE5b0e0415",
+      "speaker": "0x9Bb3…0415",
+      "text": "Thank you feral file team <3"
+    },
+    {
+      "at": "2023-07-01T01:13",
+      "from": "0x9Bb39C8e80E32273FAAA1bBe74eBC6eE5b0e0415",
+      "speaker": "0x9Bb3…0415",
+      "text": "I discovered your amazing site in 2021 by going through Manolos body of work and I saw he minted here <3"
+    },
+    {
+      "at": "2023-07-01T01:59",
+      "from": "0xA5EA4597bCa9B8eF57c436d84Fb3e16697b39CeD",
+      "speaker": "0xA5EA…9CeD",
+      "text": ":)"
+    },
+    {
+      "at": "2023-07-01T04:49",
+      "from": "0xf5c68206A746424fe96B580BF7E4274C47d66324",
+      "speaker": "0xf5c6…6324",
+      "text": "While your shows have all been special I have particular fondness for Peer to Peer and Field Guide which really highlighted some of my favorite curation from some of my favorite curators, that said all of your curation and shows have been terrific."
+    },
+    {
+      "at": "2023-07-01T05:05",
+      "from": "0x4192FA2E13BAA0cC621D40380B913BD6A6419d4E",
+      "speaker": "0x4192…9d4E",
+      "text": "Hey FF! I discovered you thanks to Refik Anadol. But have since been a collector from prior and following shows! 🙏"
+    },
+    {
+      "at": "2023-07-01T05:05",
+      "from": "0x4192FA2E13BAA0cC621D40380B913BD6A6419d4E",
+      "speaker": "0x4192…9d4E",
+      "text": "(the GRAM collection) "
+    },
+    {
+      "at": "2023-07-01T10:39",
+      "from": "0xE02BDdd66c0dbFc132e95620089a02cEddAaF2cf",
+      "speaker": "0xE02B…F2cf",
+      "text": "Hi there."
+    },
+    {
+      "at": "2023-07-01T12:54",
+      "from": "0xEae89E8cED8eE71b064c3601E19E253605b988fE",
+      "speaker": "0xEae8…88fE",
+      "text": "Hi I can't remember how I found the site but I was actively seeking out high quality digital art websites which this is. "
+    },
+    {
+      "at": "2023-07-01T20:15",
+      "from": "0x2F288D771587915fd82c092E5Bfdc36026DE7A34",
+      "speaker": "0x2F28…7A34",
+      "text": "I’m new to generative and Ai Art. I’m thankful for quality curation from Feral File that assists me in this journey. "
+    },
+    {
+      "at": "2023-07-01T22:09",
+      "from": "tz1c9vgUPbLW7Hgw3GE1Hshh5VGtRBJ24vCY",
+      "speaker": "tz1c9v…4vCY",
+      "text": "hello frens"
+    },
+    {
+      "at": "2023-07-01T22:12",
+      "from": "0x8f75Ae81354EA784dB69638E7ca1b65934Df3bE9",
+      "speaker": "0x8f75…3bE9",
+      "text": "this is cool"
+    },
+    {
+      "at": "2023-07-02T00:19",
+      "from": "0x8264e9e0f4CbcBBbb3F8eCAec0A625B590Ae790e",
+      "speaker": "0x8264…790e",
+      "text": "so excited to be here and thank feral file for all they do!"
+    },
+    {
+      "at": "2023-07-02T03:40",
+      "from": "0xA2feb99DbF3b355397532AeF85d6066b7eD029D0",
+      "speaker": "kimasendorf.eth",
+      "text": "ɘliᆿ lɒɿɘᆿ"
+    },
+    {
+      "at": "2023-07-02T08:32",
+      "from": "0x8855E06afE2FD18FF966FCfd19e6b7895af4EB1D",
+      "speaker": "0x8855…EB1D",
+      "text": "Have loved FF since the beginning?  I think.  Loved nearly everything, just keeps getting better and better.  Cheers! "
+    },
+    {
+      "at": "2023-07-02T09:26",
+      "from": "0xF47C72393065D3331b1D0C6Feb1f8210FC56DbBE",
+      "speaker": "0xF47C…DbBE",
+      "text": "hi frens, excited for the next iteration of Feral File. FF is one of the best hidden gems in the generative art space."
+    },
+    {
+      "at": "2023-07-02T12:00",
+      "from": "0x698f3eAf3DEfeE3C5A00b64Bd65FEee9015d6970",
+      "speaker": "0x698f…6970",
+      "text": "I just discovered Feral File after buying a Refik Anadol MoMA NFT. Great discovery!"
+    },
+    {
+      "at": "2023-07-02T17:58",
+      "from": "0xc51505386b5A1d3e7ECb88CEc112796D8CEe0250",
+      "speaker": "0xc515…0250",
+      "text": "think i first came across FF through Dmitri Cherniak's Transparent Grit. slight lost track of the numebr of work's i've collected since then...! congrats on FF1... can't wait for FF2!"
+    },
+    {
+      "at": "2023-07-02T18:16",
+      "from": "tz1MgD1Mrk3j5ho2jsTShWTvyUf6sMYwJa8Z",
+      "speaker": "tz1MgD…Ja8Z",
+      "text": "Gm, wen ff2?"
+    },
+    {
+      "at": "2023-07-02T19:22",
+      "from": "0x02D78c75532A490daE2596E6b07A75857815Cd70",
+      "speaker": "0x02D7…Cd70",
+      "text": "1+1 ="
+    },
+    {
+      "at": "2023-07-02T20:34",
+      "from": "0xC881Ba24fEA61D9c629BB7EB79B3B20392584115",
+      "speaker": "vanto.eth",
+      "text": "Love the Peter Burr Boom town. Found out through the FF discord. It has such radical roots."
+    },
+    {
+      "at": "2023-07-02T20:35",
+      "from": "0x0C8aF9d85325c6A44e8d40C491c4B2213DaA9ed8",
+      "speaker": "0x0C8a…9ed8",
+      "text": "once i got to know FF I started vaulting some works. Like Unsupervised or Vague Recollection. So beautiful and deep"
+    },
+    {
+      "at": "2023-07-02T23:47",
+      "from": "tz1dtRjrmA6ShhxST98X7qMPkzsxWVVd3WCZ",
+      "speaker": "tz1dtR…3WCZ",
+      "text": "GM Feral File community! "
+    },
+    {
+      "at": "2023-07-02T23:49",
+      "from": "tz1dtRjrmA6ShhxST98X7qMPkzsxWVVd3WCZ",
+      "speaker": "tz1dtR…3WCZ",
+      "text": "Can't wait to discover FF2.0!! I love to enjoy everything from the beginning of FF 1.0. \nThe best curated online artwork gallery i've seen. "
+    },
+    {
+      "at": "2023-07-03T01:51",
+      "from": "0x171446B041C6683e5F138b8a3f263BBFfb8Ee74a",
+      "speaker": "kingd.eth",
+      "text": "I became aware of FF via Casey Reas Twitter feed. With my curiosity piqued, I had to see what this new medium for creative expression and ownership was about. FF and Bitmark (and Autonomy) fed my habit of learning by doing and sparked a deep habit of collecting art on the blockchain. Looking forward to FF2."
+    },
+    {
+      "at": "2023-07-03T03:24",
+      "from": "0xbB30d45171277A4891b9Ef356Cf0Aa2fDf36109C",
+      "speaker": "0xbB30…109C",
+      "text": "bought my first refik (and surely not my last) on Feral File. "
+    },
+    {
+      "at": "2023-07-03T03:39",
+      "from": "0xAE1Be3F712b9d9A5Bb81A5fFf7Ba171493F0a7A6",
+      "speaker": "0xAE1B…a7A6",
+      "text": "excited to be here. discovered feralfile through the amazing refik anadol."
+    },
+    {
+      "at": "2023-07-03T03:58",
+      "from": "0xCB3C9a2FF3F1013A1C0c7D7FD8CeaFc975C2fE3C",
+      "speaker": "0xCB3C…fE3C",
+      "text": "gmgm everyone. what a great exhibition!!"
+    },
+    {
+      "at": "2023-07-03T03:58",
+      "from": "0xCB3C9a2FF3F1013A1C0c7D7FD8CeaFc975C2fE3C",
+      "speaker": "0xCB3C…fE3C",
+      "text": "looking forward to Feral File 2.0"
+    },
+    {
+      "at": "2023-07-03T04:22",
+      "from": "0xE6d06DBEB36F18d22813A14Cc20C958b960d070f",
+      "speaker": "0xE6d0…070f",
+      "text": "Hey y’all. Proud owner of at least 9 feral file NFTs. Kept it through the bear because I genuinely like the,  "
+    },
+    {
+      "at": "2023-07-03T05:13",
+      "from": "0xF75b111Ec72422e39B7c9AA1cA2108F31E854B48",
+      "speaker": "0xF75b…4B48",
+      "text": "why no name?"
+    },
+    {
+      "at": "2023-07-03T05:13",
+      "from": "0xF75b111Ec72422e39B7c9AA1cA2108F31E854B48",
+      "speaker": "0xF75b…4B48",
+      "text": "excited to be here"
+    },
+    {
+      "at": "2023-07-03T18:25",
+      "from": "0x4192FA2E13BAA0cC621D40380B913BD6A6419d4E",
+      "speaker": "0x4192…9d4E",
+      "text": "Wow just calculated all my Feral File NFTs between all wallets (ETH and Tezos) and got to 48! No wonder my wife says I’m addicted ;) love your art! The GRAM Collection "
+    },
+    {
+      "at": "2023-07-04T03:03",
+      "from": "0x683C7A4D0BB376b26C4a4Ad866984DBe57330b99",
+      "speaker": "0x683C…0b99",
+      "text": "First time I heard from Feral File was when I minted unsupervised by Refik Anadol. "
+    },
+    {
+      "at": "2023-07-04T05:01",
+      "from": "0x0EA9f5D0C97b430D5426465e2832A504Bd6Dd9F9",
+      "speaker": "0x0EA9…d9F9",
+      "text": "Refik Anadol"
+    },
+    {
+      "at": "2023-07-04T05:19",
+      "from": "0x3C7676976600C90c8d106786d84bda4369f872a8",
+      "speaker": "0x-ql.eth",
+      "text": "heard about it a few times previously but collected after watching a MoMA salon video."
+    },
+    {
+      "at": "2023-07-04T05:49",
+      "from": "0x4C8D78e6cA5C0d3E3D93620A68Dc03b022dE8Ef5",
+      "speaker": "0x4C8D…8Ef5",
+      "text": "CT"
+    },
+    {
+      "at": "2023-07-04T18:37",
+      "from": "0x243FE1d2E48bd6f800ABb9aafE905C70064859bF",
+      "speaker": "0x243F…59bF",
+      "text": "love your work"
+    },
+    {
+      "at": "2023-07-05T00:02",
+      "from": "tz1epuzq6Av3hSgAMGrbjoSx5KjjqPprHsPz",
+      "speaker": "tz1epu…HsPz",
+      "text": "gm"
+    },
+    {
+      "at": "2023-07-05T00:03",
+      "from": "tz1epuzq6Av3hSgAMGrbjoSx5KjjqPprHsPz",
+      "speaker": "tz1epu…HsPz",
+      "text": "this is Nuk btw"
+    },
+    {
+      "at": "2023-07-05T00:03",
+      "from": "tz1epuzq6Av3hSgAMGrbjoSx5KjjqPprHsPz",
+      "speaker": "tz1epu…HsPz",
+      "text": "First time I heard about Feral File was after a friend told me about Transparent Grit"
+    },
+    {
+      "at": "2023-07-05T05:52",
+      "from": "0x2Ee8670d2b936985D5fb1EE968810c155D3bB9cA",
+      "speaker": "0x2Ee8…B9cA",
+      "text": "gm"
+    },
+    {
+      "at": "2023-07-05T05:53",
+      "from": "0x2Ee8670d2b936985D5fb1EE968810c155D3bB9cA",
+      "speaker": "0x2Ee8…B9cA",
+      "text": "I heard about it when looking at an online gallery, and I saw transparent grit by Dmitri Cherniak"
+    },
+    {
+      "at": "2023-07-05T08:43",
+      "from": "tz1MMBPLnmWifKsctmrQXixQAf6Gjwto8p9f",
+      "speaker": "tz1MMB…8p9f",
+      "text": "GM"
+    },
+    {
+      "at": "2023-07-05T08:47",
+      "from": "tz1MMBPLnmWifKsctmrQXixQAf6Gjwto8p9f",
+      "speaker": "tz1MMB…8p9f",
+      "text": "GM"
+    },
+    {
+      "at": "2023-07-05T10:24",
+      "from": "tz1Ta9XfHcRS6VnFM63JbGkjM2JeW9diHTmZ",
+      "speaker": "tz1Ta9…HTmZ",
+      "text": "Sale by laturbo avedon "
+    },
+    {
+      "at": "2023-07-05T17:46",
+      "from": "0x25F5541ed34F99B6C79EC9c9e94e4d7C2C23381c",
+      "speaker": "0x25F5…381c",
+      "text": "gm"
+    },
+    {
+      "at": "2023-07-05T18:12",
+      "from": "0xd34Afa75535Ee684F679b34777DA271498FD82e8",
+      "speaker": "0xd34A…82e8",
+      "text": "GM!!!"
+    },
+    {
+      "at": "2023-07-05T18:41",
+      "from": "0x974AE5A3D6A4A1771Ba4A48C16A8d35BbBDf6e42",
+      "speaker": "0x974A…6e42",
+      "text": "Hello"
+    },
+    {
+      "at": "2023-07-06T08:27",
+      "from": "tz1UjauA8DZ1qcgxMt3dL6UCkvk9oHz3VM6T",
+      "speaker": "tz1Uja…VM6T",
+      "text": "hi"
+    },
+    {
+      "at": "2023-07-06T09:31",
+      "from": "0xC72A679A0d846b2395D0F092C01CFC6deb72d978",
+      "speaker": "0xC72A…d978",
+      "text": "First time heard of FF was on exhibition showing Mario Klingemann. Enjoy seeing all the different styles since then."
+    },
+    {
+      "at": "2023-07-06T09:57",
+      "from": "0x25F5541ed34F99B6C79EC9c9e94e4d7C2C23381c",
+      "speaker": "0x25F5…381c",
+      "text": "excited to be here"
+    },
+    {
+      "at": "2023-07-06T15:05",
+      "from": "tz1MJDfEjimuJwJCqqZqeVkoDubFHWxQ81Ty",
+      "speaker": "tz1MJD…81Ty",
+      "text": "GM!!! what a great exhibition "
+    },
+    {
+      "at": "2023-07-06T16:26",
+      "from": "0xd34Afa75535Ee684F679b34777DA271498FD82e8",
+      "speaker": "0xd34A…82e8",
+      "text": "GM!!!"
+    },
+    {
+      "at": "2023-07-06T16:26",
+      "from": "0xd34Afa75535Ee684F679b34777DA271498FD82e8",
+      "speaker": "0xd34A…82e8",
+      "text": "Obviously a positive change :>"
+    },
+    {
+      "at": "2023-07-06T20:42",
+      "from": "0x8855E06afE2FD18FF966FCfd19e6b7895af4EB1D",
+      "speaker": "0x8855…EB1D",
+      "text": "web3 has definitely grown into it's own in the past 2-3 years, offering a lot more security, autonomy and incredible platforms.  But along with that has come numerous scams, countless $$$ and NFTs stolen or lost and a complete sense of grift to anyone outside of it.  Don't get me started on gas fees, please.  Until this is remedied, web3 will not grow."
+    },
+    {
+      "at": "2023-07-06T21:06",
+      "from": "tz1hDUCJc9uJvuUScpx8kRFjQkr7KVNwJSAt",
+      "speaker": "tz1hDU…JSAt",
+      "text": "Hi all, long time FF lurker until recently when I purchased a Lee Mullican edition for my collection. Several other FF projects are on my wishlist but those will come."
+    },
+    {
+      "at": "2023-07-06T21:48",
+      "from": "0x683C7A4D0BB376b26C4a4Ad866984DBe57330b99",
+      "speaker": "0x683C…0b99",
+      "text": "gmgm patiently waiting for ff 2.0"
+    },
+    {
+      "at": "2023-07-06T21:52",
+      "from": "0xAE1Be3F712b9d9A5Bb81A5fFf7Ba171493F0a7A6",
+      "speaker": "0xAE1B…a7A6",
+      "text": "hey everyone."
+    },
+    {
+      "at": "2023-07-06T21:56",
+      "from": "0x3fB82b2D574199F9B015DE262271019cfF796359",
+      "speaker": "0x3fB8…6359",
+      "text": "excited for the new group exhibition!!"
+    },
+    {
+      "at": "2023-07-06T21:58",
+      "from": "0x3fB82b2D574199F9B015DE262271019cfF796359",
+      "speaker": "0x3fB8…6359",
+      "text": "one more week to go"
+    },
+    {
+      "at": "2023-07-07T10:46",
+      "from": "0x029B6d25EcF32543F1beC3323325F4dc46fE1c54",
+      "speaker": "0x029B…1c54",
+      "text": "Hello. Nice to meet you. I am Long from Vietnam"
+    },
+    {
+      "at": "2023-07-08T01:19",
+      "from": "0xb66af334Ca5488cF45903E286ED9F657Cacd50d9",
+      "speaker": "0xb66a…50d9",
+      "text": "GM"
+    },
+    {
+      "at": "2023-07-10T00:27",
+      "from": "0xE63bF62A131Eb38Cc441C5F27dC6eA8158a1BB3b",
+      "speaker": "0xE63b…BB3b",
+      "text": "hi"
+    },
+    {
+      "at": "2023-07-10T15:03",
+      "from": "0x5c20B91f068F34681e0C583F2bfD7831D5589eA8",
+      "speaker": "0x5c20…9eA8",
+      "text": "hello everyone!"
+    },
+    {
+      "at": "2023-07-10T16:14",
+      "from": "tz1dBwDL1Ze9zKtfBdiS1WcLZrqDjfgqBUuR",
+      "speaker": "tz1dBw…BUuR",
+      "text": "Hi all"
+    },
+    {
+      "at": "2023-07-10T23:19",
+      "from": "0xc481aeec5A219Ca98643E71f0B967f40bf211b38",
+      "speaker": "0xc481…1b38",
+      "text": "Gm! Excited for the N=12 exhibtion upcoming"
+    },
+    {
+      "at": "2023-07-10T23:21",
+      "from": "tz1aqUbcmWWduXtoDDKqi42dDH3DsqCAu2m4",
+      "speaker": "tz1aqU…u2m4",
+      "text": "hi hi - fun to see all the chat here"
+    },
+    {
+      "at": "2023-07-11T00:35",
+      "from": "0x2F288D771587915fd82c092E5Bfdc36026DE7A34",
+      "speaker": "0x2F28…7A34",
+      "text": "Net positive. As a photographer who understands the impact of technology on storytelling, web3 art makes complete sense in the ever evolving world of art. "
+    },
+    {
+      "at": "2023-07-12T06:26",
+      "from": "0xb4062E96c68c78F2E453a03e89510F0b496547f0",
+      "speaker": "0xb406…47f0",
+      "text": "Two more days to N=12!"
+    },
+    {
+      "at": "2023-07-12T20:41",
+      "from": "0xDcEFC9ff1E47e458e56959154c1CDCF56003D30b",
+      "speaker": "0xDcEF…D30b",
+      "text": "GM all"
+    },
+    {
+      "at": "2023-07-12T20:43",
+      "from": "0xDcEFC9ff1E47e458e56959154c1CDCF56003D30b",
+      "speaker": "0xDcEF…D30b",
+      "text": "personally, net positive. Increased my art exposure 1000x"
+    },
+    {
+      "at": "2023-07-12T20:55",
+      "from": "0x4C8D78e6cA5C0d3E3D93620A68Dc03b022dE8Ef5",
+      "speaker": "0x4C8D…8Ef5",
+      "text": "gm gm"
+    },
+    {
+      "at": "2023-07-12T22:28",
+      "from": "tz1QyBdAYdPoxQmzmhKDCEh8cALxLapTaFe7",
+      "speaker": "tz1QyB…aFe7",
+      "text": "gm! Def a net positive -- made it so much easier to engage with and collect"
+    },
+    {
+      "at": "2023-07-12T22:28",
+      "from": "tz1QyBdAYdPoxQmzmhKDCEh8cALxLapTaFe7",
+      "speaker": "tz1QyB…aFe7",
+      "text": "gm! definitely a net positive because it made it so much easier to engage and gave so many more artists a pathway to create"
+    },
+    {
+      "at": "2023-07-12T22:31",
+      "from": "tz1QyBdAYdPoxQmzmhKDCEh8cALxLapTaFe7",
+      "speaker": "tz1QyB…aFe7",
+      "text": "Oops -- sorry for the double post. Looks like it got eaten on the first post"
+    },
+    {
+      "at": "2023-07-13T01:54",
+      "from": "tz1YokFzMR1hX4m4aBqgutxLSUKFDdNoYGEN",
+      "speaker": "tz1Yok…YGEN",
+      "text": "This question is best answered by people who have traveresed Web3. One of the many positive aspects of blockchain is the potential for a ramp onto the stage, the expansion of the concept on what a 'stage' is, and a sentinel to preserve all artworks equally. A preservative for the work of the introverts, the recluse, and the misunderstood; who don’t speak the common language and are unable to rise above the noise. One day the frequency of an explorer may harmonize with this art, which can then finally be deciphered.Congrats&♡2FF"
+    },
+    {
+      "at": "2023-07-13T07:29",
+      "from": "0x9E4e4c30B92D4109442215027279Fdaed45a620f",
+      "speaker": "moskovich.eth",
+      "text": "For me, net positive for sure. "
+    },
+    {
+      "at": "2023-07-13T07:51",
+      "from": "tz1MMBPLnmWifKsctmrQXixQAf6Gjwto8p9f",
+      "speaker": "tz1MMB…8p9f",
+      "text": "GM"
+    },
+    {
+      "at": "2023-07-13T08:46",
+      "from": "0x9E4e4c30B92D4109442215027279Fdaed45a620f",
+      "speaker": "moskovich.eth",
+      "text": "Gm"
+    },
+    {
+      "at": "2023-07-13T08:47",
+      "from": "tz1MMBPLnmWifKsctmrQXixQAf6Gjwto8p9f",
+      "speaker": "tz1MMB…8p9f",
+      "text": "GM"
+    },
+    {
+      "at": "2023-07-13T08:55",
+      "from": "tz1hXDQ3rSGofL6V8zzRCiY2agUh8FyAVAyk",
+      "speaker": "tz1hXD…VAyk",
+      "text": "GM"
+    },
+    {
+      "at": "2023-07-13T09:43",
+      "from": "0x19f6c1D5C8308F7103524A339b0c7f0ad0f5B2d3",
+      "speaker": "0x19f6…B2d3",
+      "text": "GM"
+    },
+    {
+      "at": "2023-07-13T13:48",
+      "from": "0xD209CfA7f31A76a2994c949C3a7AD0415dd83148",
+      "speaker": "0xD209…3148",
+      "text": "It has been a joy to browse the artworks in the FF1 retrospective, so much fantastic work and many new favorites. I look forward to launching the N=12 exhibition and kicking off FF 2.0 in a few hours! The future is bright for digital artwork and Feral File is modeling the way forward. Congratulations to the team at FF, and to the artists & curators that are part of their story 🎉"
+    }
+  ]
+}
