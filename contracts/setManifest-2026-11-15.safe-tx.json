@@ -1,10 +1,10 @@
 {
   "version": "1.0",
   "chainId": "1",
-  "createdAt": 1794768539633,
+  "createdAt": 1794805773796,
   "meta": {
     "name": "Feral File Archive manifest \u2014 setManifest (version 4, 2026-11-15 build)",
-    "description": "FeralFileArchiveRegistry.setManifest(cid) from the custody Safe. cid = archive-manifest.json in feral-file/status, 2026-11-15 build (version 4: version 3's 236 entries unchanged, plus The Feral File Retrospective's conversation, one JSON file; previous_manifest = version 3). Verify before signing: sha256 of data/archive-manifest.json = ece339f557de4dcd9d2fe0f5ec0b0fe3720b0701a49a448960a6e0e965b809e8; the CID fetched from a second machine is byte-identical.",
+    "description": "FeralFileArchiveRegistry.setManifest(cid) from the custody Safe. cid = archive-manifest.json in feral-file/status, 2026-11-15 build (version 4: version 3's 236 entries unchanged, plus The Feral File Retrospective, four entries, and the contracts collection, 155 entries; previous_manifest = version 3). Verify before signing: sha256 of data/archive-manifest.json = 0247b13ef09b417312f73d73d974d66cc6b53bd9b66e2d03bc443413fb529534; the CID fetched from a second machine is byte-identical.",
     "txBuilderVersion": "1.17.0",
     "createdFromSafeAddress": "0xA741D850B8B4e684c6F78e9615BD5b33B37AcFcF",
     "createdFromOwnerAddress": "",
@@ -27,7 +27,7 @@
         "payable": false
       },
       "contractInputsValues": {
-        "cid": "bafkreihm4m47kv66jxgz2l7a6xwawd7doifqoanetjcisyfg4duwloaj5a"
+        "cid": "bafkreiaci6yt54e3ifzrf5z5opmxjvtmy22txwnwnywqhpcegqj7wuuvgq"
       }
     }
   ]

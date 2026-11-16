@@ -2318,13 +2318,1446 @@
     },
     {
       "id": "the-feral-file-retrospective",
-      "description": "The conversation artists and collectors had in the chat beside The Feral File Retrospective, Feral File's second-anniversary exhibitions The Experiment and Feral File 1.0 (June 28 to July 12, 2023): its pinned question and the 100 messages the retrospective's site kept, each with its time, its sender's address and the name the chat showed. The page is at https://feralfile.com/retrospective. The CID holds one JSON file.",
+      "description": "The Feral File Retrospective, Feral File's second anniversary (June 28 to July 12, 2023): the signed playlists of its two exhibitions, The Experiment and Feral File 1.0; the retrospective's own website, 162 files, as Feral File served it; and the conversation artists and collectors had in the chat beside it, the 100 messages that site kept, each with its time, its sender's address and the name the chat showed. The page is at https://feralfile.com/retrospective.",
       "items": [
+        {
+          "label": "The Experiment, signed playlist",
+          "cid": "bafkreidybxqhzgjchzc7bcodfwdwshtnvb35sdytc4tiu555atm52j4jc4",
+          "bytes": 62391,
+          "files": 1
+        },
+        {
+          "label": "Feral File 1.0, signed playlist",
+          "cid": "bafkreigop23zdzak5lqigdj3zbwq5mcxwpfdmk42mvbl6aqaxxdgsv6rbm",
+          "bytes": 131331,
+          "files": 1
+        },
+        {
+          "label": "The retrospective's website",
+          "cid": "bafybeidnv5h5brysctsoe6gn4gretgvs3okqrtlz4merocibjf3ztdsuia",
+          "bytes": 12127875,
+          "files": 162
+        },
         {
           "label": "The retrospective's conversation",
           "cid": "bafkreiead723dm3tli2mjz3nojazhjqte5lfczazxyjhdmbf3i62bq7czy",
           "bytes": 23472,
           "files": 1
+        }
+      ]
+    },
+    {
+      "id": "contracts",
+      "description": "Every contract Feral File deployed on Ethereum and Tezos and what each one is, so anyone indexing Feral File's works can tell which deployment is current. Status: live, the contract of record for its works or a tool in use; completed, a tool that did its job and stopped, holding no works; abandoned, deployed and then replaced or never used, with its replacement named where there is one. Kind: exhibition; annex, a section of an exhibition's page; partner-edition, minted for someone else's event; stewarded, the Aorist and a2p collections Feral File keeps; minted-for-artist, minted at an artist's request outside any exhibition; lot, a token that stood in for an auction lot, not an artwork; infrastructure; test, an internal deployment never published. The Monopoly Set entry names its token and the CIDs of its metadata and image.",
+      "items": [
+        {
+          "chain": "eip155:1",
+          "address": "0xC764A826285a75715db602108D706f72418586C2",
+          "status": "abandoned",
+          "kind": "exhibition",
+          "label": "Reflections in the Water (pre-V2 deployment, replaced)",
+          "replaced_by": "0x29C9E04E05c5d261836e458BC5B779a7dE3C58D6",
+          "deployed": "2021-10-26",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x63c8282C8705E7873B3302bd623b2Bc8eBCdDDD3",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Polyarrythmia",
+          "deployed": "2021-11-14",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xE5163c74fFE6563D75d750E5d767122500a1c337",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "P1×3L",
+          "deployed": "2021-11-14",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x1d5bdC75918600541C115b74b81a404C9E4AF7D4",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Instructions Follow",
+          "deployed": "2021-11-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x29C9E04E05c5d261836e458BC5B779a7dE3C58D6",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Reflections in the Water",
+          "deployed": "2021-11-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x7a15b36cB834AeA88553De69077D3777460d73Ac",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Unsupervised",
+          "deployed": "2021-11-24",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x28b51BA8B990c48CB22cB6EF0ad5415fdBA5210C",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Social Codes",
+          "deployed": "2021-12-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x43e808e2E9Dc5ff2f23d6bA15A6AbF995b34b737",
+          "status": "abandoned",
+          "kind": "exhibition",
+          "label": "Unsupervised (unused duplicate deployment)",
+          "replaced_by": "0x7a15b36cB834AeA88553De69077D3777460d73Ac",
+          "deployed": "2021-12-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x6E906B2E355294A6aeCD6B4F75816Eda9F703dda",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "The Long Cut",
+          "deployed": "2021-12-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x979316F5b3f3d8db956Af519553c853525A5b1Af",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Fragments of a Hologram Rose",
+          "deployed": "2021-12-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xaa02CC02F4531Ee75d1b78Cb5A155d4F3B54f830",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "The Bardo: Unpacking the Real",
+          "deployed": "2021-12-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xDB5f1aDCFFA1869B9711cBFBe3Bf46cc5d5319E5",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "–GRAPH",
+          "deployed": "2021-12-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xf1a843a2FCc17AF50c1b0667D7a96273cce37048",
+          "status": "abandoned",
+          "kind": "exhibition",
+          "label": "Social Codes (unused duplicate deployment)",
+          "replaced_by": "0x28b51BA8B990c48CB22cB6EF0ad5415fdBA5210C",
+          "deployed": "2021-12-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x6DBa130221A1C39f6623908A136976686050059a",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "For Your Eyes Only",
+          "deployed": "2021-12-23",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xD8eed224E1B358fa6f7b167124C2c1AFe42275b4",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Field Guide",
+          "deployed": "2022-01-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x513AC47320798fB6D74543242a9c0F686682998D",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Primordium",
+          "deployed": "2022-03-03",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x0A5c44da5F71B884c16A195CeC304F47ac0233CF",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Infinite Entropy",
+          "deployed": "2022-03-23",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x77219dF729a79F80d17c4c51dD6B2B54c25FeB45",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "EIP-2981 royalty override for Unsupervised, registered in the Royalty Registry",
+          "deployed": "2022-04-22",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x9294c5787f5BC7462E991fE8B6FeaC75F433ac39",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Ten Whistlegraphs",
+          "deployed": "2022-05-21",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x7A9Ea7C036F6aaB113E2563096ef1e0E56375A39",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "WETWARE",
+          "deployed": "2022-06-15",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xaDB387798599f5777CD0531c2ECb36007C1D1a51",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "On Screen Presence",
+          "deployed": "2022-06-21",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xA29a5824E2A52d15836f1780277d7218b0Ca244b",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2022-11-07",
+          "deployer": "0x2033606bE146405870F92Ea3144ef5057b9DEA48"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xD74745721E3b9c3D784F15bfBA2802fa2e9955d9",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "Scattered Limbs (Monument 01), Peter Burr, commissioned by Bitmark",
+          "deployed": "2022-11-08",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x6e82e4B398Ca4137007ba69ddD6FF699334d13b5",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Gray Matter",
+          "deployed": "2022-11-09",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x7E6c132B8cb00899d17750E0fD982EA122C6b0f2",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Mementos): Opening Celebration",
+          "deployed": "2022-11-17",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x22E130A4ef1eFfDdAFDF0b9825dc03D83747664e",
+          "status": "abandoned",
+          "kind": "exhibition",
+          "label": "Peer to Peer (first deployment, replaced)",
+          "replaced_by": "0x2A86C5466f088caEbf94e071a77669BAe371CD87",
+          "deployed": "2022-11-21",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x66a9c4873b21bEFB359a939e60f22a66025Cb337",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2022-11-24",
+          "deployer": "0x2033606bE146405870F92Ea3144ef5057b9DEA48"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x2A86C5466f088caEbf94e071a77669BAe371CD87",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Peer to Peer",
+          "deployed": "2022-11-26",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xB14b42814895FC1B0A528a475f8A5b070eB4c671",
+          "status": "live",
+          "kind": "annex",
+          "label": "Peer to Peer (Launch Party)",
+          "deployed": "2022-11-29",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x14a62abFEC0e09159fBE9c050F3B03044fC7ea52",
+          "status": "live",
+          "kind": "lot",
+          "label": "BOOM TOWN Monopoly Set: a token minted so the BOOM TOWN auction of 14 December 2022 could sell one edition of every work in the show as one lot; a stand-in for that lot, not an artwork",
+          "token_id": "23036679589663440554974536202901764979138118108482058082262678602930902118311",
+          "metadata_cid": "QmU5Vdnoq7MtFCjbMfm2qg1iAKU8nLaKdPRNrKwbEtCvzZ",
+          "image_cid": "QmczFs519SY5g5NXcHnNmYuwxuBoM7xFQizV4ipdWHz2xp",
+          "deployed": "2022-12-12",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x6003994adECA13407E8dbEE808280CC3EF2ab820",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "BOOM TOWN",
+          "deployed": "2022-12-14",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xE46A41b840176b62983FC71162dc9faEAC4D9bcB",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "I KNOW – On the aesthetic of truth",
+          "deployed": "2023-01-26",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xA6af782ce0733c370C57f9AA80044B3FA3525Db1",
+          "status": "completed",
+          "kind": "infrastructure",
+          "label": "Batch transfer contract that sent USDC payouts, February to May 2023 (earlier deployment)",
+          "deployed": "2023-01-27",
+          "deployer": "0x2033606bE146405870F92Ea3144ef5057b9DEA48"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x803ddB7184707e2E1B9757987287e9915F645AC9",
+          "status": "completed",
+          "kind": "infrastructure",
+          "label": "Batch transfer contract that sent USDC payouts, April to July 2023",
+          "deployed": "2023-02-01",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x8f30722dd16BD63cF2665C383c1aEf5e307B0046",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Material Wonderland",
+          "deployed": "2023-02-15",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xc4f0ee96676D3de800b9725eb628DE1C5a0CBea1",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Chain Reaction",
+          "deployed": "2023-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xe59B7D60d7d7183E09d8ABb6DF8B20EB4CF66632",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "BLOOMCORE",
+          "deployed": "2023-04-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x3B49B4b69C85c176f7B94a82EE5812AE068E161F",
+          "status": "abandoned",
+          "kind": "exhibition",
+          "label": "COLORS OF NOISE (first deployment, replaced)",
+          "replaced_by": "0xD156b0297f33Ddd706Ddeb018371FFDf02868e79",
+          "deployed": "2023-05-16",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x559fE9Fe5E2DAE7A7ae5766457096E6d7C647A46",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Burn): Data Universe — MoMA — 2D",
+          "deployed": "2023-05-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x700d9fD5B66A82B587f2AfDd90832B2E1B8BF281",
+          "status": "completed",
+          "kind": "infrastructure",
+          "label": "The contract that ran the Unsupervised burn at MoMA, May 18–22, 2023: each call burned a collector's Unsupervised editions and minted the burned work to the same wallet",
+          "deployed": "2023-05-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x864acd083AEE4Af4047C6b541684EF6E0BBB96F6",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Unused deployment",
+          "deployed": "2023-05-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x9D6c8e4B348999A69eE24285cd81226f4628e8F8",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Burn): Machine Hallucinations — MoMA Dreams",
+          "deployed": "2023-05-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xc490888997d65df70FE69f33BA3bf7C8D12989CF",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Burn): Data Universe — MoMA — 3D",
+          "deployed": "2023-05-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xD156b0297f33Ddd706Ddeb018371FFDf02868e79",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "COLORS OF NOISE",
+          "deployed": "2023-05-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xfD9FdFAC71Bbc7DD5C7176644De7Fbfd1A6825ee",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "In/Visible",
+          "deployed": "2023-06-07",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x377d8E26d145c9ba0db766A0A577baBa9de9eC17",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "The Experiment",
+          "deployed": "2023-06-16",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x455464F0d369dAC13002e81e9fAB857f6aD21795",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Sales vault (signed-sale funds)",
+          "deployed": "2023-07-20",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x60d0e7d2Ce6558d0a993693c4612fF9a642C5433",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2023-07-20",
+          "deployer": "0x8f3dB771cF012e2A81B1a8915c287A5e7A30056B"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x80104aB2486bfEd5FF8DE5Df930D37d3888e330C",
+          "status": "abandoned",
+          "kind": "infrastructure",
+          "label": "Sales vault (first deployment, replaced)",
+          "replaced_by": "0x455464F0d369dAC13002e81e9fAB857f6aD21795",
+          "deployed": "2023-07-20",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xF51bFC40C10289246e5BBa7afEDeB8cF976c3250",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "N=12",
+          "deployed": "2023-07-20",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x835dF7CC88D8BC51FCbb6a7FDED0BBE1ec020273",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "In Medias Res",
+          "deployed": "2023-08-17",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x772A3C476461C041FeAC146A86113d7b14712653",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "SuperBridge Summit Dubai",
+          "deployed": "2023-10-16",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xBb12686c360e9057be3CD031140035A705e19ceC",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Truth",
+          "deployed": "2023-10-17",
+          "deployer": "0x4F269268d46917f502f01018DC76C24636a067F7"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xD6e4739bC1E2DeDE16C05Aa694e0d7880d16c8f9",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2023-10-24",
+          "deployer": "0x2033606bE146405870F92Ea3144ef5057b9DEA48"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x87355Eb83C0772e1d96C1BbfD03c5e05A872197e",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2023-11-15",
+          "deployer": "0x4F269268d46917f502f01018DC76C24636a067F7"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xCE85Fa385A6d6F6c3B709cD7aa2DB116d3e1Ac6D",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "English auction contract",
+          "deployed": "2023-11-15",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xacd3392e9Ec2C4D876D09DC38cb52F842Ea58096",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "+GRAPH",
+          "deployed": "2023-11-16",
+          "deployer": "0x4F269268d46917f502f01018DC76C24636a067F7"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x051E50D8465417e58899FD48C3b0Fc0CA3Dd4B6a",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "DATALAND: Rainforest – WEF 2024 Memento, Refik Anadol",
+          "deployed": "2024-01-14",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x4Ce2B581D96d264294D79D7C25F86b18d3A24d4a",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Machine Hallucinations — Coral — Generative AI Data Painting, Refik Anadol (Aorist)",
+          "deployed": "2024-01-25",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x7acC33c09Beec2C2636Ec7D161e59b0582d78854",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Machine Hallucinations — Coral — Artificial Reef, Refik Anadol (Aorist)",
+          "deployed": "2024-01-25",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xd99b40C0a6D12463877839e88D7bF43C779FFe2f",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Machine Hallucinations: Coral Dreams, Refik Anadol (Aorist)",
+          "deployed": "2024-01-25",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x2F4AcB48bB2aA86D7B25e9181fa83b68b4cB8368",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "The Smell of Pink (Earth) #8, Andrés Reisinger (Aorist)",
+          "deployed": "2024-02-01",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x8Ac67db7A4eeBD437AeF868180521b78A9E08911",
+          "status": "abandoned",
+          "kind": "stewarded",
+          "label": "Take Over, Andrés Reisinger (Aorist; never minted)",
+          "deployed": "2024-02-01",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x9d611547E79653c008F31462780Fa2aa8838ce8a",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Breathing Language, Andrés Reisinger (Aorist)",
+          "deployed": "2024-02-01",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xB986E7f84F20db1cbf2f96c54f58E7C2dfaac9E5",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "The Wither, Andrés Reisinger (Aorist)",
+          "deployed": "2024-02-01",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x98BEb1dC755571fd24408170B0cC26aC98137ECc",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "The Smell of Pink, Andrés Reisinger (Aorist)",
+          "deployed": "2024-02-02",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x1080aF531dacEdc66a1911651E2b29506beCFe33",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Mushroom Cloud, Nancy Baker Cahill (Aorist)",
+          "deployed": "2024-03-05",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x22fd0C0C719745742EE4C822bf16E03bbB421305",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Hall of Visions, Pilar Zeta (Aorist)",
+          "deployed": "2024-03-05",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x86f66C89AAB96Cc08C5e360974f2a33e8521b88E",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Coral Arena, OMA/Shohei Shigematsu, Charlotte Taylor & Nicholas Préaud (Aorist, 2022 release)",
+          "deployed": "2024-03-05",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xCC063e7e05a7Fef0fd9fA09E140c7899aa7120fc",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Jardins d’Été, Quayola (Aorist, 2021 release)",
+          "deployed": "2024-03-05",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xdb8aCAB6e01A9A217F9cBB377510231045a24d5C",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "The Adventures of Minoriea, Auriea Harvey (Aorist)",
+          "deployed": "2024-03-05",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x2aE96770e163b048EeE28E73EfB374b1303b207F",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Effets de Soir, Quayola (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x3bCCA9ea3836456A9A2EB27b051B0FA28614667a",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Arcadia (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x5ca5789De0E9aaC2a5dE5689064727c4d1cd5E6f",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "What Lies Beneath: Tipping Point, Carlos Betancourt & Studio Brasch (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x69a7F2671598102331cCb44240F88F4B5F85e7E3",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "MVP (Generation 1, 32 versions), Jonas Lund (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x78C08a730D63A14305C1B0cde46A9d6233F4D458",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "STONE SPEAKS, Nancy Baker Cahill (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xa507077d630665334cD8Dc62a5fa3614000e099e",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Coral Rd, Leandro Erlich (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xB1676Ce832c0D47A39F79db7ad8698FCbd38cBb4",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Social Sacrifice, DRIFT (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xe96ae79a97fc839a1ab7C6382CC8F547C43D1d71",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Sphere in Open Platonic Solids, Joanie Lemercier (Aorist)",
+          "deployed": "2024-03-06",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x1D9787369B1DCf709f92Da1d8743c2A4b6028a83",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "SOUND MACHINES",
+          "deployed": "2024-03-13",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x30F4D17baB0C815519c5d924ac4735be14eb25EC",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Owner data registry (data collectors attach to their editions)",
+          "deployed": "2024-03-13",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x6906F2F1591E22ca320330712af68288eFc2426d",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Jardins d’Été, Quayola (Aorist, 2022 release)",
+          "deployed": "2024-04-23",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xFd79fB1749b72f04a5A956D93182cf75c6667dCD",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "ODYSSEY, Andrés Reisinger (Aorist)",
+          "deployed": "2024-04-23",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x8a20fB6eb7e1D662b157Fc6eA0694972584C09BB",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "One to Zero",
+          "deployed": "2024-04-24",
+          "deployer": "0x4F269268d46917f502f01018DC76C24636a067F7"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xCC08D6a573d05e34b34A0440982798dB20B3Df98",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "CORAL ARENA, OMA/Shohei Shigematsu, Charlotte Taylor & Nicholas Préaud (Aorist, 2021 release)",
+          "deployed": "2024-04-26",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xBE0A4E26a156B2a60cF515E86b3Df9756DEE1952",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "crystalline work",
+          "deployed": "2024-06-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xcBFaf4BDE69C9b37835761E5228f9fe9E25b452f",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Sales vault, version 2",
+          "deployed": "2024-06-18",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x3D62D2e75E2EF2A860235e3A46250011DB70F988",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Unused deployment (no code at the address)",
+          "deployed": "2024-06-25",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x81c882c59799eA442317D020c39174AaAa8d7FC7",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "CRAWL",
+          "deployed": "2024-07-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x5D303A17883C442603B8afb54921d1b7DCc0C831",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "流れのパターン / Patterns of Flow",
+          "deployed": "2024-09-24",
+          "deployer": "0x4F269268d46917f502f01018DC76C24636a067F7"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x393F21C615314a346c383cCE4D708a8ee270a312",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "[[chromatophores]], Sofia Crespo",
+          "deployed": "2024-10-30",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x5CF20FB8A4451F24B2c915f8929b8AfF999f1044",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Take Over Madrid, Andrés Reisinger (Aorist)",
+          "deployed": "2024-10-30",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x90A6CA6B6F7C3C1DAf738B0780A4bE9C6E7893CF",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Breathing Language (Garden of Impatience), Andrés Reisinger (Aorist)",
+          "deployed": "2024-10-30",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x96F6Ba69671e3cBC2B532727D892efd030548F0f",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Temporally Uncaptured, Sofia Crespo",
+          "deployed": "2024-10-30",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xBcB540b58e4e2b0e41E68b26B9DCEAb4E3b4c993",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Take Over Miami, Andrés Reisinger (Aorist)",
+          "deployed": "2024-10-30",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xFA95BF4C4cB0F1CC6e86191218f89b84d03E1A59",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Collide, Andrés Reisinger",
+          "deployed": "2024-10-30",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xfed46F583C3F61a5b48882C5AF56A94a5F096f12",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Artificial Natural History, Sofia Crespo",
+          "deployed": "2024-10-30",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xFfE213c3faA18B4B80aC1658C363D471dC745886",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "E-volved Formulae",
+          "deployed": "2024-11-30",
+          "deployer": "0x4F269268d46917f502f01018DC76C24636a067F7"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x92152733cec744c049ea7629F4Cbd7af7C43C9F7",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Artificial Natural History, Sofia Crespo (December 2024 contract)",
+          "deployed": "2024-12-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xa61459a983eE69e25082a2f8D934e89E04d8f158",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Temporally Uncaptured, Sofia Crespo (December 2024 contract)",
+          "deployed": "2024-12-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xe4a36A09eE456aBa9DE430F0488A782C04f5139d",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Neural Zoo, Sofia Crespo (December 2024 contract)",
+          "deployed": "2024-12-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x5310590A5D73F79A564d00bBD38b87c3844EDDae",
+          "status": "abandoned",
+          "kind": "infrastructure",
+          "label": "Series indexer (never used)",
+          "deployed": "2025-01-14",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x6b7f2E36f2c4044d8A87b66bEac7Aff59460030c",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "self-contained, Entangled Others",
+          "deployed": "2025-01-14",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xB745A2cd00f7983C71134d6f713c4E8c003Aff51",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Decohering Delineation, Entangled Others",
+          "deployed": "2025-01-14",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x8Dae078b56ec37cdf4B71CffAc21572cCE8873eD",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Merkle root registry",
+          "deployed": "2025-02-10",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x3892F76bA32C77A1a04CB0bcd848D9472d859716",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "a2p (Fall 2019 season, a2p-v1)",
+          "deployed": "2025-02-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xc3ECD59Ba5eC8dd2865dFFCe7bc7c2B60aDb62bf",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "a2p (Spring 2020 season, a2p-v2)",
+          "deployed": "2025-02-19",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x614d5475FE81ef4b6Dd8093b5C73EfEEE03167e0",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Console Spirituality",
+          "deployed": "2025-06-23",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x8930D48776B7Ff4797Bf56f3C43F5BED43912aaD",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Byte library linked by Console Spirituality",
+          "deployed": "2025-06-23",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xC26220dE03166947E9CfC170a03DA09ecC5b6465",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "On-chain renderer library linked by Console Spirituality",
+          "deployed": "2025-06-23",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x10049DCae04C3f4b4afd9beBd96dba8AdBaec170",
+          "status": "live",
+          "kind": "minted-for-artist",
+          "label": "Neural Zoo, Sofia Crespo",
+          "deployed": "2025-07-21",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x115C9A6118bC7a3EB0aBD30f6BCF1C45Bb198AEd",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Net Evil",
+          "deployed": "2025-08-20",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x67E3ad1902A55074AAdD84d9b335105B2D52b813",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "StarQuest",
+          "deployed": "2025-11-17",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x32c07ADE321B90813220F5064842B1F34A59f322",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Ex Nihilo",
+          "deployed": "2026-03-10",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xA741D850B8B4e684c6F78e9615BD5b33B37AcFcF",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Feral File Safe (2-of-3 multisig vault)",
+          "deployed": "2026-07-13",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x9aF574cafe2C14161DEC1eAC11F7F2c281fCa34e",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Feral File Archive Registry (records the current Archive manifest)",
+          "deployed": "2026-08-05",
+          "deployer": "0x7BF12Dc499F42f1050E22835d8447C86e274d486"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0xD1b52beE57FB7e31Ed50122cC1eeb6a4673D9Eae",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Most Valuable Painting",
+          "deployed": "2026-09-08",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x62Afc81fa951754B84b8e7590e0E569A04433f51",
+          "status": "abandoned",
+          "kind": "stewarded",
+          "label": "Coral Burn (first deployment, replaced; Aorist)",
+          "replaced_by": "0x95bd8229F3492c274Fba64d5F65fE4715152E6EB",
+          "deployed": "2026-10-16",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "eip155:1",
+          "address": "0x95bd8229F3492c274Fba64d5F65fE4715152E6EB",
+          "status": "live",
+          "kind": "stewarded",
+          "label": "Machine Hallucinations — Coral — Emergence (Coral Burn), Refik Anadol (Aorist)",
+          "deployed": "2026-10-17",
+          "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1P3ZJZVVrATfVWsyb5zfhFTHF3KWrLWZRC",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2022-07-21",
+          "deployer": "tz1Td5qwQxz5mDZiwk7TsRGhDU2HBvXgULip"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1QWATcHYpBVDxvNoxw5CbkaMGpjm4SxXa2",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2022-07-21",
+          "deployer": "tz1Td5qwQxz5mDZiwk7TsRGhDU2HBvXgULip"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1QBAUEkXSqZ7HvM95XZYmCmHLcmME9kjiv",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Tezos Profiles identity record for the Feral File deployer wallet",
+          "deployed": "2022-07-27",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1RnhKKsAD7ScFi3Nb7HKK2hnPCqXcbNG3k",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "gämma",
+          "deployed": "2022-07-27",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1U1KFWkAR8ea9GUi8fAH1jPKRMmAHJLhpN",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Doppelganger",
+          "deployed": "2022-08-24",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1WgvCKC8vvjbAYEgaXHo9A6GprKDyaw7N3",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Ecotone",
+          "deployed": "2022-09-12",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1GbUx4MFBWHi3YhofDDvDYyeDeqahpKAGD",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Harbingers",
+          "deployed": "2022-09-23",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1EyVFCmLFqzgwSBNbdnwfqGeCPRWPvH9QF",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2022-10-18",
+          "deployer": "tz1Td5qwQxz5mDZiwk7TsRGhDU2HBvXgULip"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1K3iG87Kf1YrZkANwoMkawCkAePVjVTr5B",
+          "status": "abandoned",
+          "kind": "test",
+          "label": "Test deployment",
+          "deployed": "2022-10-19",
+          "deployer": "tz1Td5qwQxz5mDZiwk7TsRGhDU2HBvXgULip"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1Q4SBM941oAeu69v8LsrfwSiEkhMWJiVrp",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Simulation Sketchbook: Works in Process",
+          "deployed": "2022-10-19",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1Mkhkz1XLSAxdadViQCjnaRLpWzfdxyWHM",
+          "status": "live",
+          "kind": "annex",
+          "label": "Simulation Sketchbook: Works in Process (Catalog)",
+          "deployed": "2022-10-20",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1TNsJJKYqxdVAwcZKXzgypGU2kainW3gJm",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "MoMA R&D Salon 40: The Third Web — Ma'Dear, Stephanie Dinkins",
+          "deployed": "2022-10-24",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1F6EKvGq8CKJhgsBy3GUJMSS9KPKn1UD5D",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "Luxembourg Art Week — Aleksandra Jovanić",
+          "deployed": "2022-11-08",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1CPeE8YGVG16xkpoE9sviUYoEzS7hWfu39",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Mementos): Memento 1 — Opening Day",
+          "deployed": "2022-11-18",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1EVV7LqSE79UxTiQ2LJpa6UeFwPnrrCfnz",
+          "status": "abandoned",
+          "kind": "annex",
+          "label": "Peer to Peer (Launch Party), Tezos deployment never minted",
+          "replaced_by": "eip155:1:0xB14b42814895FC1B0A528a475f8A5b070eB4c671",
+          "deployed": "2022-11-29",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1RcZU4sphiF4b2mxW7zGkrfV8S2puKBFT3",
+          "status": "live",
+          "kind": "annex",
+          "label": "Peer to Peer (Catalog)",
+          "deployed": "2022-11-29",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1U49F46ZRK2WChpVpkUvwwQme7Z595V3nt",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Mementos): Memento 2 — Installation",
+          "deployed": "2022-12-21",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1C4wjLiVNb4Mdn2DAQNqipfKhQiGEQK1ou",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "WETWARE (Tezos editions)",
+          "deployed": "2023-01-17",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1Q3GCiWndMUWBjeUt12crnDFF9PFohhfmZ",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Reflections in the Water (Tezos editions)",
+          "deployed": "2023-01-17",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1WqfumoJbfSjhNnzzj2ZCbMCWHJvvU1nkz",
+          "status": "abandoned",
+          "kind": "exhibition",
+          "label": "Field Guide (Tezos, first deployment, never minted)",
+          "replaced_by": "KT1CnEoyTFyJaLR3CB6N5Avw91fp4Q6bvS8x",
+          "deployed": "2023-01-17",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1TkBmhjz65awMWoPBvmtfBCcVnwaXXTrmy",
+          "status": "live",
+          "kind": "annex",
+          "label": "I KNOW – On the aesthetic of truth (Memento)",
+          "deployed": "2023-01-25",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1CnEoyTFyJaLR3CB6N5Avw91fp4Q6bvS8x",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "Field Guide (Tezos editions)",
+          "deployed": "2023-02-02",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT19rZLpAurqKuDXtkMcJZWvWqGJz1CwWHzr",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Mementos): Memento 3 — Installation",
+          "deployed": "2023-02-22",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1CtDPiLjHiU1LVLrhshDry8jkR9h29tXNo",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "LeeMullican.PCX",
+          "deployed": "2023-03-21",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1KzEtNm6Bb9qip8trTsnBohoriH2g2dvc7",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Mementos): Memento 4 — Installation",
+          "deployed": "2023-03-27",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1JCd3QHFgNZRatQuniDi8evTtyuhKFb3DC",
+          "status": "live",
+          "kind": "exhibition",
+          "label": "FeralVerse",
+          "deployed": "2023-04-05",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1CVdPp5gNAVQrgb8fymn6ExJjc1piYrkK2",
+          "status": "abandoned",
+          "kind": "partner-edition",
+          "label": "Culture3 x TED (first deployment, never minted)",
+          "replaced_by": "KT1WCvekSUUYhGsxtXT7V4nZpsQYm7QQ2kRz",
+          "deployed": "2023-04-14",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1KrufZwVx2pyE21tD7hJ1XfaNCkfbCcajH",
+          "status": "abandoned",
+          "kind": "partner-edition",
+          "label": "Melody Figments (first deployment, never minted)",
+          "replaced_by": "KT1WcodfxnvtFzorTnK7Co1dcEBoVa3XunJ4",
+          "deployed": "2023-04-14",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1WcodfxnvtFzorTnK7Co1dcEBoVa3XunJ4",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "Melody Figment No. 002, MF Dynamics",
+          "deployed": "2023-04-14",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1WCvekSUUYhGsxtXT7V4nZpsQYm7QQ2kRz",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "Culture3 x TED in Vancouver",
+          "deployed": "2023-04-14",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1RWFkvQPkhjxQQzg1ZvS2EKbprbkAdPRSc",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Mementos): Memento 5 — Installation",
+          "deployed": "2023-05-24",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1VNooU9Nrj6hB1SwTkCA5yFXJxjZQCtBRM",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "Wedgwood Portland Vase NFT",
+          "deployed": "2023-05-29",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1EghRcdQM3qR6QYytkoccgVYDdQ1cnW9cb",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "Third World: The Bottom Dimension – FUNFUN: LOOK AWAY, Gabriel Massan and Serpentine",
+          "deployed": "2023-06-22",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1X7i8EeQHChQ2cKGVthHrBS2jsPLSDWoEw",
+          "status": "live",
+          "kind": "annex",
+          "label": "Unsupervised (Mementos): Memento 6 — Installation",
+          "deployed": "2023-07-04",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT19VkuK7tw22m4P36xRpPiMT4qzEw8YAN8A",
+          "status": "live",
+          "kind": "partner-edition",
+          "label": "Memento Structures of Being Mapping, Casa Batlló (Sofia Crespo)",
+          "deployed": "2024-01-27",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
+        },
+        {
+          "chain": "tezos:mainnet",
+          "address": "KT1FSypR2be51BdEdoWDaca5V5aUWy6EGLou",
+          "status": "live",
+          "kind": "infrastructure",
+          "label": "Feral File TzSafe (2-of-3 multisig vault)",
+          "deployed": "2026-07-14",
+          "deployer": "tz1af6xXFXVZnttqpVjnwFdza6g8LKUiT25K"
         }
       ]
     }
