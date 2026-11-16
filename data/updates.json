@@ -66,7 +66,7 @@
  },
  {
   "date": "2026-11-16",
-  "title": "Archive manifest version 4 is on Ethereum: the 2023 Retrospective and every contract Feral File deployed",
+  "title": "Archive manifest version 4 is on Ethereum: the 2023 Retrospective and 155 contracts Feral File deployed",
   "body": "The Feral File Safe executed setManifest for the 2026-11-15 build (tx 0x9bbb83a88834c0b160cb35b01c18485c4755d8af14f0bcc35742980f7db3b473). The manifest, CID bafkreidqfe6zjz5e74m7rrhxumqiayxc4wk5a2ketmoh7ai7ixtioaqk7q, keeps version 3's 236 entries and adds two collections. The Feral File Retrospective, the second-anniversary show of 2023: the signed playlists of The Experiment and Feral File 1.0, the retrospective's website as Feral File served it (162 files), and the 100 messages of the chat beside it, each with its time, its sender's address and the name the chat showed; the page is now feralfile.com/retrospective. And the contracts: 155 that Feral File's deployer wallets created on Ethereum (119) and Tezos (36), each listed by address as live (128), completed (3) or abandoned (24), with its kind; the evidence per contract is in data/contracts-evidence-2026-11-15.md. Version 3 stays readable on-chain through historyAt(2) and the new manifest names it as its predecessor. Pinned on the archival node and on a second machine and byte-checked through ipfs.feralfile.com before signing."
  }
 ]
