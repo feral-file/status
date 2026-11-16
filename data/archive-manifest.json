@@ -2318,7 +2318,7 @@
     },
     {
       "id": "the-feral-file-retrospective",
-      "description": "The Feral File Retrospective, Feral File's second anniversary (June 28 to July 12, 2023): the signed playlists of its two exhibitions, The Experiment and Feral File 1.0; the retrospective's own website, 162 files, as Feral File served it; and the conversation artists and collectors had in the chat beside it, the 100 messages that site kept, each with its time, its sender's address and the name the chat showed. The page is at https://feralfile.com/retrospective.",
+      "description": "The Feral File Retrospective, Feral File's second anniversary in 2023: the signed playlists of its two exhibitions, The Experiment and Feral File 1.0; the retrospective's own website, 162 files, as Feral File served it; and the conversation artists and collectors had in the chat beside it, the 100 messages that site kept, each with its time, its sender's address and the name the chat showed. The page is at https://feralfile.com/retrospective.",
       "items": [
         {
           "label": "The Experiment, signed playlist",
@@ -3246,7 +3246,7 @@
           "address": "0x92152733cec744c049ea7629F4Cbd7af7C43C9F7",
           "status": "live",
           "kind": "minted-for-artist",
-          "label": "Artificial Natural History, Sofia Crespo (December 2024 contract)",
+          "label": "Artificial Natural History, Sofia Crespo (second contract)",
           "deployed": "2024-12-19",
           "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
         },
@@ -3255,7 +3255,7 @@
           "address": "0xa61459a983eE69e25082a2f8D934e89E04d8f158",
           "status": "live",
           "kind": "minted-for-artist",
-          "label": "Temporally Uncaptured, Sofia Crespo (December 2024 contract)",
+          "label": "Temporally Uncaptured, Sofia Crespo (second contract)",
           "deployed": "2024-12-19",
           "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
         },
@@ -3264,7 +3264,7 @@
           "address": "0xe4a36A09eE456aBa9DE430F0488A782C04f5139d",
           "status": "live",
           "kind": "minted-for-artist",
-          "label": "Neural Zoo, Sofia Crespo (December 2024 contract)",
+          "label": "Neural Zoo, Sofia Crespo (first contract)",
           "deployed": "2024-12-19",
           "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
         },
