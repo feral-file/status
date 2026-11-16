@@ -183,7 +183,7 @@
   },
   {
    "id": "contracts",
-   "description": "Every contract Feral File deployed on Ethereum and Tezos and what each one is, so anyone indexing Feral File's works can tell which deployment is current. Status: live, the contract of record for its works or a tool in use; completed, a tool that did its job and stopped, holding no works; abandoned, deployed and then replaced or never used, with its replacement named where there is one. Kind: exhibition; annex, a section of an exhibition's page; partner-edition, minted for someone else's event; stewarded, the Aorist and a2p collections Feral File keeps; minted-for-artist, minted at an artist's request outside any exhibition; lot, a token that stood in for an auction lot, not an artwork; infrastructure; test, an internal deployment never published. The Monopoly Set entry names its token and the CIDs of its metadata and image.",
+   "description": "The contracts Feral File deployed on Ethereum and Tezos, except one registry that has never been used, and what each one is, so anyone indexing Feral File's works can tell which deployment is current. Status: live, the contract of record for its works or a tool in use; completed, a tool that did its job and stopped, holding no works; abandoned, deployed and then replaced or never used, with its replacement named where there is one. Kind: exhibition; annex, a section of an exhibition's page; partner-edition, minted for someone else's event; stewarded, the Aorist and a2p collections Feral File keeps; minted-for-artist, minted at an artist's request outside any exhibition; lot, a token that stood in for an auction lot, not an artwork; infrastructure; test, an internal deployment never published. The Monopoly Set entry names its token and the CIDs of its metadata and image.",
    "items": [
     {
      "chain": "eip155:1",
@@ -455,7 +455,7 @@
      "address": "0x14a62abFEC0e09159fBE9c050F3B03044fC7ea52",
      "status": "live",
      "kind": "lot",
-     "label": "BOOM TOWN Monopoly Set: a token minted so the BOOM TOWN auction of 14 December 2022 could sell one edition of every work in the show as one lot; a stand-in for that lot, not an artwork",
+     "label": "BOOM TOWN Monopoly Set: a token that stood in for the 2022 BOOM TOWN auction lot of one edition of every work in the show; not an artwork",
      "token_id": "23036679589663440554974536202901764979138118108482058082262678602930902118311",
      "metadata_cid": "QmU5Vdnoq7MtFCjbMfm2qg1iAKU8nLaKdPRNrKwbEtCvzZ",
      "image_cid": "QmczFs519SY5g5NXcHnNmYuwxuBoM7xFQizV4ipdWHz2xp",
@@ -485,7 +485,7 @@
      "address": "0xA6af782ce0733c370C57f9AA80044B3FA3525Db1",
      "status": "completed",
      "kind": "infrastructure",
-     "label": "Batch transfer contract that sent USDC payouts, February to May 2023 (earlier deployment)",
+     "label": "Batch transfer contract for USDC payouts (earlier deployment)",
      "deployed": "2023-01-27",
      "deployer": "0x2033606bE146405870F92Ea3144ef5057b9DEA48"
     },
@@ -494,7 +494,7 @@
      "address": "0x803ddB7184707e2E1B9757987287e9915F645AC9",
      "status": "completed",
      "kind": "infrastructure",
-     "label": "Batch transfer contract that sent USDC payouts, April to July 2023",
+     "label": "Batch transfer contract for USDC payouts",
      "deployed": "2023-02-01",
      "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
     },
@@ -558,7 +558,7 @@
      "address": "0x864acd083AEE4Af4047C6b541684EF6E0BBB96F6",
      "status": "abandoned",
      "kind": "test",
-     "label": "Unused deployment",
+     "label": "Test deployment",
      "deployed": "2023-05-18",
      "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
     },
@@ -982,7 +982,7 @@
      "address": "0x3D62D2e75E2EF2A860235e3A46250011DB70F988",
      "status": "abandoned",
      "kind": "test",
-     "label": "Unused deployment (no code at the address)",
+     "label": "Test deployment",
      "deployed": "2024-06-25",
      "deployer": "0x1d05cf6c6BEb0c869851BFdb9510D4E44E855ad6"
     },

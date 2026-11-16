@@ -86,12 +86,13 @@ def main():
     manifest = {
         "name": "Feral File Archive",
         "description": (
-            "Copies of the artworks and records Feral File preserves. Each "
-            "entry has a content identifier (CID), an address made from its "
-            "files' contents, which IPFS software uses to check that what it "
-            "downloads matches. Anyone can keep a copy by pinning a CID, and "
-            "every independent copy helps preserve the works. Published by "
-            "Feral File; the "
+            "Copies of the artworks and records Feral File preserves, and "
+            "the contracts Feral File deployed. Each copy has a content "
+            "identifier (CID), an address made from its files' contents, "
+            "which IPFS software uses to check that what it downloads "
+            "matches; each contract is listed by its address. Anyone can keep "
+            "a copy by pinning a CID, and every independent copy helps "
+            "preserve the works. Published by Feral File; the "
             "Feral File Archive Registry on Ethereum records which version of "
             "this document is current."
         ),
